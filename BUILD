@@ -1,13 +1,21 @@
 cc_library(
     name = "gpio",
-    srcs = ["gpio.cc"],
-    hdrs = ["include/gpio.h"],
+    srcs = [],
+    hdrs = [
+	    "include/gpio.h",
+	    "include/am335x/gpio.h",
+	    ],
+    deps = [
+	    ":soc",
+	    ],
+    visibility = ["//visibility:public"],
 )
 
-cc_binary(
-    name = "hello-world",
-    srcs = ["src/gpio.cc"],
-    deps = [
-        ":hello-greet",
-    ],
+cc_library(
+    name = "soc",
+    srcs = [],
+    hdrs = [
+	    "include/soc.h",
+	    ],
+    visibility = ["//visibility:public"],
 )
