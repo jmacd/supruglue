@@ -1,7 +1,10 @@
 #include "include/gpio.h"
 #include "gtest/gtest.h"
 
-TEST(SocTest, WordSize) {
-  // This is a 32-bit platform
-  EXPECT_EQ(sizeof(uint32_t), WORDSZ);
+const uint32_t allbits = 0xffffffff;
+
+TEST(GpioTest, Output) {
+  GPIO_BANK1[GPIOREG_CLEARDATAOUT] = allbits;
+
+  EXPECT_EQ(allbits, GPIO_BANK1[GPIOREG_DATAOUT]);
 }

@@ -1,21 +1,37 @@
 cc_library(
-    name = "gpio",
+    name = "supruglue",
     srcs = [],
-    hdrs = [
-	    "include/gpio.h",
-	    "include/am335x/gpio.h",
-	    ],
-    deps = [
-	    ":soc",
-	    ],
-    visibility = ["//visibility:public"],
+    hdrs = ["supruglue/gpio.h",
+	    "supruglue/soc.h",],
 )
 
 cc_library(
-    name = "soc",
-    srcs = [],
-    hdrs = [
-	    "include/soc.h",
-	    ],
-    visibility = ["//visibility:public"],
+    name = "test",
+    srcs = ["test/soc.cc",
+	    "test/gpio.cc"],
+    copts = ["-Isupruglue/test"],
+    hdrs = ["supruglue/test/include/gpio.h",
+	    "supruglue/test/include/soc.h",],
+    deps = [":supruglue",],
+    testonly = 1,
+)
+
+cc_test(
+    name = "gpio_test",
+    srcs = ["test/gpio_test.cc"],
+    copts = ["-Isupruglue/test"],
+    deps = [
+        "@gtest//:gtest_main",
+        ":test",
+    ],
+)
+
+cc_test(
+    name = "soc_test",
+    srcs = ["test/soc_test.cc"],
+    copts = ["-Isupruglue/test"],
+    deps = [
+        "@gtest//:gtest_main",
+        ":test",
+    ],
 )
