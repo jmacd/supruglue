@@ -16,14 +16,11 @@
 
 #define GPIO_NUM_BANKS 4
 
-#define GPIO_BANK0 (&_SOC_gpio0)
-#define GPIO_BANK1 (&_SOC_gpio1)
-#define GPIO_BANK2 (&_SOC_gpio2)
-#define GPIO_BANK3 (&_SOC_gpio3)
+#define GPIO_BANK_N(soc, n) (&(soc)->gpio_banks[n])
 
-extern supruglue_gpio _SOC_gpio0;
-extern supruglue_gpio _SOC_gpio1;
-extern supruglue_gpio _SOC_gpio2;
-extern supruglue_gpio _SOC_gpio3;
+#define GPIO_BANK0(soc) GPIO_BANK_N(soc, 0)
+#define GPIO_BANK1(soc) GPIO_BANK_N(soc, 1)
+#define GPIO_BANK2(soc) GPIO_BANK_N(soc, 2)
+#define GPIO_BANK3(soc) GPIO_BANK_N(soc, 3)
 
 #endif // SUPRUGLUE_TEST_SUPRUGLUE_GPIO_H

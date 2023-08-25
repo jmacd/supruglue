@@ -1,12 +1,9 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+extern "C" {
 #include "include/gpio.h"
-
-supruglue_gpio _SOC_gpio0;
-supruglue_gpio _SOC_gpio1;
-supruglue_gpio _SOC_gpio2;
-supruglue_gpio _SOC_gpio3;
+}
 
 void GPIO_SetRegister(supruglue_gpio *g, int r, uint32_t v) {
   switch (r) {

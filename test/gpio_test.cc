@@ -1,19 +1,17 @@
-#include "include/gpio.h"
 #include "gtest/gtest.h"
+
+extern "C" {
+#include "include/gpio.h"
+}
 
 const uint32_t allbits = 0xffffffff;
 const uint32_t halfbits = 0x0ff00ff0;
 
-supruglue_gpio *allGPIOs[GPIO_NUM_BANKS] = {
-    GPIO_BANK0,
-    GPIO_BANK1,
-    GPIO_BANK2,
-    GPIO_BANK3,
-};
-
 TEST(GpioTest, Output) {
+  supruglue_test_system *ts = Test_New_SOC();
+
   for (int i = 0; i < GPIO_NUM_BANKS; i++) {
-    supruglue_gpio *gpio = allGPIOs[i];
+    supruglue_gpio *gpio = &ts->gpio_banks[i];
 
     // Clear al bits
     GPIO_SetRegister(gpio, GPIOREG_CLEARDATAOUT, allbits);

@@ -6,14 +6,16 @@
 
 #include <stdint.h>
 
+#include "supruglue/gpio.h"
 #include "supruglue/soc.h"
 
 #define WORDSZ sizeof(uint32_t)
 
 typedef struct {
+  supruglue_gpio *gpio_banks;
 } supruglue_test_system;
 
-extern supruglue_test_system _SOC;
+supruglue_test_system *Test_New_SOC();
 
 void Test_Panic(const char *str);
 

@@ -8,10 +8,10 @@
 #include "supruglue/gpio.h"
 
 // See table 2.2 of the TRM for these addresses.
-#define GPIO_BANK0 ((supruglue_gpio *)0x44e07000)
-#define GPIO_BANK1 ((supruglue_gpio *)0x4804c000)
-#define GPIO_BANK2 ((supruglue_gpio *)0x481ac000)
-#define GPIO_BANK3 ((supruglue_gpio *)0x481ae000)
+#define GPIO_BANK0(soc) ((supruglue_gpio *)0x44e07000)
+#define GPIO_BANK1(soc) ((supruglue_gpio *)0x4804c000)
+#define GPIO_BANK2(soc) ((supruglue_gpio *)0x481ac000)
+#define GPIO_BANK3(soc) ((supruglue_gpio *)0x481ae000)
 
 // See TRM 25.4.1.
 
