@@ -15,4 +15,6 @@ typedef struct {
 
 extern supruglue_test_system _SOC;
 
+void Test_Panic(const char *str);
+
 #endif // SUPRUGLUE_TEST_SUPRUGLUE_SOC_H
