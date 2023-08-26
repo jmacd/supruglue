@@ -1,0 +1,50 @@
+cc_library(
+    name = "supruglue",
+    srcs = [],
+    hdrs = [
+        "supruglue/gpio.h",
+        "supruglue/soc.h",
+    ],
+    copts = ["-g"],
+)
+
+cc_library(
+    name = "test",
+    testonly = 1,
+    srcs = [
+        "test/gpio.cc",
+        "test/soc.cc",
+    ],
+    hdrs = [
+        "supruglue/test32/include/gpio.h",
+        "supruglue/test32/include/soc.h",
+    ],
+    copts = [
+        "-Isupruglue/test32",
+        "-g",
+    ],
+    deps = [":supruglue"],
+)
+
+cc_test(
+    name = "gpio_test",
+    srcs = ["test/gpio_test.cc"],
+    copts = [
+        "-Isupruglue/test32",
+        "-g",
+    ],
+    deps = [
+        ":test",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "soc_test",
+    srcs = ["test/soc_test.cc"],
+    copts = ["-Isupruglue/test32"],
+    deps = [
+        ":test",
+        "@gtest//:gtest_main",
+    ],
+)
