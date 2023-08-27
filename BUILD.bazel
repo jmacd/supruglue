@@ -5,7 +5,7 @@ cc_library(
         "supruglue/gpio.h",
         "supruglue/soc.h",
     ],
-    copts = ["-g"],
+    copts = [],
 )
 
 cc_library(
@@ -18,10 +18,27 @@ cc_library(
     hdrs = [
         "supruglue/test32/include/gpio.h",
         "supruglue/test32/include/soc.h",
+	":pinmap_test32_gen",
     ],
     copts = [
         "-Isupruglue/test32",
-        "-g",
+        "-Ibazel-out/supruglue/test32",
+    ],
+    deps = [":supruglue"],
+)
+
+cc_library(
+    name = "am335x",
+    srcs = [
+    ],
+    hdrs = [
+        "supruglue/am335x/include/gpio.h",
+        "supruglue/am335x/include/soc.h",
+        ":pinmap_am335x_gen",
+    ],
+    copts = [
+        "-Isupruglue/am335x",
+        "-Ibazel-out/supruglue/am335x",
     ],
     deps = [":supruglue"],
 )
@@ -31,7 +48,6 @@ cc_test(
     srcs = ["test/gpio_test.cc"],
     copts = [
         "-Isupruglue/test32",
-        "-g",
     ],
     deps = [
         ":test",
@@ -47,4 +63,37 @@ cc_test(
         ":test",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_test(
+    name = "pinmap_test",
+    srcs = ["test/pinmap_test.cc"],
+    copts = ["-Isupruglue/test32"],
+    deps = [
+        ":test",
+        "@gtest//:gtest_main",
+    ],
+)
+
+genrule(
+  name = "pinmap_test32_gen",
+  outs = ["supruglue/test32/include/pinmap.h"],
+  cmd = "./$(location //tools/cmd/pinmap:pinmap) test32 $(location :arch_files) > $@",
+  tools = ["//tools/cmd/pinmap:pinmap"],
+  srcs = [":arch_files"],
+)
+
+genrule(
+  name = "pinmap_am335x_gen",
+  outs = ["supruglue/am335x/include/pinmap.h"],
+  cmd = "./$(location //tools/cmd/pinmap:pinmap) am335x $(location :arch_files) > $@",
+  tools = ["//tools/cmd/pinmap:pinmap"],
+  srcs = [":arch_files"],
+)
+
+filegroup(
+    name = "arch_files",
+    srcs = glob([
+        "arch/*.csv",
+    ]),
 )
