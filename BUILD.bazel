@@ -4,6 +4,7 @@ cc_library(
     hdrs = [
         "supruglue/gpio.h",
         "supruglue/soc.h",
+        "supruglue/pinmap.h",
     ],
     copts = [],
 )
