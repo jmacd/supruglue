@@ -1,3 +1,4 @@
+Name,Addr,Mode0,Mode1,Mode2,Mode3,Mode4,Mode5,Mode6,Mode7,GpioNum,Name2
 P8_1,GND,,,,,,,,,,P8_1
 P8_2,GND,,,,,,,,,,P8_2
 P8_3,0x818,gpmc_ad6,mmc1_dat6,,,,,,gpio1_6,38,P8_3
@@ -91,4 +92,4 @@ P9_42.1,0x9A0,mcasp0_aclkr,eQEP0A_in,mcasp0_axr2,mcasp1_aclkx,mmc0_sdwp,pr1_pru0
 P9_43,GND,,,,,,,,,,P9_43
 P9_44,GND,,,,,,,,,,P9_44
 P9_45,GND,,,,,,,,,,P9_45
-P9_46,GND,,,,,,,,,,
+P9_46,GND,,,,,,,,,,P9_46

@@ -18,7 +18,7 @@ cc_library(
     hdrs = [
         "supruglue/test32/include/gpio.h",
         "supruglue/test32/include/soc.h",
-	":pinmap_test32_gen",
+        ":pinmap_test32_gen",
     ],
     copts = [
         "-Isupruglue/test32",
@@ -76,19 +76,19 @@ cc_test(
 )
 
 genrule(
-  name = "pinmap_test32_gen",
-  outs = ["supruglue/test32/include/pinmap.h"],
-  cmd = "./$(location //tools/cmd/pinmap:pinmap) test32 $(location :arch_files) > $@",
-  tools = ["//tools/cmd/pinmap:pinmap"],
-  srcs = [":arch_files"],
+    name = "pinmap_test32_gen",
+    srcs = [":arch_files"],
+    outs = ["supruglue/test32/include/pinmap.h"],
+    cmd = "./$(location //tools/cmd/pinmap:pinmap) test32 $(location :arch_files) > $@",
+    tools = ["//tools/cmd/pinmap"],
 )
 
 genrule(
-  name = "pinmap_am335x_gen",
-  outs = ["supruglue/am335x/include/pinmap.h"],
-  cmd = "./$(location //tools/cmd/pinmap:pinmap) am335x $(location :arch_files) > $@",
-  tools = ["//tools/cmd/pinmap:pinmap"],
-  srcs = [":arch_files"],
+    name = "pinmap_am335x_gen",
+    srcs = [":arch_files"],
+    outs = ["supruglue/am335x/include/pinmap.h"],
+    cmd = "./$(location //tools/cmd/pinmap:pinmap) am335x $(location :arch_files) > $@",
+    tools = ["//tools/cmd/pinmap"],
 )
 
 filegroup(

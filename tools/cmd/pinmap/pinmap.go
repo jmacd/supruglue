@@ -1,45 +1,36 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"log"
 	"os"
-	"sort"
-	"strconv"
 	"strings"
-)
 
-type gpioNum struct {
-	bank int
-	bit  int
-}
+	"github.com/jmacd/supruglue/tools/internal/arch"
+	"github.com/jmacd/supruglue/tools/internal/csv"
+)
 
 func main() {
 	if len(os.Args) != 3 {
 		log.Fatal("usage: %s <arch> <pins.csv>\n", os.Args[0])
 	}
-	arch := os.Args[1]
+
+	hw := os.Args[1]
 	inp := os.Args[2]
 
-	switch arch {
+	switch hw {
 	case "test32":
 	case "am335x":
 	default:
-		log.Fatal("unknown arch: ", arch)
+		log.Fatal("unknown hardware: ", hw)
 	}
 
-	guard := strings.ToUpper("supruglue_" + arch + "_include_pinmap_h")
+	guard := strings.ToUpper("supruglue_" + hw + "_include_pinmap_h")
 
-	pins, err := ParsePins(inp)
+	pins, err := csv.ReadFile[arch.Pin](inp)
 	if err != nil {
-		log.Fatal("unknown arch: ", arch)
+		log.Fatal("parse pin file: ", err)
 	}
-	var spin []string
-	for pin := range pins {
-		spin = append(spin, pin)
-	}
-	sort.Strings(spin)
 
 	fmt.Printf(`// Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
@@ -54,58 +45,49 @@ func main() {
 #endif // %s
 `, inp, guard, guard, func() string {
 		var sb strings.Builder
-		for _, pin := range spin {
-			sb.WriteString("// ")
-			sb.WriteString(pin)
+		for _, pin := range pins {
+			if !pin.HasGpio() {
+				continue
+			}
+			gbank, err := pin.GpioBank()
+			if err != nil {
+				log.Fatal("gpio bank parse error: %s: %s", pin.Name, err)
+			}
+			gbit, err := pin.GpioBit()
+			if err != nil {
+				log.Fatal("gpio bank parse error: %s: %s", pin.Name, err)
+			}
+
+			cppname := pin.Name
+			cppname = strings.ReplaceAll(cppname, "-", "_")
+			cppname = strings.ReplaceAll(cppname, ".", "_")
+
 			sb.WriteString("\n")
+			sb.WriteString(fmt.Sprintf("// %s\n", pin.Name))
+
+			sb.WriteString("#define ")
+			sb.WriteString(cppname)
+			sb.WriteString(fmt.Sprint("_gpio_bank ", gbank, "\n"))
+
+			sb.WriteString("#define ")
+			sb.WriteString(cppname)
+			sb.WriteString(fmt.Sprint("_gpio_bit ", gbit, "\n"))
+
+			if pruNum, has := pin.PRUHasGpioFastOutput(); has {
+				fbit, err := pin.PRUGpioFastOutputBit()
+				if err != nil {
+					log.Fatal("gpio fast bit parse: %w", err)
+				}
+				sb.WriteString(fmt.Sprint("#define ", cppname, "_gpio_pru", pruNum, "_output_r30_bit ", fbit, "\n"))
+			}
+			if pruNum, has := pin.PRUHasGpioFastInput(); has {
+				fbit, err := pin.PRUGpioFastInputBit()
+				if err != nil {
+					log.Fatal("gpio fast bit parse: %w", err)
+				}
+				sb.WriteString(fmt.Sprint("#define ", cppname, "_gpio_pru", pruNum, "_input_r31_bit ", fbit, "\n"))
+			}
 		}
 		return sb.String()
 	}(), guard)
-}
-
-func ParsePins(pinFile string) (map[string]gpioNum, error) {
-	pin2gpio := map[string]gpioNum{}
-
-	f, err := os.Open(pinFile)
-	if err != nil {
-		return nil, fmt.Errorf("open %s: %w", pinFile, err)
-	}
-	pins, err := csv.NewReader(f).ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("read csv %s: %w", pinFile, err)
-	}
-	for _, row := range pins {
-		ps := row[0]
-		gs := row[9]
-		if !strings.HasPrefix(gs, "gpio") {
-			continue
-		}
-		pinAdd := 0
-		if strings.HasSuffix(ps, ".1") {
-			ps = ps[:len(ps)-2]
-			// This +50 convention is used in the fpp config file.
-			pinAdd = 50
-		}
-		hdr := ps[:2]
-		pinNum, err := strconv.Atoi(ps[3:])
-		if err != nil {
-			return nil, fmt.Errorf("invalid pin: %s", ps)
-		}
-		pin := fmt.Sprintf("%s-%02d", hdr, pinNum+pinAdd)
-
-		bank := int(gs[4] - '0')
-		if bank < 0 || bank > 3 {
-			return nil, fmt.Errorf("invalid gpio: %s", gs)
-		}
-		bit, err := strconv.Atoi(gs[6:])
-		if err != nil {
-			return nil, fmt.Errorf("invalid gpio: %s", gs)
-		}
-
-		pin2gpio[pin] = gpioNum{
-			bank: bank,
-			bit:  bit,
-		}
-	}
-	return pin2gpio, nil
 }

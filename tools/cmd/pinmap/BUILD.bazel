@@ -5,6 +5,10 @@ go_library(
     srcs = ["pinmap.go"],
     importpath = "github.com/jmacd/supruglue/tools/cmd/pinmap",
     visibility = ["//visibility:private"],
+    deps = [
+        "//tools/internal/arch",
+        "//tools/internal/csv",
+    ],
 )
 
 go_binary(
