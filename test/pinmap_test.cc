@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "supruglue/pinmap.h"
+#include "supruglue/test32/gpio.h"
 #include "supruglue/test32/pinmap.h"
 }
 

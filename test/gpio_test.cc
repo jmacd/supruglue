@@ -8,10 +8,10 @@ const uint32_t allbits = 0xffffffff;
 const uint32_t halfbits = 0x0ff00ff0;
 
 TEST(GpioTest, Output) {
-  supruglue_test_system *ts = Test_New_SOC();
+  test_system *ts = Test_New_SOC();
 
-  for (int i = 0; i < GPIO_NUM_BANKS; i++) {
-    supruglue_gpio *gpio = &ts->gpio_banks[i];
+  for (int i = 0; i < GPIO_NUM_REGISTERS; i++) {
+    gpio_register *gpio = &ts->gpio_banks[i];
 
     // Clear al bits
     GPIO_SetRegister(gpio, GPIOREG_CLEARDATAOUT, allbits);

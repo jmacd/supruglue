@@ -16,6 +16,6 @@ TEST(SocTest, NumWords) {
 }
 
 TEST(SocTest, TestSOC) {
-  supruglue_test_system *ts = Test_New_SOC();
+  test_system *ts = Test_New_SOC();
   EXPECT_NE(ts, nullptr);
 }

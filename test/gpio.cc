@@ -5,7 +5,7 @@ extern "C" {
 #include "supruglue/test32/gpio.h"
 }
 
-void GPIO_SetRegister(supruglue_gpio *g, int r, uint32_t v) {
+void GPIO_SetRegister(gpio_register *g, int r, uint32_t v) {
   switch (r) {
   case GPIOREG_CLEARDATAOUT:
     *g &= ~v;
@@ -24,7 +24,7 @@ void GPIO_SetRegister(supruglue_gpio *g, int r, uint32_t v) {
   }
 }
 
-uint32_t GPIO_GetRegister(supruglue_gpio *g, int r) {
+uint32_t GPIO_GetRegister(gpio_register *g, int r) {
   switch (r) {
   case GPIOREG_DATAOUT:
     return *g;

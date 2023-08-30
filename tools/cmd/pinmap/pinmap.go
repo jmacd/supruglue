@@ -40,6 +40,8 @@ func main() {
 #ifndef %s
 #define %s
 
+#include "supruglue/pinmap.h"
+
 %s
 
 #endif // %s

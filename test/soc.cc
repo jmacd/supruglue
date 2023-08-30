@@ -13,8 +13,8 @@ void Test_Panic(const char *str) {
   *ptr = 0;
 }
 
-supruglue_test_system *Test_New_SOC() {
-  supruglue_test_system *ts = new supruglue_test_system();
-  ts->gpio_banks = new supruglue_gpio[GPIO_NUM_BANKS]();
+test_system *Test_New_SOC() {
+  test_system *ts = new test_system();
+  ts->gpio_banks = new gpio_register[GPIO_NUM_REGISTERS]();
   return ts;
 }

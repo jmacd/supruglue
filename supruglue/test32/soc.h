@@ -12,10 +12,10 @@
 #define WORDSZ sizeof(uint32_t)
 
 typedef struct {
-  supruglue_gpio *gpio_banks;
-} supruglue_test_system;
+  gpio_register *gpio_banks;
+} test_system;
 
-supruglue_test_system *Test_New_SOC();
+test_system *Test_New_SOC();
 
 void Test_Panic(const char *str);
 
