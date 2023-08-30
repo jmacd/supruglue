@@ -4,6 +4,8 @@
 #ifndef SUPRUGLUE_GPIO_H
 #define SUPRUGLUE_GPIO_H
 
+#include <stdint.h>
+
 typedef uint32_t supruglue_gpio;
 
 void GPIO_SetRegister(supruglue_gpio *g, int r, uint32_t v);

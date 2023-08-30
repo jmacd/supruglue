@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 extern "C" {
-#include "include/gpio.h"
+#include "supruglue/test32/gpio.h"
 }
 
 void GPIO_SetRegister(supruglue_gpio *g, int r, uint32_t v) {

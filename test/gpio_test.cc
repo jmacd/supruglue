@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "include/gpio.h"
+#include "supruglue/test32/gpio.h"
 }
 
 const uint32_t allbits = 0xffffffff;

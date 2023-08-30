@@ -5,10 +5,10 @@
 
 extern "C" {
 #include "supruglue/pinmap.h"
-#include "supruglue/test32/include/pinmap.h"
+#include "supruglue/test32/pinmap.h"
 }
 
-TEST(PinMapTest, Macros) {
+TEST(PinMapTest, GpioMacros) {
   EXPECT_EQ(3, GPIO_PIN_TO_BANK(P9_25));
   EXPECT_EQ(21, GPIO_PIN_TO_BIT(P9_25));
 

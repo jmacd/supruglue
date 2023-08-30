@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "include/soc.h"
+#include "soc.h"
 #include "supruglue/gpio.h"
 
 #define GPIOREG_CLEARDATAOUT 0

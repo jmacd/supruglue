@@ -4,7 +4,7 @@
 #ifndef SUPRUGLUE_AM335X_GPIO_H
 #define SUPRUGLUE_AM335X_GPIO_H
 
-#include "include/soc.h"
+#include "soc.h"
 #include "supruglue/gpio.h"
 
 // See table 2.2 of the TRM for these addresses.

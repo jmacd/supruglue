@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "include/soc.h"
+#include "soc.h"
 }
 
 TEST(SocTest, WordSize) {

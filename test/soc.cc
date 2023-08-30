@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 extern "C" {
-#include "include/soc.h"
-#include "include/gpio.h"
+#include "supruglue/test32/soc.h"
 #include "stdio.h"
+#include "supruglue/test32/gpio.h"
 }
 
 void Test_Panic(const char *str) {
