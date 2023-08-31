@@ -75,6 +75,10 @@ func main() {
 			sb.WriteString(cppname)
 			sb.WriteString(fmt.Sprint("_gpio_bit ", gbit, "\n"))
 
+			sb.WriteString("#define ")
+			sb.WriteString(cppname)
+			sb.WriteString(fmt.Sprint("_gpio_register(soc) GPIO_REGISTER", gbank, "(soc)\n"))
+
 			if pruNum, has := pin.PRUHasGpioFastOutput(); has {
 				fbit, err := pin.PRUGpioFastOutputBit()
 				if err != nil {

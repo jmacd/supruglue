@@ -20,4 +20,7 @@ typedef struct {
 int GPIO_GetPin(gpio_pin pin);
 void GPIO_SetPin(gpio_pin pin, int value);
 
+#define GPIO_PIN(soc, pin)                                                                                             \
+  gpio_pin { .reg = GPIO_PIN_TO_REGISTER(soc, pin), .bit = GPIO_PIN_TO_BIT(pin) }
+
 #endif // SUPRUGLUE_GPIO_H
