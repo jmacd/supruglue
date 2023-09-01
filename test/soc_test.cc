@@ -1,8 +1,5 @@
+#include "supruglue/test32/soc.h"
 #include "gtest/gtest.h"
-
-extern "C" {
-#include "soc.h"
-}
 
 TEST(SocTest, WordSize) {
   int sz = sizeof(uint32_t);
@@ -16,6 +13,6 @@ TEST(SocTest, NumWords) {
 }
 
 TEST(SocTest, TestSOC) {
-  test_system *ts = Test_New_SOC();
+  test_system *ts = new test_system;
   EXPECT_NE(ts, nullptr);
 }

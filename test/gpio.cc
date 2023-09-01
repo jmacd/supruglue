@@ -1,9 +1,7 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-extern "C" {
 #include "supruglue/test32/gpio.h"
-}
 
 void GPIO_SetRegister(gpio_register *g, int r, uint32_t v) {
   switch (r) {
@@ -20,7 +18,7 @@ void GPIO_SetRegister(gpio_register *g, int r, uint32_t v) {
     break;
 
   default:
-    Test_Panic("set register");
+    throw std::invalid_argument("unknown gpio register");
   }
 }
 
@@ -30,7 +28,7 @@ uint32_t GPIO_GetRegister(gpio_register *g, int r) {
     return *g;
 
   default:
-    Test_Panic("get register");
+    throw std::invalid_argument("unknown gpio register");
   }
   return 0;
 }

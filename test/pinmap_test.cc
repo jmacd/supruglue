@@ -1,15 +1,12 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "gtest/gtest.h"
-
-extern "C" {
 #include "supruglue/test32/gpio.h"
 #include "supruglue/test32/pinmap.h"
-}
+#include "gtest/gtest.h"
 
 TEST(PinMapTest, GpioMacros) {
-  test_system *soc = Test_New_SOC();
+  test_system *soc = new test_system;
 
   EXPECT_EQ(3, GPIO_PIN_TO_BANK(P9_25));
   EXPECT_EQ(21, GPIO_PIN_TO_BIT(P9_25));
