@@ -9,6 +9,7 @@ cc_library(
         "-Ibazel-out/supruglue/test32",
     ],
     visibility = ["//visibility:public"],
+    target_compatible_with = ["//tools/toolchain:test32"],
 )
 
 genrule(

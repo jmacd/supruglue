@@ -98,17 +98,44 @@ def _impl(ctx):
         ],
     )
 
+    sysroot_feature = feature(
+        name = "sysroot",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.linkstamp_compile,
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.cpp_module_codegen,
+                    ACTION_NAMES.lto_backend,
+                    ACTION_NAMES.clif_match,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-I=%{sysroot}/include"],
+                        expand_if_available = "sysroot",
+                    ),
+                ],
+            ),
+        ],
+    )
+    
     random_seed_feature = feature(
         name = "random_seed",
         enabled = False,
     )
     
-    features = [dependency_file_feature, include_paths_feature, random_seed_feature]
+    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature]
     
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
+        builtin_sysroot = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3",
         cxx_builtin_include_directories = [
-            "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/include",
+            # couldn't make this work, see sysroot_feature
         ],
         toolchain_identifier = "pru-toolchain",
         host_system_name = "local",

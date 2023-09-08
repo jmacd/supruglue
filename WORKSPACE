@@ -43,5 +43,3 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 # gazelle:prefix github.com/jmacd/supruglue
 
 gazelle_dependencies()
-
-
