@@ -43,3 +43,19 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 # gazelle:prefix github.com/jmacd/supruglue
 
 gazelle_dependencies()
+
+# see https://stackoverflow.com/questions/58937356/bazel-relative-local-path-as-url-in-http-archive
+#http_archive(
+#    name = "ti-cgt-pru",
+#    url = "file://tools/download/ti_cgt_pru_2.3.3_linux_installer_x86.tar.gz",
+#    sha256 = "b5fe14f178e4b074ddfbdc711a59dbe5bf80e9d95c5a366d20ef6f587a1af70e",
+#    build_file = "@//tools/download/ti-cgt-pru.BUILD.bazel"
+#)
+
+load("//tools/download:local.bzl", "local_archive")
+
+local_archive(
+    name = "ti-cgt-pru",
+    src = "//tools/download:ti_cgt_pru_2.3.3_linux_installer_x86.tar.gz",
+    build_file = "@//tools/download:ti-cgt-pru.BUILD.bazel"
+)

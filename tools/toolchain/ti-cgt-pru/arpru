@@ -1,0 +1,2 @@
+#!/bin/bash
+exec external/ti-cgt-pru/bin/arpru $@

@@ -11,18 +11,20 @@ load(
 )
 
 def _impl(ctx):
-    tool_paths = [ # NEW
+    # See https://stackoverflow.com/questions/73504780/bazel-reference-binaries-from-packages-in-custom-toolchain-definition
+    # about the wrappers used below.
+    tool_paths = [
         tool_path(
             name = "gcc",
-            path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/clpru"
+            path = "ti-cgt-pru/clpru"
         ),
         tool_path(
             name = "ld",
-            path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/clpru"
+            path = "ti-cgt-pru/clpru"
         ),
         tool_path(
             name = "ar",
-            path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/arpru"
+            path = "ti-cgt-pru/arpru"
         ),
         tool_path(
             name = "cpp",
@@ -133,7 +135,7 @@ def _impl(ctx):
     
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
-        builtin_sysroot = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3",
+        #builtin_sysroot = "/Users/josh.macdonald/src/ti-cgt-pru-2.3.3",
         cxx_builtin_include_directories = [
             # couldn't make this work, see sysroot_feature
         ],
