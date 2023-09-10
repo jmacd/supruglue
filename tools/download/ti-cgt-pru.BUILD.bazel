@@ -3,8 +3,7 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "all_files",
     srcs = glob([
-        "external/ti-cgt-pru/include/*",
-        "external/ti-cgt-pru/bin/*",
-        "external/ti-cgt-pru/lib/*",
+        "ti-cgt-pru/include/*",
+        "ti-cgt-pru/lib/*",
         ]),
     )

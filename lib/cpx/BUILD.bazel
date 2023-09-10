@@ -7,5 +7,5 @@ cc_library(
     ],
     hdrs = [
 	"CorePartition.h",
-    ],
+	],
 )

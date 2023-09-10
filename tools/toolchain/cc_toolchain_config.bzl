@@ -12,19 +12,23 @@ load(
 
 def _impl(ctx):
     # See https://stackoverflow.com/questions/73504780/bazel-reference-binaries-from-packages-in-custom-toolchain-definition
-    # about the wrappers used below.
+    # Problem is that the tools in the archive are for the wrong OS, so we use the local
+    # non-hermetic tools with hermetic copies of the include files.
     tool_paths = [
         tool_path(
             name = "gcc",
             path = "ti-cgt-pru/clpru"
+            # path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/clpru"
         ),
         tool_path(
             name = "ld",
             path = "ti-cgt-pru/clpru"
+            # path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/clpru"
         ),
         tool_path(
             name = "ar",
             path = "ti-cgt-pru/arpru"
+            #path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/arpru"
         ),
         tool_path(
             name = "cpp",
@@ -118,7 +122,7 @@ def _impl(ctx):
                 ],
                 flag_groups = [
                     flag_group(
-                        flags = ["-I=%{sysroot}/include"],
+                        flags = ["-Iexternal/ti-cgt-pru/include"],
                         expand_if_available = "sysroot",
                     ),
                 ],
@@ -135,14 +139,16 @@ def _impl(ctx):
     
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
-        #builtin_sysroot = "/Users/josh.macdonald/src/ti-cgt-pru-2.3.3",
+        #builtin_sysroot = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3",
+        #builtin_sysroot = "external/ti-cgt-pru",
+        builtin_sysroot = "FAKE",
         cxx_builtin_include_directories = [
-            # couldn't make this work, see sysroot_feature
+            "%package(@ti-cgt-pru//include)%",
         ],
         toolchain_identifier = "pru-toolchain",
         host_system_name = "local",
-        target_system_name = "local",
-        target_cpu = "pru",
+        target_system_name = "pruss",
+        target_cpu = "pruss",
         target_libc = "unknown",
         compiler = "clpru",
         abi_version = "unknown",

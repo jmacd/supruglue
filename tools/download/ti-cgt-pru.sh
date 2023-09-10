@@ -37,12 +37,12 @@ docker exec -ti ${PID} /usr/bin/apt-get install -y gcc-multilib
 
 # Run the installer
 docker exec -ti ${PID} bash -c "/data/${INPUT} << EOM
-/pru-cgt
+/ti-cgt-pru
 Y
 EOM
 "
 
-docker exec -ti ${PID} tar -czvf /data/${OUTPUT}.tmp /pru-cgt/{bin,include,lib}
+docker exec -ti ${PID} tar -C /ti-cgt-pru -czvf /data/${OUTPUT}.tmp {include,lib}
 docker exec -ti ${PID} mv /data/${OUTPUT}.tmp /data/${OUTPUT}
 
 trap "docker rm -f ${PID}" EXIT

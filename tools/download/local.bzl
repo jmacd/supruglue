@@ -6,6 +6,7 @@ local_archive = repository_rule(
     attrs = {
         "src": attr.label(mandatory = True, allow_single_file = True),
         "build_file": attr.label(mandatory = True, allow_single_file = True),
-    },
+	},
+    local = True,
     implementation = _local_archive_impl,
 )
