@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # This would be a little more elegant using a Dockerfile!
-# Probably Bazel could do even better.
+# And then we could use the Linux binaries in Docker.  TODO I stopped,
+# the ti_cgt_pru_2.3.3_osx_installer_x86_64.tar.gz is hand-crafted.
 
 SOURCE=https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-FaNNGkDH7s/2.3.3/ti_cgt_pru_2.3.3_linux_installer_x86.bin
 SUM=abb76fac986993aafaf467915985ec4f

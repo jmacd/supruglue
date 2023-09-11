@@ -123,7 +123,31 @@ def _impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = ["-Iexternal/ti-cgt-pru/include"],
-                        expand_if_available = "sysroot",
+                    ),
+                    # flag_group(
+                    #     flags = ["-k"],
+                    # ),
+                ],
+            ),
+        ],
+    )
+
+    linker_flags_feature = feature(
+        name = "linker_flags",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.cpp_link_executable,
+                    ACTION_NAMES.cpp_link_dynamic_library,
+                    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                    ACTION_NAMES.lto_index_for_executable,
+                    ACTION_NAMES.lto_index_for_dynamic_library,
+                    ACTION_NAMES.lto_index_for_nodeps_dynamic_library,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-z"],
                     ),
                 ],
             ),
@@ -135,13 +159,10 @@ def _impl(ctx):
         enabled = False,
     )
     
-    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature]
+    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature, linker_flags_feature]
     
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
-        #builtin_sysroot = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3",
-        #builtin_sysroot = "external/ti-cgt-pru",
-        builtin_sysroot = "FAKE",
         cxx_builtin_include_directories = [
             "%package(@ti-cgt-pru//include)%",
         ],
