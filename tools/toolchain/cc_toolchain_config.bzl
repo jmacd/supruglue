@@ -18,17 +18,14 @@ def _impl(ctx):
         tool_path(
             name = "gcc",
             path = "ti-cgt-pru/clpru"
-            # path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/clpru"
         ),
         tool_path(
             name = "ld",
-            path = "ti-cgt-pru/clpru"
-            # path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/clpru"
+            path = "ti-cgt-pru/lnkpru"
         ),
         tool_path(
             name = "ar",
             path = "ti-cgt-pru/arpru"
-            #path = "/Users/josh.macdonald/src/ti-pru-cgt-2.3.3/bin/arpru"
         ),
         tool_path(
             name = "cpp",

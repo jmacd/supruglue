@@ -1,2 +1,13 @@
 #!/bin/bash
-exec external/ti-cgt-pru/bin/clpru $@
+ARGS=
+for x in $@; do
+    if [ "$x" = "-c" ]; then
+	ARGS="${ARGS} -c"
+    elif [ "$x" = "-o" ]; then
+	ARGS="${ARGS} -fe"
+    else
+	ARGS="${ARGS} ${x}"
+    fi
+done
+echo Running external/ti-cgt-pru/bin/clpru ${ARGS}
+exec external/ti-cgt-pru/bin/clpru ${ARGS}
