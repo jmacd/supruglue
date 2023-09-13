@@ -2,10 +2,10 @@
 ARGS=
 for x in $@; do
     if [ "$x" = "rcsD" ]; then
-	ARGS="${ARGS}"
+	ARGS="${ARGS} rs0"
     else
 	ARGS="${ARGS} ${x}"
     fi
 done
 echo Running external/ti-cgt-pru/bin/arpru ${ARGS}
-exec external/ti-cgt-pru/bin/arpru $@
+exec external/ti-cgt-pru/bin/arpru ${ARGS}

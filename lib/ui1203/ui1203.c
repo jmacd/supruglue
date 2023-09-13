@@ -11,5 +11,5 @@ void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin clock, gpio_pin data) {
 
 void UI1203_Run_Reader(UI1203_Reader *rdr) {
   // Placeholder! @@@
-  printf("Running\n");
+  printf("Running!!\n");
 }

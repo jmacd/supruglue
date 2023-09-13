@@ -1,3 +1,4 @@
 #!/bin/bash
+>&2 echo "LNKPRU: PWD=\"$(pwd)\"; PATH=\"${PATH}\"."
 echo Running external/ti-cgt-pru/bin/lnkpru $@
 exec external/ti-cgt-pru/bin/lnkpru $@

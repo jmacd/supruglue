@@ -12,8 +12,6 @@ load(
 
 def _impl(ctx):
     # See https://stackoverflow.com/questions/73504780/bazel-reference-binaries-from-packages-in-custom-toolchain-definition
-    # Problem is that the tools in the archive are for the wrong OS, so we use the local
-    # non-hermetic tools with hermetic copies of the include files.
     tool_paths = [
         tool_path(
             name = "gcc",
@@ -121,9 +119,6 @@ def _impl(ctx):
                     flag_group(
                         flags = ["-Iexternal/ti-cgt-pru/include"],
                     ),
-                    # flag_group(
-                    #     flags = ["-k"],
-                    # ),
                 ],
             ),
         ],
@@ -143,8 +138,29 @@ def _impl(ctx):
                     ACTION_NAMES.lto_index_for_nodeps_dynamic_library,
                 ],
                 flag_groups = [
+                    #flag_group(
+                    #flags = ["-z"],
+                    # This is commented out b/c -z breaks the lnkpru command?
+                    #),
+                ],
+            ),
+        ],
+    )
+
+    strip_debug_symbols_feature = feature(
+        name = "strip_debug_symbols",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.cpp_link_executable,
+                    ACTION_NAMES.cpp_link_dynamic_library,
+                    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                ],
+                flag_groups = [
                     flag_group(
-                        flags = ["-z"],
+                        flags = ["-s"],
+                        expand_if_available = "strip_debug_symbols",
                     ),
                 ],
             ),
@@ -156,7 +172,7 @@ def _impl(ctx):
         enabled = False,
     )
     
-    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature, linker_flags_feature]
+    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature, linker_flags_feature, strip_debug_symbols_feature]
     
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
@@ -177,7 +193,7 @@ def _impl(ctx):
 
 cc_toolchain_config = rule(
     implementation = _impl,
-    attrs = {},
+    attrs = {
+    },
     provides = [CcToolchainConfigInfo],
 )
-
