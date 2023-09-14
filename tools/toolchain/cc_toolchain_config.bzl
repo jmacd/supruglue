@@ -15,15 +15,15 @@ def _impl(ctx):
     tool_paths = [
         tool_path(
             name = "gcc",
-            path = "ti-cgt-pru/clpru"
+            path = "wrappers/clpru"
         ),
         tool_path(
             name = "ld",
-            path = "ti-cgt-pru/lnkpru"
+            path = "wrappers/lnkpru"
         ),
         tool_path(
             name = "ar",
-            path = "ti-cgt-pru/arpru"
+            path = "wrappers/arpru"
         ),
         tool_path(
             name = "cpp",
@@ -138,10 +138,9 @@ def _impl(ctx):
                     ACTION_NAMES.lto_index_for_nodeps_dynamic_library,
                 ],
                 flag_groups = [
-                    #flag_group(
-                    #flags = ["-z"],
-                    # This is commented out b/c -z breaks the lnkpru command?
-                    #),
+                    flag_group(
+                        flags = ["-iexternal/ti-cgt-pru/lib", "--reread_libs"],
+                    ),
                 ],
             ),
         ],

@@ -1,9 +1,11 @@
 #!/bin/bash
 ARGS=
 CMD=clpru
+OUT=
 
 if [ "$1" = "-o" ]; then
     CMD=lnkpru
+    OUT=$2
 fi
 
 >&2 echo "CLPRU: PWD=\"$(pwd)\"; PATH=\"${PATH}\" ARG1=\"$1\" ARG2=\"$2\" CMD=$CMD"
@@ -20,10 +22,19 @@ for x in $@; do
 	fi
     elif [[ $x =~ \.a$ ]]; then
 	ARGS="${ARGS} --library=${x}"
+    elif [[ $x =~ \.lib$ ]]; then
+	ARGS="${ARGS} --library=${x}"
     else
 	ARGS="${ARGS} ${x}"
     fi
 done
+
+if [ "${CMD}" = "lnkpru" ]; then
+    ARGS="${ARGS} --library=external/ti-cgt-pru/lib/libc.a"
+    ARGS="${ARGS} --rom_model"
+    ARGS="${ARGS} --code_endian=little"
+    ARGS="${ARGS} -m${OUT}.map"
+fi
 
 echo Running external/ti-cgt-pru/bin/${CMD} ${ARGS}
 exec external/ti-cgt-pru/bin/${CMD} ${ARGS}

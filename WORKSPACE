@@ -52,10 +52,10 @@ gazelle_dependencies()
 #    build_file = "@//tools/download/ti-cgt-pru.BUILD.bazel"
 #)
 
-load("//tools/download:local.bzl", "local_archive")
+load("//tools/toolchain/download:local.bzl", "local_archive")
 
 local_archive(
     name = "ti-cgt-pru",
-    src = "//tools/download:ti_cgt_pru_2.3.3_osx_installer_x86_64.tar.gz",
-    build_file = "@//tools/download:ti-cgt-pru.BUILD.bazel"
+    src = "//tools/toolchain/download:ti_cgt_pru_2.3.3_osx_installer_x86_64.tar.gz",
+    build_file = "@//tools/toolchain:ti-cgt-pru.BUILD"
 )

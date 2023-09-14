@@ -7,5 +7,8 @@ cc_binary(
 cc_library(
     name = "example_lib",
     srcs = ["example.c"],
-    deps = ["//lib/ui1203"],
+    deps = [
+	    "//lib/ui1203",
+	    "//tools/toolchain:runtime",
+	    ],
 )

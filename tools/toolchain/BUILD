@@ -15,8 +15,17 @@ cc_toolchain_suite(
 filegroup(
     name = "wrappers_all",
     srcs = glob([
-        "ti-cgt-pru/*",
-    ]) + ["@ti-cgt-pru//:all_files"],
+        "wrappers/*",
+    ]) + [
+        "@ti-cgt-pru//:all_files",
+    ],
+)
+
+cc_library(
+    name = "runtime",
+    srcs = [
+        "@ti-cgt-pru//:libc_a",
+    ],
 )
 
 cc_toolchain(
