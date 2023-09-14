@@ -148,7 +148,7 @@ def _impl(ctx):
 
     strip_debug_symbols_feature = feature(
         name = "strip_debug_symbols",
-        enabled = True,
+        enabled = False,
         flag_sets = [
             flag_set(
                 actions = [

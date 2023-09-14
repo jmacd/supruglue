@@ -4,6 +4,7 @@ cc_binary(
     srcs = ["example.c"],
     deps = [
 	    "//lib/ui1203",
+	    "//lib/cpx",
 	    "//tools/toolchain/am335x:runtime",
 	    ],
     linkopts = [
