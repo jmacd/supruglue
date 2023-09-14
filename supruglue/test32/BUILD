@@ -1,0 +1,21 @@
+cc_library(
+    name = "test32",
+    hdrs = [
+	"gpio.h",
+	"soc.h",
+        ":pinmap_test32_gen",
+    ],
+    copts = [
+        "-Ibazel-out/supruglue/test32",
+    ],
+    visibility = ["//visibility:public"],
+    target_compatible_with = ["//tools/toolchain:test32"],
+)
+
+genrule(
+    name = "pinmap_test32_gen",
+    srcs = ["//arch"],
+    outs = ["pinmap.h"],
+    cmd = "./$(location //tools/cmd/pinmap:pinmap) test32 $(location //arch) > $@",
+    tools = ["//tools/cmd/pinmap"],
+)

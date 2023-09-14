@@ -1,0 +1,40 @@
+#!/bin/bash
+ARGS=
+CMD=clpru
+OUT=
+
+if [ "$1" = "-o" ]; then
+    CMD=lnkpru
+    OUT=$2
+fi
+
+#>&2 echo "CLPRU: PWD=\"$(pwd)\"; PATH=\"${PATH}\" ARG1=\"$1\" ARG2=\"$2\" CMD=$CMD"
+
+for x in $@; do
+    if [ "$x" = "-c" ]; then
+	ARGS="${ARGS} -c"
+    elif [ "$x" = "-o" ]; then
+	if [ "${CMD}" = "clpru" ]; then
+	    ARGS="${ARGS} -fe"
+	else
+	    ARGS="${ARGS} -o"
+	fi
+    elif [[ $x =~ \.a$ ]]; then
+	ARGS="${ARGS} ${x}"
+    elif [[ $x =~ \.lib$ ]]; then
+	ARGS="${ARGS} ${x}"
+    else
+	ARGS="${ARGS} ${x}"
+    fi
+done
+
+if [ "${CMD}" = "lnkpru" ]; then
+    ARGS="${ARGS} --ram_model"
+    ARGS="${ARGS} --code_endian=little"
+    ARGS="${ARGS} -m${OUT}.map"
+else
+    ARGS="${ARGS} -v3 -O2 --display_error_number --endian=little --hardware_mac=on"
+fi
+
+echo Running external/ti-cgt-pru/bin/${CMD} ${ARGS}
+exec external/ti-cgt-pru/bin/${CMD} ${ARGS}
