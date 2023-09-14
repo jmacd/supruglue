@@ -7,5 +7,5 @@ for x in $@; do
 	ARGS="${ARGS} ${x}"
     fi
 done
-echo Running external/ti-cgt-pru/bin/arpru ${ARGS}
+#echo Running external/ti-cgt-pru/bin/arpru ${ARGS}
 exec external/ti-cgt-pru/bin/arpru ${ARGS}

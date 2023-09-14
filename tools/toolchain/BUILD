@@ -21,13 +21,6 @@ filegroup(
     ],
 )
 
-cc_library(
-    name = "runtime",
-    srcs = [
-        "@ti-cgt-pru//:libc_a",
-    ],
-)
-
 cc_toolchain(
     name = "pru_toolchain",
     toolchain_identifier = "pru-toolchain",

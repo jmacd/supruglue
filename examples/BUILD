@@ -1,14 +1,15 @@
 
 cc_binary(
     name = "example",
-    deps = [":example_lib"],
-)
-
-cc_library(
-    name = "example_lib",
     srcs = ["example.c"],
     deps = [
 	    "//lib/ui1203",
-	    "//tools/toolchain:runtime",
+	    "//tools/toolchain/am335x:runtime",
 	    ],
+    linkopts = [
+        "$(location //tools/toolchain/am335x:cmd)",
+    ],
+    additional_linker_inputs = [
+        "//tools/toolchain/am335x:cmd",
+    ],
 )
