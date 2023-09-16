@@ -10,7 +10,11 @@ filegroup(
 cc_library(
     name = "runtime",
     srcs = [
-            "@ti-cgt-pru//:libc_a",
+        "@ti-cgt-pru//:libc_a",
+    ],
+    deps = [
+        "@ti-pru-support//:rpmsg",
+	"@ti-pru-support//:am335x",
     ],
 )
 

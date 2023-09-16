@@ -59,3 +59,12 @@ local_archive(
     src = "//tools/toolchain/download:ti_cgt_pru_2.3.3_osx_installer_x86_64.tar.gz",
     build_file = "@//tools/toolchain:ti-cgt-pru.BUILD"
 )
+
+# PRU software support
+git_repository(
+    name = "ti-pru-support",
+    remote = "git://git.ti.com/pru-software-support-package/pru-software-support-package.git",
+    tag = "v6.2.0",
+    build_file = "@//tools/toolchain:ti-pru-support.BUILD"
+)
+
