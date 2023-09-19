@@ -61,10 +61,17 @@ local_archive(
 )
 
 # PRU software support
+# git_repository(
+#     name = "ti-pru-support",
+#     remote = "git://git.ti.com/pru-software-support-package/pru-software-support-package.git",
+#     tag = "v6.2.0",
+#     build_file = "@//tools/toolchain:ti-pru-support.BUILD"
+# )
+
+# This fork of the above has a few workarounds.
 git_repository(
     name = "ti-pru-support",
-    remote = "git://git.ti.com/pru-software-support-package/pru-software-support-package.git",
-    tag = "v6.2.0",
-    build_file = "@//tools/toolchain:ti-pru-support.BUILD"
+    remote = "git@github.com:jmacd/pru-software-support-package.git",
+    #branch = "jmacd/6_2_0_BUILD",
+    commit = "8b6be8452639a981e77428de9890a638d1e72e27",
 )
-

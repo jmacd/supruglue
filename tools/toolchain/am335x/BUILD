@@ -12,9 +12,10 @@ cc_library(
     srcs = [
         "@ti-cgt-pru//:libc_a",
     ],
+    copts = [
+        "-Iexternal/ti-pru-support/include",
+    ],
     deps = [
-        "@ti-pru-support//:rpmsg",
-	"@ti-pru-support//:am335x",
+        "@ti-pru-support//include",
     ],
 )
-
