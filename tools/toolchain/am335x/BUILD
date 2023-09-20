@@ -8,14 +8,12 @@ filegroup(
 )
 
 cc_library(
-    name = "runtime",
+    name = "am335x",
     srcs = [
         "@ti-cgt-pru//:libc_a",
     ],
-    copts = [
-        "-Iexternal/ti-pru-support/include",
-    ],
     deps = [
         "@ti-pru-support//include",
+        "@ti-pru-support//lib/src/rpmsg_lib",
     ],
 )

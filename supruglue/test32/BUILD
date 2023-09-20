@@ -9,7 +9,10 @@ cc_library(
         "-Ibazel-out/supruglue/test32",
     ],
     visibility = ["//visibility:public"],
-    target_compatible_with = ["//tools/toolchain:test32"],
+    target_compatible_with = select({
+        "//tools/toolchain:am335x": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 genrule(

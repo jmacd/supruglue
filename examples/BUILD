@@ -5,7 +5,7 @@ cc_binary(
     deps = [
 	    "//lib/ui1203",
 	    "//lib/cpx",
-	    "//tools/toolchain/am335x:runtime",
+	    "//tools/toolchain/am335x",
 	    ],
     linkopts = [
         "$(location //tools/toolchain/am335x:cmd)",
