@@ -16,4 +16,8 @@ cc_library(
         "@ti-pru-support//include",
         "@ti-pru-support//lib/src/rpmsg_lib",
     ],
+    target_compatible_with = select({
+        "//tools/toolchain:am335x": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

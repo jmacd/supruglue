@@ -8,6 +8,10 @@ cc_library(
     copts = [
         "-Ibazel-out/supruglue/test32",
     ],
+    deps = [
+        "@ti-pru-support//include",
+        "@ti-pru-support//lib/src/rpmsg_lib",
+    ],
     visibility = ["//visibility:public"],
     target_compatible_with = select({
         "//tools/toolchain:am335x": ["@platforms//:incompatible"],

@@ -1,6 +1,6 @@
 
 cc_binary(
-    name = "example",
+    name = "example_pru",
     srcs = ["example.c"],
     deps = [
 	    "//lib/ui1203",
@@ -13,4 +13,14 @@ cc_binary(
     additional_linker_inputs = [
         "//tools/toolchain/am335x:cmd",
     ],
+)
+
+cc_binary(
+    name = "local",
+    srcs = ["local.c"],
+    deps = [
+	    "//lib/ui1203",
+	    "//lib/cpx",
+	    "//supruglue/test32",
+	    ],
 )

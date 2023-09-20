@@ -63,13 +63,3 @@ platform(
         "@io_bazel_rules_go//go/toolchain:cgo_off",
     ],
 )
-
-platform(
-    name = "fake_pru",
-    constraint_values = [
-	":test32",
-        "@platforms//os:osx",
-        "@platforms//cpu:arm64",
-        "@io_bazel_rules_go//go/toolchain:cgo_off",
-    ],
-)

@@ -73,5 +73,27 @@ git_repository(
     name = "ti-pru-support",
     remote = "git@github.com:jmacd/pru-software-support-package.git",
     #branch = "jmacd/6_2_0_BUILD",
-    commit = "8b6be8452639a981e77428de9890a638d1e72e27",
+    commit = "99c5b892e2e315b8b3bf211c957c26e98c59a870",
 )
+
+# Zig CC
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+HERMETIC_CC_TOOLCHAIN_VERSION = "v2.1.0"
+
+http_archive(
+    name = "hermetic_cc_toolchain",
+    sha256 = "892b0dd7aa88c3504a8821e65c44fd22f32c16afab12d89e9942fff492720b37",
+    urls = [
+        "https://mirror.bazel.build/github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
+        "https://github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
+    ],
+)
+
+load("@hermetic_cc_toolchain//toolchain:defs.bzl", zig_toolchains = "toolchains")
+
+# Plain zig_toolchains() will pick reasonable defaults. See
+# toolchain/defs.bzl:toolchains on how to change the Zig SDK version and
+# download URL.
+zig_toolchains()
