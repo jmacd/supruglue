@@ -1,23 +1,9 @@
-cc_library(
-    name = "test",
-    testonly = 1,
-    srcs = [
-        "gpio.cc",
-        "soc.cc",
-    ],
-    deps = [
-	"//supruglue",
-        "//supruglue/test32",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 cc_test(
     name = "gpio_test",
     srcs = ["gpio_test.cc"],
     copts = [],
     deps = [
-        ":test",
+        "//supruglue/test32",
         "@gtest//:gtest_main",
     ],
 )
@@ -25,9 +11,9 @@ cc_test(
 cc_test(
     name = "soc_test",
     srcs = ["soc_test.cc"],
-    copts = ["-Isupruglue/test32"],
+#    copts = ["-Isupruglue/test32"],
     deps = [
-        ":test",
+        "//supruglue/test32",
         "@gtest//:gtest_main",
     ],
 )
@@ -35,9 +21,9 @@ cc_test(
 cc_test(
     name = "pinmap_test",
     srcs = ["pinmap_test.cc"],
-    copts = ["-Isupruglue/test32"],
+#    copts = ["-Isupruglue/test32"],
     deps = [
-        ":test",
+        "//supruglue/test32",
         "@gtest//:gtest_main",
     ],
 )

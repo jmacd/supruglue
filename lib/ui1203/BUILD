@@ -16,7 +16,7 @@ cc_test(
     srcs = ["ui1203_test.cc"],
     deps = [
 	":ui1203",
-        "//test",
+        "//supruglue/test32",
         "@gtest//:gtest_main",
     ],
 )

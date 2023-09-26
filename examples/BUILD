@@ -19,8 +19,8 @@ cc_binary(
     name = "local",
     srcs = ["local.c"],
     deps = [
-	    "//lib/ui1203",
-	    "//lib/cpx",
-	    "//supruglue/test32",
-	    ],
+	"//lib/ui1203",
+	"//lib/cpx",
+	"//supruglue/test32",
+    ],
 )

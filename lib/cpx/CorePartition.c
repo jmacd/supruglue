@@ -67,13 +67,6 @@ extern "C"
 
 #define THREAD_NAME_MAX 8
 
-    enum __cp_lock_type
-    {
-        CP_LOCK_NONE = 0,
-        CP_LOCK_SIMPLE,
-        CP_LOCK_SHARED
-    };
-
     enum __cpx_thread_controller_type
     {
         CPX_CTRL_TYPE_STATIC = 1,
@@ -211,14 +204,7 @@ extern "C"
 
         if (ppStaticCpxThread == NULL)
         {
-#ifndef _CPX_NO_HEAP_
-            if ((pCpxThread = (CpxThread**)malloc (sizeof (CpxThread**) * nThreadPartitions)) == NULL)
-            {
-                return false;
-            }
-#else
-        return false;
-#endif
+            return false;
         }
         else
         {
@@ -229,20 +215,18 @@ extern "C"
         {
             size_t nCount = 0;
 
-            for (nCount=0; nCount < nMaxThreads; nCount++)
+            for (nCount = 0; nCount < nMaxThreads; nCount++)
             {
-                pCpxThread [nCount] = NULL;
+                pCpxThread[nCount] = NULL;
             }
         }
 
         return true;
     }
 
-    bool Cpx_StaticStart (CpxThread** ppStaticThread, size_t nStaticThreadSize)
+    bool Cpx_StaticStart (CpxThread** ppStaticThread, size_t nStaticThreadCount)
     {
-        VERIFY (nStaticThreadSize > sizeof (CpxThread**), false);
-
-        return Cpx_CommonStart (nStaticThreadSize / sizeof (CpxThread**), ppStaticThread);
+        return Cpx_CommonStart (nStaticThreadCount, ppStaticThread);
     }
 
     bool Cpx_Start (size_t nThreadPartitions)
@@ -263,22 +247,16 @@ extern "C"
         }
 
         /* determine if no free threads here*/
-        if (nThread == nMaxThreads) return false;
+        if (nThread == nMaxThreads)
+        {
+            printf ("no threads avail\n");
+            return false;
+        }
 
         /* Starts to assign the appropriate thread context and set type */
         if (pStaticContext == NULL)
         {
-#ifndef _CPX_NO_HEAP_
-            /* HEAP initializations */
-            if ((pCpxThread[nThread] = (CpxThread*)malloc ((sizeof (uint8_t) * nStackMaxSize) + sizeof (CpxThread))) == NULL)
-            {
-                return false;
-            }
-
-            pCpxThread[nThread]->nThreadController = 0;
-#else
-        return false;
-#endif
+            return false;
         }
         else
         {
@@ -318,6 +296,8 @@ extern "C"
         nThreadCount++;
         nRunningThreads++;
 
+        printf ("create thread %zu\n", nThread);
+
         return true;
     }
 
@@ -345,8 +325,9 @@ extern "C"
 
     static uint32_t Cpx_GetNextTime (size_t nThreadID)
     {
-        return (uint32_t) (pCpxThread[nThreadID]->nLastMomentun + ((THREADL_SLEEP != pCpxThread[nThreadID]->nStatus) ?
-                pCpxThread[nThreadID]->nNice : pCpxThread[nThreadID]->control.nSleepTime));
+        return (uint32_t)(pCpxThread[nThreadID]->nLastMomentun + ((THREADL_SLEEP != pCpxThread[nThreadID]->nStatus)
+                                                                          ? pCpxThread[nThreadID]->nNice
+                                                                          : pCpxThread[nThreadID]->control.nSleepTime));
     }
 
 #define _CPTHREAD(T) pCpxThread[T]
@@ -369,35 +350,47 @@ extern "C"
             nCThread = nCurrentThread + 1;
 
             nCurTime = Cpx_GetCurrentTick ();
+            printf ("ncThread %zu\n", nCThread);
 
             while (nCount < nMaxThreads)
             {
+                printf ("CASE A\n");
                 if (nCThread >= nMaxThreads)
                 {
+                    printf ("CASE B\n");
                     nCThread = 0;
                 }
 
                 if (NULL != (pThread = pCpxThread[nCThread]) && pThread->nStatus >= THREADL_RUNNING)
                 {
+                    printf ("CASE C\n");
                     nNextTime = pThread->nLastMomentun + ((THREADL_SLEEP != pThread->nStatus) ? pThread->nNice : pThread->control.nSleepTime);
 
                     if (nNextTime < nCurTime || (THREADL_START == pThread->nStatus || THREADL_NOW == pThread->nStatus))
                     {
+                        printf ("CASE D\n");
                         nThread = nCThread;
                         return nThread;
                     }
                     else if (nNextTime - nCurTime < nMin)
                     {
                         nMin = nNextTime - nCurTime;
+                        printf ("CASE E, new min %zu\n", nMin);
                         nThread = nCThread;
                     }
+                }
+                else if (pThread == NULL)
+                {
+                    printf ("CASE G\n");
                 }
 
                 nCThread++;
                 nCount++;
+                printf ("CASE F %zu\n", nCount);
             } /* code */
         }
 
+        printf ("Return %zu\n", nThread);
         return nThread;
     }
 
@@ -405,23 +398,19 @@ extern "C"
     {
         if (pCurrentThread != NULL)
         {
+            printf ("stopping %hhu\n", pCurrentThread->nStatus);
             if (pCurrentThread->nStatus != THREADL_WAITTAG && pCurrentThread->nStatus != THREADL_LOCK)
             {
-                nRunningThreads--;
+                printf ("now running %zu\n", nRunningThreads);
+                //  @@@ nRunningThreads--;
             }
 
             if ((pCurrentThread->nThreadController & CPX_CTRL_BROKER_STATIC) == 0 && pCurrentThread->pSubscriptions != NULL)
             {
-#ifndef _CPX_NO_HEAP_
-                free (pCurrentThread->pSubscriptions);
-#endif
             }
 
             if ((pCurrentThread->nThreadController & CPX_CTRL_TYPE_STATIC) == 0)
             {
-#ifndef _CPX_NO_HEAP_
-                free (pCurrentThread);
-#endif
             }
 
             pCurrentThread = NULL;
@@ -436,6 +425,7 @@ extern "C"
     {
         VERIFY (pCpxThread != NULL, );
         VERIFY (nThreadCount > 0, );
+        printf ("start w/ %zu\n", nRunningThreads);
 
         pCurrentThread = pCpxThread[0];
 
@@ -445,12 +435,14 @@ extern "C"
 
         do
         {
+            printf ("enter loop w/ %zu\n", nRunningThreads);
             if (pCurrentThread != NULL)
             {
                 pStartStck = (void*)&nValue;
 
                 if (setjmp (jmpJoinPointer) == 0)
                 {
+                    printf ("enter setjmp w/ %hhu\n", pCurrentThread->nStatus);
                     switch (pCurrentThread->nStatus)
                     {
                         case THREADL_START:
@@ -462,16 +454,19 @@ extern "C"
 
                             Cpx_StopThread ();
 
+                            printf ("stopped %zu!\n", nRunningThreads);
                             continue;
 
                         case THREADL_RUNNING:
                         case THREADL_SLEEP:
                         case THREADL_NOW:
 
+                            printf ("jumping!\n");
                             longjmp (pCurrentThread->mem.jmpRegisterBuffer, 1);
                             break;
 
                         default:
+                            printf ("wat -- break!\n");
                             break;
                     }
                 }
@@ -481,8 +476,10 @@ extern "C"
             pCurrentThread = pCpxThread[nCurrentThread];
             /*(nCurrentThread + 1) >= nMaxThreads ? 0 : (nCurrentThread + 1); */
 
+            printf ("here w/ %zu and %zu\n", nRunningThreads, nCurrentThread);
         } while (nRunningThreads > 0);
 
+        printf ("join finished\n");
         pCurrentThread = NULL;
     }
 
@@ -677,14 +674,14 @@ extern "C"
     {
         VERIFY (Cpx_IsCoreRunning () && nID < nMaxThreads || NULL != pCpxThread[nID], 0);
 
-        return (pCpxThread [nID]->nThreadController & CPX_CTRL_TYPE_STATIC) ? true : false;
+        return (pCpxThread[nID]->nThreadController & CPX_CTRL_TYPE_STATIC) ? true : false;
     }
 
     bool Cpx_IsBrokerStaticByID (size_t nID)
     {
         VERIFY (Cpx_IsCoreRunning () && nID < nMaxThreads || NULL != pCpxThread[nID], 0);
 
-        return (pCpxThread [nID]->nThreadController & CPX_CTRL_BROKER_STATIC) ? true : false;
+        return (pCpxThread[nID]->nThreadController & CPX_CTRL_BROKER_STATIC) ? true : false;
     }
 
     /*
@@ -699,18 +696,7 @@ extern "C"
         {
             if (pStaticSubscription == NULL)
             {
-#ifndef _CPX_NO_HEAP_
-                size_t nMemorySize = sizeof (CpxSubscriptions) + (sizeof (uint32_t) * ((nMaxTopics <= 1) ? 0 : nMaxTopics - 1));
-
-                VERIFY ((pStaticSubscription = malloc (nMemorySize)) != NULL, false);
-
-                /*
-                 * Set Static broker bit to 0 (disable)
-                 */
-                pCurrentThread->nThreadController &= (~CPX_CTRL_BROKER_STATIC);
-#else
-            return false;
-#endif
+                return false;
             }
             else
             {
@@ -750,7 +736,7 @@ extern "C"
 
     static int32_t Cpx_GetTopicID (const char* pszTopic, size_t length)
     {
-        return ((int32_t) ((Cpx_CRC16 ((const uint8_t*)pszTopic, length, 0) << 15) | Cpx_CRC16 ((const uint8_t*)pszTopic, length, 0x8408)));
+        return ((int32_t)((Cpx_CRC16 ((const uint8_t*)pszTopic, length, 0) << 15) | Cpx_CRC16 ((const uint8_t*)pszTopic, length, 0x8408)));
     }
 
     bool Cpx_IsSubscribed (const char* pszTopic, size_t length)

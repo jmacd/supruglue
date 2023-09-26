@@ -1,5 +1,9 @@
 cc_library(
     name = "test32",
+    srcs = [
+        "gpio.cc",
+        "soc.cc",
+    ],
     hdrs = [
 	"gpio.h",
 	"soc.h",
@@ -9,8 +13,12 @@ cc_library(
         "-Ibazel-out/supruglue/test32",
     ],
     deps = [
+	"//supruglue",
         "@ti-pru-support//include",
-        "@ti-pru-support//lib/src/rpmsg_lib",
+
+        # Note: we can't build this w/o clpru
+        # so we replace it
+        # "@ti-pru-support//lib/src/rpmsg_lib",
     ],
     visibility = ["//visibility:public"],
     target_compatible_with = select({

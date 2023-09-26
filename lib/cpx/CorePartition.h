@@ -24,7 +24,6 @@
     SOFTWARE.
 */
 
-
 #ifndef Cpx_hpp
 #define Cpx_hpp
 
@@ -47,9 +46,9 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 
-    /* Official version */
-    #define CPX_VERSION "2.7.1"
-    static const char CpxVersionCode[]=CPX_VERSION;
+/* Official version */
+#define CPX_VERSION "2.7.1"
+    static const char CpxVersionCode[] = CPX_VERSION;
     static const char CpxVersion[] = CPX_VERSION "/" __TIMESTAMP__;
 
     /*
@@ -175,11 +174,11 @@ extern "C"
      * @brief Start CorePartition thread provisioning
      *
      * @param ppStaticThread     Static Thread pointer type CpxThread**
-     * @param nStaticThreadSize  Static Thread size in bytes
+     * @param nStaticThreadSize  Static Thread count
      *
      * @return true  true if successfully created all provisioned threads
      */
-    bool Cpx_StaticStart (CpxThread** ppStaticThread, size_t nStaticThreadSize);
+    bool Cpx_StaticStart (CpxThread** ppStaticThread, size_t nStaticThreadCount);
 
     /**
      * @brief  Create a non-Isolated context Thread

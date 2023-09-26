@@ -7,5 +7,16 @@ cc_library(
     ],
     hdrs = [
 	"CorePartition.h",
-	],
+    ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "cpx_test.cc",
+    ],
+    deps = [
+        "@gtest//:gtest_main",
+        ":cpx",
+    ],
 )
