@@ -3,10 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "cpx",
     srcs = [
-	"CorePartition.c",
+	"cpx.c",
     ],
     hdrs = [
-	"CorePartition.h",
+	"cpx.h",
     ],
 )
 
