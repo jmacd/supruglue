@@ -10,8 +10,12 @@ extern "C" {
 #include <assert.h>
 #include <stdlib.h>
 
-SystemConfig DefaultSystemConfig() { return (SystemConfig){.defaultStackSize = DEFAULT_STACK_SIZE}; }
-ThreadConfig DefaultThreadConfig() { return (ThreadConfig){.stackSize = DEFAULT_STACK_SIZE, .nice = DEFAULT_NICE}; }
+SystemConfig DefaultSystemConfig() {
+  return (SystemConfig){.default_stack_size = DEFAULT_STACK_SIZE};
+}
+ThreadConfig DefaultThreadConfig() {
+  return (ThreadConfig){.stack_size = DEFAULT_STACK_SIZE, .nice = DEFAULT_NICE};
+}
 
 int Init(System *sys, SystemConfig cfg) {
   memset(sys, 0, sizeof(*sys));
@@ -19,44 +23,68 @@ int Init(System *sys, SystemConfig cfg) {
   return 0;
 }
 
-int Create(System *sys, Thread *thread, ThreadFunc *func, void *arg, ThreadConfig cfg) {
+int Create(System *sys, Thread *thread, uint8_t *stack, ThreadFunc *func, void *arg, ThreadConfig cfg) {
   memset(thread, 0, sizeof(*thread));
   thread->cfg = cfg;
   thread->exec.call.func = func;
   thread->exec.call.arg = arg;
   thread->next = sys->runnable;
   thread->state = STARTING;
+  thread->stack = stack;
   sys->runnable = thread;
   return 0;
 }
 
 int Run(System *sys) {
-  for (volatile Thread *run = sys->runnable; run != NULL; run = run->next) {
-    // HERE: save current, setjmp
-    int err = setjump(sys->return_jump);
-    if (err != 0) {
-      // @@@
-      return err;
+  Thread *volatile run;
+
+  for (run = sys->runnable; run != NULL; run = run->next) {
+    sys->run_stack_pos = (void *)&run;
+
+    if (setjmp(sys->return_jump) == 0) {
+      // Start or resume a thread.
+      switch (run->state) {
+      case STARTING:
+        printf("Starting\n");
+        run->exec.call.func(run->exec.call.arg);
+        // @@@ Stop the thread, remove from runnable
+        break;
+      case RUNNING:
+        printf("Continued\n");
+        longjmp(run->exec.run_jump, 1);
+        break;
+      }
+      continue;
     }
 
-    switch (run->state) {
-    case STARTING:
-      run->exec.call.func(run->exec.call.arg);
-      break;
-    case RUNNING:
-      longjmp(run->exec.call.run_jump, 1);
-    }
+    printf("Yielded\n");
+    // Someone yielded, continue.
   }
   return 0;
 }
 
-void Yield() {
-  // @@@ Got it, so we need a global at this point, the place to save the
-  // jump buf is per thread can't be a global, so need a global thread pointer.
-  setjump(XXX->run_buf);
+void Yield(System *sys) {
+  void *volatile not_used;
+  void *yield_stack_pos = (void *)&not_used;
+  yield_stack_pos++;
+  printf("Hii %p %p %u\n", yield_stack_pos, sys->run_stack_pos, sys->run_stack_pos - yield_stack_pos);
+
+  // Check for stack overflow.
+  memcpy(sys->runnable->stack, yield_stack_pos, sys->run_stack_pos - yield_stack_pos);
+
+  if (setjmp(sys->runnable->exec.run_jump) == 0) {
+    printf("Bye\n");
+    longjmp(sys->return_jump, 1);
+  }
+
+  // yield_stack_pos is not volatile, wasn't restored.
+  yield_stack_pos = (void *)&not_used;
+  memcpy(yield_stack_pos, sys->runnable->stack, sys->run_stack_pos - yield_stack_pos);
 }
 
-ProcessID Pid() { return 0; }
+ThreadID PID(System *sys) {
+  return (ThreadID)sys->runnable;
+}
 
 #ifdef __cplusplus
 }

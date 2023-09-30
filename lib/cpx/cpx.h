@@ -22,7 +22,7 @@ typedef struct _SystemConfig SystemConfig;
 
 typedef void(ThreadFunc)(void *);
 
-typedef uint8_t ProcessID;
+typedef uintptr_t ThreadID;
 
 enum ThreadState {
   STARTING, // Use exec.call.func(exec.call.arg)
@@ -32,7 +32,7 @@ enum ThreadState {
 typedef enum ThreadState ThreadState;
 
 struct _ThreadConfig {
-  size_t stackSize;
+  size_t stack_size;
   uint32_t nice;
 };
 
@@ -40,6 +40,9 @@ struct _Thread {
   Thread *next;
   ThreadConfig cfg;
   ThreadState state;
+  uint8_t *stack;
+
+  // exec is a jump buffer or the initial function/arg
   union {
     jmp_buf run_jump;
     struct {
@@ -47,16 +50,16 @@ struct _Thread {
       void *arg;
     } call;
   } exec;
-  uint8_t id;
 };
 
 struct _SystemConfig {
-  uint32_t defaultStackSize;
+  uint32_t default_stack_size;
 };
 
 struct _System {
   SystemConfig cfg;
   jmp_buf return_jump;
+  void *run_stack_pos;
   Thread *runnable;
 };
 
@@ -65,13 +68,13 @@ ThreadConfig DefaultThreadConfig();
 
 int Init(System *sys, SystemConfig cfg);
 
-int Create(System *sys, Thread *thread, ThreadFunc *func, void *arg, ThreadConfig cfg);
+int Create(System *sys, Thread *thread, uint8_t *stack, ThreadFunc *func, void *arg, ThreadConfig cfg);
 
 int Run(System *sys);
 
 void Yield();
 
-ProcessID Pid();
+ThreadID PID(System *sys);
 
 #ifdef __cplusplus
 }

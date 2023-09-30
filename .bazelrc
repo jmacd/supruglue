@@ -9,3 +9,5 @@ build:clpru --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 build:clpru --platforms //tools/toolchain:real_pru
 
 build:testx86 --spawn_strategy=standalone
+
+test --test_output=all --test_arg=--verbose
