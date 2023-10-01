@@ -15,8 +15,8 @@ TEST(CpxTest, TwoThreads) {
   System sys;
   Thread threads[2];
   uint32_t regs[2] = {0, 0};
-  uint8_t stack0[128];
-  uint8_t stack1[128];
+  uint8_t stack0[1024];
+  uint8_t stack1[1024];
 
   EXPECT_EQ(0, Init(&sys, DefaultSystemConfig()));
 
@@ -32,26 +32,31 @@ TEST(CpxTest, TwoThreads) {
   EXPECT_EQ(2, regs[1]);
 }
 
+extern "C" {
+void run_func(void *arg) {
+  for (int i = 0; i < 2; i++) {
+    fprintf(stderr, "loop body %d\n", i);
+    auto p = reinterpret_cast<std::pair<System *, vector<ThreadID> *> *>(arg);
+    p->second->push_back(PID(p->first));
+    Yield(p->first);
+  }
+  fprintf(stderr, "body return\n");
+}
+}
+
 TEST(CpxTest, TwiceAlternating) {
   System sys;
   Thread threads[2];
   vector<ThreadID> which;
-  uint8_t stack0[128];
-  uint8_t stack1[128];
+  uint8_t stack0[1024];
+  uint8_t stack1[1024];
 
   auto inarg = std::make_pair(&sys, &which);
-  auto run = [](void *arg) {
-    for (int i = 0; i < 2; i++) {
-      auto p = reinterpret_cast<decltype(inarg) *>(arg);
-      p->second->push_back(PID(p->first));
-      Yield();
-    }
-  };
 
   EXPECT_EQ(0, Init(&sys, DefaultSystemConfig()));
 
-  EXPECT_EQ(0, Create(&sys, &threads[0], stack0, run, &inarg, DefaultThreadConfig()));
-  EXPECT_EQ(0, Create(&sys, &threads[1], stack1, run, &inarg, DefaultThreadConfig()));
+  EXPECT_EQ(0, Create(&sys, &threads[0], stack0, run_func, &inarg, DefaultThreadConfig()));
+  EXPECT_EQ(0, Create(&sys, &threads[1], stack1, run_func, &inarg, DefaultThreadConfig()));
 
   EXPECT_EQ(0, ::Run(&sys));
 

@@ -5,6 +5,7 @@ cc_library(
     srcs = [
 	"cpx.c",
     ],
+    copts = ["-Wmissing-prototypes"],
     hdrs = [
 	"cpx.h",
     ],
@@ -14,7 +15,7 @@ cc_test(
     name = "test",
     srcs = [
         "cpx_test.cc",
-    ],
+	],
     deps = [
         "@gtest//:gtest_main",
         ":cpx",

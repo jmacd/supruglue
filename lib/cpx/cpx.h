@@ -1,11 +1,11 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <setjmp.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define DEFAULT_STACK_SIZE 256
 #define DEFAULT_NICE 0
@@ -27,6 +27,7 @@ typedef uintptr_t ThreadID;
 enum ThreadState {
   STARTING, // Use exec.call.func(exec.call.arg)
   RUNNING,  // Use longjump(exec.run_jump)
+  FINISHED, // Nothing to do
 };
 
 typedef enum ThreadState ThreadState;
@@ -61,10 +62,11 @@ struct _System {
   jmp_buf return_jump;
   void *run_stack_pos;
   Thread *runnable;
+  Thread *running;
 };
 
-SystemConfig DefaultSystemConfig();
-ThreadConfig DefaultThreadConfig();
+SystemConfig DefaultSystemConfig(void);
+ThreadConfig DefaultThreadConfig(void);
 
 int Init(System *sys, SystemConfig cfg);
 
@@ -72,7 +74,7 @@ int Create(System *sys, Thread *thread, uint8_t *stack, ThreadFunc *func, void *
 
 int Run(System *sys);
 
-void Yield();
+void Yield(System *sys);
 
 ThreadID PID(System *sys);
 
