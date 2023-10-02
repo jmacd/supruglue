@@ -39,7 +39,7 @@ int Create(System *sys, Thread *thread, uint8_t *stack, ThreadFunc *func, void *
   return 0;
 }
 
-int Run(System *sys) {
+int Run(System *volatile sys) {
   int volatile running = 1;
   while (running) {
     fprintf(stderr, "Enter while\n");
@@ -47,6 +47,7 @@ int Run(System *sys) {
     Thread *volatile run;
 
     for (run = sys->runnable; run != NULL; run = run->next) {
+      fprintf(stderr, "Pre-Run is %p\n", run);
       sys->running = run;
       sys->run_stack_pos = (void *)&run;
       fprintf(stderr, "RunStackPos %p\n", sys->run_stack_pos);
@@ -57,7 +58,12 @@ int Run(System *sys) {
         case STARTING:
           run->state = RUNNING;
           fprintf(stderr, "Starting %p\n", sys->run_stack_pos);
-          run->exec.call.func(run->exec.call.arg);
+          run->exec.call.func(sys, run->exec.call.arg);
+
+          sys->run_stack_pos = (void *)&run;
+
+          fprintf(stderr, "Finishing %p\n", sys->run_stack_pos);
+          fprintf(stderr, "Post-Run is %p\n", run);
           run->state = FINISHED;
           break;
         case RUNNING:
@@ -74,6 +80,7 @@ int Run(System *sys) {
 
       fprintf(stderr, "Yielded\n");
       running = 1;
+      sys->running = NULL;
       // Someone yielded, continue.
     }
     fprintf(stderr, "Finish while\n");
@@ -88,7 +95,7 @@ void Yield(System *sys) {
   // yield_stack_pos++;
   fprintf(stderr, "YieldStackPos %p\n", yield_stack_pos);
   // Check for stack overflow.
-  size_t size = (size_t)sys->run_stack_pos - (size_t)yield_stack_pos;
+  size_t volatile size = (size_t)sys->run_stack_pos - (size_t)yield_stack_pos;
   fprintf(stderr, "To copy: %zx\n", size);
   if (sys->running->cfg.stack_size < size) {
     fprintf(stderr, "panic! %zx > %zx\n", sys->running->cfg.stack_size, size);
@@ -99,12 +106,15 @@ void Yield(System *sys) {
     fprintf(stderr, "Return to scheduler\n");
     longjmp(sys->return_jump, 1);
   }
-  fprintf(stderr, "Arrive from scheduler\n");
-
   // yield_stack_pos is not volatile, wasn't restored.
   yield_stack_pos = (void *)&not_used;
 
-  memcpy(yield_stack_pos, sys->running->stack, (size_t)sys->run_stack_pos - (size_t)yield_stack_pos);
+  fprintf(stderr, "Arrive from scheduler sys: %p\n", sys);
+  fprintf(stderr, "Arrive from scheduler A: %zx\n", (size_t)yield_stack_pos);
+  fprintf(stderr, "Arrive from scheduler B: %zx\n", (size_t)sys->run_stack_pos);
+  fprintf(stderr, "Arrive from scheduler size: %zx\n", size);
+
+  memcpy(yield_stack_pos, sys->running->stack, size);
   fprintf(stderr, "Return from yield\n");
 }
 

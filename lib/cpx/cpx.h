@@ -20,7 +20,7 @@ typedef struct _ThreadConfig ThreadConfig;
 typedef struct _System System;
 typedef struct _SystemConfig SystemConfig;
 
-typedef void(ThreadFunc)(void *);
+typedef void(ThreadFunc)(System *sys, void *);
 
 typedef uintptr_t ThreadID;
 
