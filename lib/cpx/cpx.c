@@ -13,11 +13,16 @@
 extern "C" {
 #endif
 
-SystemConfig DefaultSystemConfig(void) {
-  return (SystemConfig){.default_stack_size = DEFAULT_STACK_SIZE};
+SystemConfig DefaultSystemConfig() {
+  return (SystemConfig){};
 }
-ThreadConfig DefaultThreadConfig(void) {
-  return (ThreadConfig){.stack_size = DEFAULT_STACK_SIZE, .nice = DEFAULT_NICE};
+
+ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size) {
+  return (ThreadConfig){
+      .nice = DEFAULT_NICE,
+      .stack = stack,
+      .stack_size = stack_size,
+  };
 }
 
 int Init(System *sys, SystemConfig cfg) {
@@ -27,13 +32,16 @@ int Init(System *sys, SystemConfig cfg) {
   return 0;
 }
 
-int Create(System *sys, Thread *thread, uint8_t *stack, ThreadFunc *func, void *arg, ThreadConfig cfg) {
+int Create(System *sys, Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg) {
   memset(thread, 0, sizeof(*thread));
+  memset(cfg.stack, 0, cfg.stack_size);
   thread->cfg = cfg;
   thread->exec.call.func = func;
-  thread->exec.call.arg = arg;
+  thread->exec.call.args = args;
+  thread->exec.call.argsize = argsize;
+  fprintf(stderr, "Note func is %p\n", thread->exec.call.func);
+
   thread->state = STARTING;
-  thread->stack = stack;
   thread->next = sys->runnable;
   sys->runnable = thread;
   return 0;
@@ -57,8 +65,8 @@ int Run(System *volatile sys) {
         switch (run->state) {
         case STARTING:
           run->state = RUNNING;
-          fprintf(stderr, "Starting %p\n", sys->run_stack_pos);
-          run->exec.call.func(sys, run->exec.call.arg);
+          fprintf(stderr, "Starting %p note %p\n", sys->run_stack_pos, run->exec.call.func);
+          run->exec.call.func(sys, TID(run), run->exec.call.args, run->exec.call.argsize);
 
           sys->run_stack_pos = (void *)&run;
 
@@ -100,7 +108,7 @@ void Yield(System *sys) {
   if (sys->running->cfg.stack_size < size) {
     fprintf(stderr, "panic! %zx > %zx\n", sys->running->cfg.stack_size, size);
   }
-  memcpy(sys->running->stack, yield_stack_pos, size);
+  memcpy(sys->running->cfg.stack, yield_stack_pos, size);
 
   if (setjmp(sys->running->exec.run_jump) == 0) {
     fprintf(stderr, "Return to scheduler\n");
@@ -114,12 +122,8 @@ void Yield(System *sys) {
   fprintf(stderr, "Arrive from scheduler B: %zx\n", (size_t)sys->run_stack_pos);
   fprintf(stderr, "Arrive from scheduler size: %zx\n", size);
 
-  memcpy(yield_stack_pos, sys->running->stack, size);
+  memcpy(yield_stack_pos, sys->running->cfg.stack, size);
   fprintf(stderr, "Return from yield\n");
-}
-
-ThreadID PID(System *sys) {
-  return (ThreadID)sys->running;
 }
 
 #ifdef __cplusplus

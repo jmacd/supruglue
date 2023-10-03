@@ -1,3 +1,9 @@
+// Copyright Joshua MacDonald
+// SPDX-License-Identifier: MIT
+
+#ifndef LIB_CPX_CPX_H
+#define LIB_CPX_CPX_H
+
 #include <setjmp.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -7,7 +13,6 @@
 extern "C" {
 #endif
 
-#define DEFAULT_STACK_SIZE 256
 #define DEFAULT_NICE 0
 
 struct _Thread;
@@ -20,9 +25,9 @@ typedef struct _ThreadConfig ThreadConfig;
 typedef struct _System System;
 typedef struct _SystemConfig SystemConfig;
 
-typedef void(ThreadFunc)(System *sys, void *);
-
 typedef uintptr_t ThreadID;
+
+typedef void(ThreadFunc)(System *sys, ThreadID thid, const char *args, size_t argsize);
 
 enum ThreadState {
   STARTING, // Use exec.call.func(exec.call.arg)
@@ -33,6 +38,7 @@ enum ThreadState {
 typedef enum ThreadState ThreadState;
 
 struct _ThreadConfig {
+  uint8_t *stack;
   size_t stack_size;
   uint32_t nice;
 };
@@ -41,20 +47,20 @@ struct _Thread {
   Thread *next;
   ThreadConfig cfg;
   ThreadState state;
-  uint8_t *stack;
 
   // exec is a jump buffer or the initial function/arg
   union {
     jmp_buf run_jump;
     struct {
       ThreadFunc *func;
-      void *arg;
+      const char *args;
+      size_t argsize;
     } call;
   } exec;
 };
 
 struct _SystemConfig {
-  uint32_t default_stack_size;
+  size_t unused;
 };
 
 struct _System {
@@ -66,18 +72,22 @@ struct _System {
 };
 
 SystemConfig DefaultSystemConfig(void);
-ThreadConfig DefaultThreadConfig(void);
+ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size);
 
 int Init(System *sys, SystemConfig cfg);
 
-int Create(System *sys, Thread *thread, uint8_t *stack, ThreadFunc *func, void *arg, ThreadConfig cfg);
+int Create(System *sys, Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg);
 
 int Run(System *sys);
 
 void Yield(System *sys);
 
-ThreadID PID(System *sys);
+inline ThreadID TID(Thread *th) {
+  return (ThreadID)th;
+}
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif // LIB_CPX_CPX_H
