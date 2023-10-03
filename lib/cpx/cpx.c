@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+System __system;
+
 SystemConfig DefaultSystemConfig() {
   return (SystemConfig){};
 }
@@ -25,14 +27,15 @@ ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size) {
   };
 }
 
-int Init(System *sys, SystemConfig cfg) {
+int Init(SystemConfig cfg) {
+  System *sys = &__system;
   memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
   fprintf(stderr, "SIZEOF(VOID*)=%lu\n", sizeof(void *));
   return 0;
 }
 
-int Create(System *sys, Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg) {
+int Create(Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg) {
   memset(thread, 0, sizeof(*thread));
   memset(cfg.stack, 0, cfg.stack_size);
   thread->cfg = cfg;
@@ -42,30 +45,32 @@ int Create(System *sys, Thread *thread, ThreadFunc *func, const char *args, size
   fprintf(stderr, "Note func is %p\n", thread->exec.call.func);
 
   thread->state = STARTING;
-  thread->next = sys->runnable;
-  sys->runnable = thread;
+  thread->next = __system.runnable;
+  __system.runnable = thread;
   return 0;
 }
 
-int Run(System *volatile sys) {
+int Run() {
+  System *const sys = &__system;
+  Thread *volatile run;
   int volatile running = 1;
+
   while (running) {
     fprintf(stderr, "Enter while\n");
     running = 0;
-    Thread *volatile run;
 
-    for (run = sys->runnable; run != NULL; run = run->next) {
+    for (run = __system.runnable; run != NULL; run = run->next) {
       fprintf(stderr, "Pre-Run is %p\n", run);
       sys->running = run;
       sys->run_stack_pos = (void *)&run;
-      fprintf(stderr, "RunStackPos %p\n", sys->run_stack_pos);
+      fprintf(stderr, "RunStackPos %p will setjmp %p\n", sys->run_stack_pos, sys);
 
       if (setjmp(sys->return_jump) == 0) {
         //  Start or resume a thread.
         switch (run->state) {
         case STARTING:
           run->state = RUNNING;
-          fprintf(stderr, "Starting %p note %p\n", sys->run_stack_pos, run->exec.call.func);
+          fprintf(stderr, "Starting RunStackPos %p note %p\n", sys->run_stack_pos, run->exec.call.func);
           run->exec.call.func(sys, TID(run), run->exec.call.args, run->exec.call.argsize);
 
           sys->run_stack_pos = (void *)&run;
@@ -75,8 +80,9 @@ int Run(System *volatile sys) {
           run->state = FINISHED;
           break;
         case RUNNING:
-          fprintf(stderr, "Continuing a running thread\n");
+          fprintf(stderr, "Continuing a running thread %p: %p (RunStackPos)\n", run, sys->run_stack_pos);
           longjmp(run->exec.run_jump, 1);
+          fprintf(stderr, "NOT SUPPOSED TO BE HERE %p\n", run);
           break;
         case FINISHED:
           fprintf(stderr, "See a finished thread\n");
@@ -84,10 +90,11 @@ int Run(System *volatile sys) {
         }
         fprintf(stderr, "Looping around...\n");
         continue;
-      }
+      } else {
 
-      fprintf(stderr, "Yielded\n");
-      running = 1;
+        fprintf(stderr, "Yielded\n");
+        running = 1;
+      }
       sys->running = NULL;
       // Someone yielded, continue.
     }
@@ -96,31 +103,38 @@ int Run(System *volatile sys) {
   return 0;
 }
 
-void Yield(System *sys) {
-  Thread *volatile not_used = sys->running;
-  void *yield_stack_pos = (void *)&not_used;
+void Yield() {
+  System *const sys = &__system;
+  void *yield_stack_pos = (void *)&sys;
 
   // yield_stack_pos++;
   fprintf(stderr, "YieldStackPos %p\n", yield_stack_pos);
+
   // Check for stack overflow.
   size_t volatile size = (size_t)sys->run_stack_pos - (size_t)yield_stack_pos;
+
   fprintf(stderr, "To copy: %zx\n", size);
   if (sys->running->cfg.stack_size < size) {
     fprintf(stderr, "panic! %zx > %zx\n", sys->running->cfg.stack_size, size);
   }
   memcpy(sys->running->cfg.stack, yield_stack_pos, size);
 
+  fprintf(stderr, "Return to scheduler\n");
+  fprintf(stderr, "See here departing: %zx (RunStackPos)\n", (size_t)sys->run_stack_pos);
   if (setjmp(sys->running->exec.run_jump) == 0) {
-    fprintf(stderr, "Return to scheduler\n");
     longjmp(sys->return_jump, 1);
   }
-  // yield_stack_pos is not volatile, wasn't restored.
-  yield_stack_pos = (void *)&not_used;
+  yield_stack_pos = (void *)&sys;
+
+  /* fprintf(stderr, "WHAT THE: %p (&RunStackPos)\n", &sys->run_stack_pos); */
+  /* fprintf(stderr, "WHAT THE: %zx (RunStackPos)\n", (size_t)sys->run_stack_pos); */
 
   fprintf(stderr, "Arrive from scheduler sys: %p\n", sys);
   fprintf(stderr, "Arrive from scheduler A: %zx\n", (size_t)yield_stack_pos);
-  fprintf(stderr, "Arrive from scheduler B: %zx\n", (size_t)sys->run_stack_pos);
+  fprintf(stderr, "Arrive from scheduler B: %zx (RunStackPos)\n", (size_t)sys->run_stack_pos);
   fprintf(stderr, "Arrive from scheduler size: %zx\n", size);
+  size = (size_t)sys->run_stack_pos - (size_t)yield_stack_pos;
+  fprintf(stderr, "Arrive from scheduler size(again): %zx\n", size);
 
   memcpy(yield_stack_pos, sys->running->cfg.stack, size);
   fprintf(stderr, "Return from yield\n");

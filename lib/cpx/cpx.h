@@ -74,13 +74,13 @@ struct _System {
 SystemConfig DefaultSystemConfig(void);
 ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size);
 
-int Init(System *sys, SystemConfig cfg);
+int Init(SystemConfig cfg);
 
-int Create(System *sys, Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg);
+int Create(Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg);
 
-int Run(System *sys);
+int Run();
 
-void Yield(System *sys);
+void Yield();
 
 inline ThreadID TID(Thread *th) {
   return (ThreadID)th;

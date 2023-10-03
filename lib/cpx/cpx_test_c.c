@@ -15,5 +15,5 @@ void test_run_func(System *sys, ThreadID arg, const char *args, size_t argsize) 
     test_run_vector[test_run_vector_size++] = arg;
     Yield(sys);
   }
-  fprintf(stderr, "body return\n");
+  fprintf(stderr, "body return %p\n", (void *)arg);
 }
