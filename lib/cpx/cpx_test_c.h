@@ -14,7 +14,7 @@ extern ThreadID test_run_vector[32];
 extern size_t test_run_vector_size;
 
 void test_run_reset(void);
-void test_run_func(System *sys, ThreadID arg, const char *args, size_t argsize);
+void test_run_func(ThreadID arg, const char *args);
 
 #ifdef __cplusplus
 }

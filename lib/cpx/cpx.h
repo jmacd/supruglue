@@ -22,12 +22,13 @@ struct _SystemConfig;
 
 typedef struct _Thread Thread;
 typedef struct _ThreadConfig ThreadConfig;
+typedef struct _ThreadList ThreadList;
 typedef struct _System System;
 typedef struct _SystemConfig SystemConfig;
 
 typedef uintptr_t ThreadID;
 
-typedef void(ThreadFunc)(System *sys, ThreadID thid, const char *args, size_t argsize);
+typedef void(ThreadFunc)(ThreadID thid, const char *args);
 
 enum ThreadState {
   STARTING, // Use exec.call.func(exec.call.arg)
@@ -43,8 +44,13 @@ struct _ThreadConfig {
   uint32_t nice;
 };
 
+struct _ThreadList {
+  ThreadList *next;
+  ThreadList *prev;
+};
+
 struct _Thread {
-  Thread *next;
+  ThreadList list;
   ThreadConfig cfg;
   ThreadState state;
 
@@ -54,7 +60,6 @@ struct _Thread {
     struct {
       ThreadFunc *func;
       const char *args;
-      size_t argsize;
     } call;
   } exec;
 };
@@ -67,8 +72,8 @@ struct _System {
   SystemConfig cfg;
   jmp_buf return_jump;
   void *run_stack_pos;
-  Thread *runnable;
-  Thread *running;
+  ThreadList runnable;
+  Thread *current;
 };
 
 SystemConfig DefaultSystemConfig(void);
@@ -76,7 +81,7 @@ ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size);
 
 int Init(SystemConfig cfg);
 
-int Create(Thread *thread, ThreadFunc *func, const char *args, size_t argsize, ThreadConfig cfg);
+int Create(Thread *thread, ThreadFunc *func, const char *args, ThreadConfig cfg);
 
 int Run();
 
