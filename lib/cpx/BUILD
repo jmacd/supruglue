@@ -3,10 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "cpx",
     srcs = [
-	"cpx.c",
+	    "cpx.c",
+	    "args.c",
     ],
     hdrs = [
-	"cpx.h",
+	    "cpx.h",
+	    "args.h",
     ],
 )
 
@@ -23,7 +25,6 @@ cc_library(
     ],
     testonly = 1,
 )
-
 
 cc_test(
     name = "test",

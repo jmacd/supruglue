@@ -32,14 +32,6 @@ void threadListInit(ThreadList *list) {
   list->prev = list;
 }
 
-int Init(SystemConfig cfg) {
-  System *sys = &__system;
-  memset(sys, 0, sizeof(*sys));
-  sys->cfg = cfg;
-  threadListInit(&sys->runnable);
-  return 0;
-}
-
 int threadListEmpty(ThreadList *head) {
   return head->next == head;
 }
@@ -63,7 +55,15 @@ Thread *threadListPopFront(ThreadList *head) {
   return thread;
 }
 
-int Create(Thread *thread, ThreadFunc *func, const char *args, ThreadConfig cfg) {
+int Init(SystemConfig cfg) {
+  System *sys = &__system;
+  memset(sys, 0, sizeof(*sys));
+  sys->cfg = cfg;
+  threadListInit(&sys->runnable);
+  return 0;
+}
+
+int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg) {
   memset(thread, 0, sizeof(*thread));
   memset(cfg.stack, 0, cfg.stack_size);
   thread->cfg = cfg;
@@ -104,11 +104,12 @@ int Run() {
 void Yield() {
   void *volatile unused;
   void *yield_stack = (void *)&unused;
-
   size_t size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
-  // Check for stack overflow.
-  if (__system.current->cfg.stack_size < size) {
+  // Check for thread-stack overflow.
+  if (size > __system.current->cfg.stack_size) {
+    // TODO:
+    assert(0);
   }
   memcpy(__system.current->cfg.stack, yield_stack, size);
 

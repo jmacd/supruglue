@@ -34,15 +34,15 @@ TEST(CpxTest, TwoThreads) {
   uint8_t stack0[1024];
   uint8_t stack1[1024];
 
-  auto test_func = [](ThreadID tid, const char *args) {
+  auto test_func = [](ThreadID tid, Args args) {
     TestThread *tt = (TestThread *)tid;
     tt->regs[tt->index] = tt->index + 1;
   };
 
   EXPECT_EQ(0, Init(DefaultSystemConfig()));
 
-  EXPECT_EQ(0, Create(&threads[0].thread, test_func, "1", DefaultThreadConfig(stack0, 1024)));
-  EXPECT_EQ(0, Create(&threads[1].thread, test_func, "2", DefaultThreadConfig(stack1, 1024)));
+  EXPECT_EQ(0, Create(&threads[0].thread, test_func, Args{.ptr = "1"}, DefaultThreadConfig(stack0, 1024)));
+  EXPECT_EQ(0, Create(&threads[1].thread, test_func, Args{.ptr = "2"}, DefaultThreadConfig(stack1, 1024)));
 
   EXPECT_EQ(0, ::Run());
   EXPECT_EQ(1, regs[0]);
@@ -56,8 +56,8 @@ TEST(CpxTest, TwiceAlternating) {
 
   EXPECT_EQ(0, Init(DefaultSystemConfig()));
 
-  EXPECT_EQ(0, Create(&threads[0], test_run_func, "2", DefaultThreadConfig(stack0, 1024)));
-  EXPECT_EQ(0, Create(&threads[1], test_run_func, "22", DefaultThreadConfig(stack1, 1024)));
+  EXPECT_EQ(0, Create(&threads[0], test_run_func, Args{.ptr = "2"}, DefaultThreadConfig(stack0, 1024)));
+  EXPECT_EQ(0, Create(&threads[1], test_run_func, Args{.ptr = "22"}, DefaultThreadConfig(stack1, 1024)));
 
   EXPECT_EQ(0, ::Run());
 
@@ -72,4 +72,17 @@ TEST(CpxTest, TwiceAlternating) {
   };
 
   EXPECT_EQ(expect, test_run_get());
+}
+
+TEST(CpxTest, TestOverflow) {
+  Thread thread;
+  uint8_t stack0[500];
+
+  EXPECT_EQ(0, Init(DefaultSystemConfig()));
+
+  EXPECT_EQ(0, Create(&thread, test_recursive_func, Args{.ptr = "9"}, DefaultThreadConfig(stack0, sizeof(stack0))));
+
+  EXPECT_EQ(0, ::Run());
+
+  // @@@
 }
