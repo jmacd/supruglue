@@ -32,11 +32,19 @@ void threadListInit(ThreadList *list) {
   list->prev = list;
 }
 
+int Init(SystemConfig cfg) {
+  System *sys = &__system;
+  memset(sys, 0, sizeof(*sys));
+  sys->cfg = cfg;
+  threadListInit(&sys->runnable);
+  return 0;
+}
+
 int threadListEmpty(ThreadList *head) {
   return head->next == head;
 }
 
-void threadListAddAfter(ThreadList *head, Thread *thread) {
+void threadListAdd(ThreadList *head, Thread *thread) {
   ThreadList *next = head->next;
 
   head->next = &thread->list;
@@ -55,14 +63,6 @@ Thread *threadListPopFront(ThreadList *head) {
   return thread;
 }
 
-int Init(SystemConfig cfg) {
-  System *sys = &__system;
-  memset(sys, 0, sizeof(*sys));
-  sys->cfg = cfg;
-  threadListInit(&sys->runnable);
-  return 0;
-}
-
 int Create(Thread *thread, ThreadFunc *func, const char *args, ThreadConfig cfg) {
   memset(thread, 0, sizeof(*thread));
   memset(cfg.stack, 0, cfg.stack_size);
@@ -70,20 +70,19 @@ int Create(Thread *thread, ThreadFunc *func, const char *args, ThreadConfig cfg)
   thread->exec.call.func = func;
   thread->exec.call.args = args;
   thread->state = STARTING;
-  threadListAddAfter(__system.runnable.prev, thread);
+  threadListAdd(__system.runnable.prev, thread);
   return 0;
 }
 
 int Run() {
   while (!threadListEmpty(&__system.runnable)) {
-    void *volatile run_stack;
+    Thread *volatile run = threadListPopFront(&__system.runnable);
 
-    Thread *run = threadListPopFront(&__system.runnable);
     __system.current = run;
-    __system.run_stack_pos = (void *)&run_stack;
+    __system.run_stack_pos = (void *)&run;
 
     if (setjmp(__system.return_jump) != 0) {
-      threadListAddAfter(__system.runnable.prev, run);
+      threadListAdd(__system.runnable.prev, run);
       continue;
     }
     switch (run->state) {
@@ -103,24 +102,25 @@ int Run() {
 }
 
 void Yield() {
-  void *volatile yield_stack;
+  void *volatile unused;
+  void *yield_stack = (void *)&unused;
 
-  size_t size;
+  size_t size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
   // Check for stack overflow.
-  size = (size_t)__system.run_stack_pos - (size_t)&yield_stack;
   if (__system.current->cfg.stack_size < size) {
   }
-  memcpy(__system.current->cfg.stack, (void *)&yield_stack, size);
+  memcpy(__system.current->cfg.stack, yield_stack, size);
 
   if (setjmp(__system.current->exec.run_jump) == 0) {
     longjmp(__system.return_jump, 1);
   }
 
-  // Size is not volatile, recompute.
-  size = (size_t)__system.run_stack_pos - (size_t)&yield_stack;
+  // size and yield_stack are not volatile, recompute:
+  yield_stack = (void *)&unused;
+  size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
-  memcpy((void *)&yield_stack, __system.current->cfg.stack, size);
+  memcpy(yield_stack, __system.current->cfg.stack, size);
 }
 
 #ifdef __cplusplus
