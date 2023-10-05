@@ -15,15 +15,16 @@ extern "C" {
 
 System __system;
 
-SystemConfig DefaultSystemConfig() {
+SystemConfig NewSystemConfig() {
   return (SystemConfig){};
 }
 
-ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size) {
+ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size) {
   return (ThreadConfig){
       .nice = DEFAULT_NICE,
       .stack = stack,
       .stack_size = stack_size,
+      .name = name,
   };
 }
 
@@ -81,9 +82,14 @@ int Run() {
     __system.current = run;
     __system.run_stack_pos = (void *)&run;
 
-    if (setjmp(__system.return_jump) != 0) {
+    switch (setjmp(__system.return_jump)) {
+    case SETJUMP:
+      break;
+    case CONTINUING:
       threadListAdd(__system.runnable.prev, run);
       continue;
+    case OVERFLOW:
+      run->state = FINISHED;
     }
     switch (run->state) {
     case STARTING:
@@ -92,7 +98,7 @@ int Run() {
       run->state = FINISHED;
       break;
     case RUNNING:
-      longjmp(run->exec.run_jump, 1);
+      longjmp(run->exec.run_jump, CONTINUING);
       break;
     case FINISHED:
       break;
@@ -101,20 +107,29 @@ int Run() {
   return 0;
 }
 
+void journal2z(const char *msg, size_t arg1, size_t arg2) {
+  int32_t idx = __system.log.sequence % LOG_QUEUE_SIZE;
+  __system.log.queue[idx].tid = TID(__system.current);
+  __system.log.queue[idx].msg = msg;
+  __system.log.queue[idx].arg1 = arg1;
+  __system.log.queue[idx].arg2 = arg2;
+  __system.log.sequence++;
+}
+
 void Yield() {
   void *volatile unused;
-  void *yield_stack = (void *)&unused;
+  void  *yield_stack = (void *)&unused;
   size_t size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
   // Check for thread-stack overflow.
   if (size > __system.current->cfg.stack_size) {
-    // TODO:
-    assert(0);
+    journal2z("stack overflow: %zu exceeds %zu", size, __system.current->cfg.stack_size);
+    longjmp(__system.return_jump, OVERFLOW);
   }
   memcpy(__system.current->cfg.stack, yield_stack, size);
 
-  if (setjmp(__system.current->exec.run_jump) == 0) {
-    longjmp(__system.return_jump, 1);
+  if (setjmp(__system.current->exec.run_jump) == SETJUMP) {
+    longjmp(__system.return_jump, CONTINUING);
   }
 
   // size and yield_stack are not volatile, recompute:

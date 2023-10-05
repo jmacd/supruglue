@@ -16,34 +16,45 @@ extern "C" {
 #endif
 
 #define DEFAULT_NICE 0
+#define LOG_QUEUE_SIZE 4U
 
 struct _Thread;
 struct _ThreadConfig;
 struct _System;
 struct _SystemConfig;
 
-typedef struct _Thread Thread;
+typedef struct _Thread       Thread;
 typedef struct _ThreadConfig ThreadConfig;
-typedef struct _ThreadList ThreadList;
-typedef struct _System System;
+typedef struct _ThreadList   ThreadList;
+typedef struct _System       System;
+typedef struct _SystemLog    SystemLog;
 typedef struct _SystemConfig SystemConfig;
+typedef struct _LogEntry     LogEntry;
 
 typedef uintptr_t ThreadID;
 
 typedef void(ThreadFunc)(ThreadID thid, Args args);
 
 enum ThreadState {
-  STARTING, // Use exec.call.func(exec.call.arg)
-  RUNNING,  // Use longjump(exec.run_jump)
-  FINISHED, // Nothing to do
+  STARTING = 1, // Use exec.call.func(exec.call.arg)
+  RUNNING = 2,  // Use longjump(exec.run_jump)
+  FINISHED = 3, // Nothing to do
+};
+
+enum JumpCode {
+  SETJUMP = 0,
+  CONTINUING = 1,
+  OVERFLOW = 2,
 };
 
 typedef enum ThreadState ThreadState;
+typedef enum JumpCode    JumpCode;
 
 struct _ThreadConfig {
-  uint8_t *stack;
-  size_t stack_size;
-  uint32_t nice;
+  uint8_t    *stack;
+  size_t      stack_size;
+  uint32_t    nice;
+  const char *name;
 };
 
 struct _ThreadList {
@@ -52,16 +63,15 @@ struct _ThreadList {
 };
 
 struct _Thread {
-  ThreadList list;
+  ThreadList   list;
   ThreadConfig cfg;
-  ThreadState state;
+  ThreadState  state;
 
-  // exec is a jump buffer or the initial function/arg
   union {
     jmp_buf run_jump;
     struct {
       ThreadFunc *func;
-      Args args;
+      Args        args;
     } call;
   } exec;
 };
@@ -70,16 +80,33 @@ struct _SystemConfig {
   size_t unused;
 };
 
-struct _System {
-  SystemConfig cfg;
-  jmp_buf return_jump;
-  void *run_stack_pos;
-  ThreadList runnable;
-  Thread *current;
+struct _LogEntry {
+  ThreadID    tid;
+  const char *msg;
+  size_t      arg1;
+  size_t      arg2;
 };
 
-SystemConfig DefaultSystemConfig(void);
-ThreadConfig DefaultThreadConfig(uint8_t *stack, size_t stack_size);
+struct _SystemLog {
+  uint32_t sequence;
+  LogEntry queue[LOG_QUEUE_SIZE];
+};
+
+struct _System {
+  SystemConfig cfg;
+  SystemLog    log;
+
+  jmp_buf return_jump;
+  void   *run_stack_pos;
+
+  ThreadList runnable;
+  Thread    *current;
+};
+
+extern System __system;
+
+SystemConfig NewSystemConfig(void);
+ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size);
 
 int Init(SystemConfig cfg);
 
