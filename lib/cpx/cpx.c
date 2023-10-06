@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+void journal2u(const char *msg, size_t arg1, size_t arg2);
+
 System __system;
 
 SystemConfig NewSystemConfig() {
@@ -107,23 +109,77 @@ int Run() {
   return 0;
 }
 
-void journal2z(const char *msg, size_t arg1, size_t arg2) {
-  int32_t idx = __system.log.sequence % LOG_QUEUE_SIZE;
-  __system.log.queue[idx].tid = TID(__system.current);
-  __system.log.queue[idx].msg = msg;
-  __system.log.queue[idx].arg1 = arg1;
-  __system.log.queue[idx].arg2 = arg2;
-  __system.log.sequence++;
+int channelEmpty(Channel *ch) {
+  return ch->head == ch->tail;
+}
+
+void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
+  if (ch->tail + data_size > ch->head) {
+    // @@@
+    fprintf(stderr, "no data in channel %u %u!\n", ch->tail, ch->head);
+    assert(0);
+    return;
+  }
+  int32_t take = data_size;
+  int32_t tidx = ch->tail % ch_size;
+  if (tidx + take > ch_size) {
+    take = ch_size - tidx;
+  }
+  memcpy((uint8_t *)data, ch->buffer + tidx, take);
+  memcpy(((uint8_t *)data) + take, ch->buffer, data_size - take);
+
+  ch->tail += data_size;
+}
+
+void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
+  if (data_size > ch_size) {
+    journal2u("write too large: %u > %u", data_size, ch_size);
+    // TODO: re-enter yield somehow, test this.
+    return;
+  }
+
+  int32_t limit = ch->head + data_size;
+  if (limit > ch->tail + ch_size) {
+    // Note: data loss
+    fprintf(stderr, "DATA LOSS\n");
+    assert(0);
+    ch->tail = limit - ch_size;
+  }
+
+  int32_t hidx = ch->head % ch_size;
+  int32_t take = data_size;
+  if (hidx + take > ch_size) {
+    take = ch_size - hidx;
+  }
+
+  memcpy(ch->buffer + hidx, (uint8_t *)data, take);
+  memcpy(ch->buffer, ((uint8_t *)data) + take, data_size - take);
+
+  ch->head += data_size;
+}
+
+void journal2u(const char *msg, size_t arg1, size_t arg2) {
+  LogEntry ent;
+  ent.tid = TID(__system.current);
+  ent.msg = msg;
+  ent.arg1 = arg1;
+  ent.arg2 = arg2;
+
+  // fprintf(stderr, "journal: ");
+  // fprintf(stderr, msg, arg1, arg2);
+  // fprintf(stderr, "\n");
+
+  channelWrite(&__system.log.base, sizeof(__system.log.space), &ent, sizeof(ent));
 }
 
 void Yield() {
   void *volatile unused;
-  void  *yield_stack = (void *)&unused;
-  size_t size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
+  void   *yield_stack = (void *)&unused;
+  int32_t size = (int32_t)((size_t)__system.run_stack_pos - (size_t)yield_stack);
 
   // Check for thread-stack overflow.
   if (size > __system.current->cfg.stack_size) {
-    journal2z("stack overflow: %zu exceeds %zu", size, __system.current->cfg.stack_size);
+    journal2u("stack overflow: %u exceeds %u", size, __system.current->cfg.stack_size);
     longjmp(__system.return_jump, OVERFLOW);
   }
   memcpy(__system.current->cfg.stack, yield_stack, size);

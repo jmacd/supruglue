@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #define DEFAULT_NICE 0
-#define LOG_QUEUE_SIZE 4U
+#define LOG_CHANNEL_ENTRIES 4U
 
 struct _Thread;
 struct _ThreadConfig;
@@ -27,8 +27,9 @@ typedef struct _Thread       Thread;
 typedef struct _ThreadConfig ThreadConfig;
 typedef struct _ThreadList   ThreadList;
 typedef struct _System       System;
-typedef struct _SystemLog    SystemLog;
 typedef struct _SystemConfig SystemConfig;
+typedef struct _Channel      Channel;
+typedef struct _LogChannel   LogChannel;
 typedef struct _LogEntry     LogEntry;
 
 typedef uintptr_t ThreadID;
@@ -52,8 +53,8 @@ typedef enum JumpCode    JumpCode;
 
 struct _ThreadConfig {
   uint8_t    *stack;
-  size_t      stack_size;
-  uint32_t    nice;
+  int32_t     stack_size;
+  uint8_t     nice;
   const char *name;
 };
 
@@ -83,18 +84,24 @@ struct _SystemConfig {
 struct _LogEntry {
   ThreadID    tid;
   const char *msg;
-  size_t      arg1;
-  size_t      arg2;
+  int32_t     arg1;
+  int32_t     arg2;
 };
 
-struct _SystemLog {
-  uint32_t sequence;
-  LogEntry queue[LOG_QUEUE_SIZE];
+struct _Channel {
+  uint32_t head;
+  uint32_t tail;
+  uint8_t  buffer[0];
+};
+
+struct _LogChannel {
+  Channel base;
+  uint8_t space[sizeof(LogEntry) * LOG_CHANNEL_ENTRIES];
 };
 
 struct _System {
   SystemConfig cfg;
-  SystemLog    log;
+  LogChannel   log;
 
   jmp_buf return_jump;
   void   *run_stack_pos;
@@ -115,6 +122,10 @@ int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg);
 int Run();
 
 void Yield();
+
+int  channelEmpty(Channel *ch);
+void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size);
+void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size);
 
 inline ThreadID TID(Thread *th) {
   return (ThreadID)th;

@@ -33,11 +33,12 @@ string test_logs_format(LogEntry entry) {
 }
 
 vector<string> test_logs_get() {
-  int32_t        count = std::min(__system.log.sequence, LOG_QUEUE_SIZE);
-  int32_t        idx = __system.log.sequence - count;
   vector<string> result;
-  for (; idx < count; idx++) {
-    result.push_back(test_logs_format(__system.log.queue[idx % LOG_QUEUE_SIZE]));
+
+  while (!channelEmpty(&__system.log.base)) {
+    LogEntry ent;
+    channelRead(&__system.log.base, sizeof(__system.log.space), &ent, sizeof(ent));
+    result.push_back(test_logs_format(ent));
   }
   return result;
 }
