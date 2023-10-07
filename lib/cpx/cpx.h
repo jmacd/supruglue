@@ -44,9 +44,16 @@ enum ThreadState {
 
 enum JumpCode {
   JC_SETJUMP = 0,
-  JC_CONTINUING = 1,
-  JC_OVERFLOW = 2,
-  JC_INTERNAL = 3,
+  JC_SUSPEND = 1,
+  JC_RESUME = 2,
+  JC_OVERFLOW = 3,
+  JC_INTERNAL = 4,
+  JC_BLOCKED = 5,
+  JC_UNBLOCKED = 6,
+};
+
+enum ChannelFlags {
+  CF_BLOCKING = 1,
 };
 
 typedef enum ThreadState ThreadState;
@@ -83,6 +90,8 @@ struct _SystemConfig {
 };
 
 struct _LogEntry {
+  // TODO: timestamp, sequence
+
   ThreadID    tid;
   const char *msg;
   int32_t     arg1;
@@ -90,13 +99,16 @@ struct _LogEntry {
 };
 
 struct _Channel {
-  uint32_t head;
-  uint32_t tail;
-  uint8_t  buffer[0];
+  uint32_t   flags;
+  uint32_t   head;
+  uint32_t   tail;
+  ThreadList readers;
+  ThreadList writers;
+  uint8_t    buffer[0];
 };
 
 struct _LogChannel {
-  Channel base;
+  Channel ch;
   uint8_t space[sizeof(LogEntry) * LOG_CHANNEL_ENTRIES];
 };
 
@@ -128,6 +140,9 @@ int32_t channelAvailable(Channel *ch);
 void    channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size);
 void    channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size);
 void    journalBogus(void);
+void    journal2u(const char *msg, int32_t arg1, int32_t arg2);
+void    journalRead(LogEntry *entry);
+void    yieldInternal(JumpCode jc);
 
 inline ThreadID TID(Thread *th) {
   return (ThreadID)th;

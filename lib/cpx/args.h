@@ -4,6 +4,8 @@
 #ifndef LIB_CPX_ARGS_H
 #define LIB_CPX_ARGS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +19,8 @@ struct _Args {
 };
 
 const char *TakeArg(Args *args);
+
+int32_t Atoi(const char *);
 
 #ifdef __cplusplus
 }

@@ -14,3 +14,17 @@ const char *TakeArg(Args *args) {
   args->ptr = p + 1;
   return start;
 }
+
+int32_t Atoi(const char *p) {
+  int32_t r = 0;
+
+  for (; *p != 0; p++) {
+    if (*p >= '0' && *p <= '9') {
+      r = r * 10;
+      r += *p - '0';
+      continue;
+    }
+    break;
+  }
+  return r;
+}

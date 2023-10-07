@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-void journal2u(const char *msg, size_t arg1, size_t arg2);
-
 System __system;
 
 SystemConfig NewSystemConfig() {
@@ -62,7 +60,13 @@ int Init(SystemConfig cfg) {
   System *sys = &__system;
   memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
+
   threadListInit(&sys->runnable);
+
+  sys->log.ch.flags |= CF_BLOCKING;
+  threadListInit(&sys->log.ch.readers);
+  threadListInit(&sys->log.ch.writers);
+
   return 0;
 }
 
@@ -86,24 +90,38 @@ int Run() {
 
     switch (setjmp(__system.return_jump)) {
     case JC_SETJUMP:
+      // The return jump was prepared, break to the second switch with
+      // the current runnable thread.
       break;
-    case JC_CONTINUING:
+    case JC_SUSPEND:
+      // Running thread yielded.
       threadListAdd(__system.runnable.prev, run);
+      continue;
+    case JC_BLOCKED:
+      // Running thread became blocked by another.
       continue;
     case JC_OVERFLOW:
     case JC_INTERNAL:
-      run->state = TS_FINISHED; // TODO: or error
+      // Running thread had an error.
+      run->state = TS_FINISHED;
+      break;
+    default:
+      assert(0);
     }
     switch (run->state) {
     case TS_STARTING:
+      // Run a new thread.
       run->state = TS_RUNNING;
       run->exec.call.func(TID(run), run->exec.call.args);
       run->state = TS_FINISHED;
       break;
     case TS_RUNNING:
-      longjmp(run->exec.run_jump, JC_CONTINUING);
+      // Re-enter the yield call.
+      longjmp(run->exec.run_jump, JC_RESUME);
       break;
+      // Function call returned
     case TS_FINISHED:
+      // Error cases exit here.
       break;
     }
   }
@@ -117,9 +135,9 @@ int32_t channelAvailable(Channel *ch) {
 void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
   int32_t avail = channelAvailable(ch);
   if (data_size > avail) {
-    // @@@
-    fprintf(stderr, "no data in channel %u!\n", avail);
-    assert(0);
+    fprintf(stderr, "reader go to sleep\n");
+    threadListAdd(ch->readers.prev, __system.current);
+    yieldInternal(JC_BLOCKED);
     return;
   }
   int32_t take = data_size;
@@ -131,6 +149,13 @@ void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
   memcpy(((uint8_t *)data) + take, ch->buffer, data_size - take);
 
   ch->tail += data_size;
+
+  if (threadListEmpty(&ch->writers)) {
+    return;
+  }
+  fprintf(stderr, "writer wakeup\n");
+  Thread *next = threadListPopFront(&ch->writers);
+  threadListAdd(__system.runnable.prev, next);
 }
 
 void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
@@ -141,10 +166,18 @@ void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
 
   int32_t limit = ch->head + data_size;
   if (limit > ch->tail + ch_size) {
-    // Note: data loss
-    fprintf(stderr, "DATA LOSS\n");
-    assert(0);
-    ch->tail = limit - ch_size;
+
+    if (ch->flags & CF_BLOCKING) {
+      // No room to write.
+      fprintf(stderr, "writer go to sleep\n");
+      threadListAdd(ch->writers.prev, __system.current);
+      yieldInternal(JC_BLOCKED);
+    } else {
+      // Non-blocking channel full => data loss.
+      fprintf(stderr, "@@@ data loss\n");
+      assert(0);
+      ch->tail = limit - ch_size;
+    }
   }
 
   int32_t hidx = ch->head % ch_size;
@@ -157,9 +190,20 @@ void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
   memcpy(ch->buffer, ((uint8_t *)data) + take, data_size - take);
 
   ch->head += data_size;
+
+  if (threadListEmpty(&ch->readers)) {
+    return;
+  }
+  fprintf(stderr, "reader wakeup\n");
+  Thread *next = threadListPopFront(&ch->readers);
+  threadListAdd(__system.runnable.prev, next);
 }
 
-void journal2u(const char *msg, size_t arg1, size_t arg2) {
+void journalRead(LogEntry *entry) {
+  channelRead(&__system.log.ch, sizeof(__system.log.space), entry, sizeof(*entry));
+}
+
+void journal2u(const char *msg, int32_t arg1, int32_t arg2) {
   LogEntry ent;
   ent.tid = TID(__system.current);
   ent.msg = msg;
@@ -170,15 +214,14 @@ void journal2u(const char *msg, size_t arg1, size_t arg2) {
   // fprintf(stderr, msg, arg1, arg2);
   // fprintf(stderr, "\n");
 
-  channelWrite(&__system.log.base, sizeof(__system.log.space), &ent, sizeof(ent));
-}
-
-void journalBogus(void) {
-  LogEntry toomany[LOG_CHANNEL_ENTRIES + 1];
-  channelWrite(&__system.log.base, sizeof(__system.log.space), &toomany, sizeof(toomany));
+  channelWrite(&__system.log.ch, sizeof(__system.log.space), &ent, sizeof(ent));
 }
 
 void Yield() {
+  yieldInternal(JC_SUSPEND);
+}
+
+void yieldInternal(JumpCode jc) {
   void *volatile unused;
   void   *yield_stack = (void *)&unused;
   int32_t size = (int32_t)((size_t)__system.run_stack_pos - (size_t)yield_stack);
@@ -190,8 +233,13 @@ void Yield() {
   }
   memcpy(__system.current->cfg.stack, yield_stack, size);
 
-  if (setjmp(__system.current->exec.run_jump) == JC_SETJUMP) {
-    longjmp(__system.return_jump, JC_CONTINUING);
+  switch (setjmp(__system.current->exec.run_jump)) {
+  case JC_SETJUMP:
+    longjmp(__system.return_jump, jc);
+  case JC_RESUME:
+    break;
+  default:
+    assert(0);
   }
 
   // size and yield_stack are not volatile, recompute:
