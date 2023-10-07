@@ -37,15 +37,16 @@ typedef uintptr_t ThreadID;
 typedef void(ThreadFunc)(ThreadID thid, Args args);
 
 enum ThreadState {
-  STARTING = 1, // Use exec.call.func(exec.call.arg)
-  RUNNING = 2,  // Use longjump(exec.run_jump)
-  FINISHED = 3, // Nothing to do
+  TS_STARTING = 1, // Use exec.call.func(exec.call.arg)
+  TS_RUNNING = 2,  // Use longjump(exec.run_jump)
+  TS_FINISHED = 3, // Nothing to do
 };
 
 enum JumpCode {
-  SETJUMP = 0,
-  CONTINUING = 1,
-  OVERFLOW = 2,
+  JC_SETJUMP = 0,
+  JC_CONTINUING = 1,
+  JC_OVERFLOW = 2,
+  JC_INTERNAL = 3,
 };
 
 typedef enum ThreadState ThreadState;
@@ -123,9 +124,10 @@ int Run();
 
 void Yield();
 
-int  channelEmpty(Channel *ch);
-void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size);
-void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size);
+int32_t channelAvailable(Channel *ch);
+void    channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size);
+void    channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size);
+void    journalBogus(void);
 
 inline ThreadID TID(Thread *th) {
   return (ThreadID)th;

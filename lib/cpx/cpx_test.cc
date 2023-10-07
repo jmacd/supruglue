@@ -35,7 +35,7 @@ string test_logs_format(LogEntry entry) {
 vector<string> test_logs_get() {
   vector<string> result;
 
-  while (!channelEmpty(&__system.log.base)) {
+  while (channelAvailable(&__system.log.base) != 0) {
     LogEntry ent;
     channelRead(&__system.log.base, sizeof(__system.log.space), &ent, sizeof(ent));
     result.push_back(test_logs_format(ent));
@@ -144,4 +144,19 @@ TEST(CpxTest, TestMultiOverflow) {
   EXPECT_EQ(2, logs.size());
   EXPECT_THAT(logs[0], HasSubstr("[a] stack overflow"));
   EXPECT_THAT(logs[1], HasSubstr("[b] stack overflow"));
+}
+
+TEST(CpxTest, TestWriteSizeError) {
+  Thread  thread;
+  uint8_t stack[500];
+
+  auto test_func = [](ThreadID tid, Args args) { journalBogus(); };
+
+  EXPECT_EQ(0, Init(NewSystemConfig()));
+  EXPECT_EQ(0, Create(&thread, test_func, Args{.ptr = ""}, NewThreadConfig("inval", stack, sizeof(stack))));
+  EXPECT_EQ(0, ::Run());
+
+  auto logs = test_logs_get();
+  EXPECT_EQ(1, logs.size());
+  EXPECT_THAT(logs[0], HasSubstr("[inval] write too large"));
 }

@@ -72,7 +72,7 @@ int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg) {
   thread->cfg = cfg;
   thread->exec.call.func = func;
   thread->exec.call.args = args;
-  thread->state = STARTING;
+  thread->state = TS_STARTING;
   threadListAdd(__system.runnable.prev, thread);
   return 0;
 }
@@ -85,38 +85,40 @@ int Run() {
     __system.run_stack_pos = (void *)&run;
 
     switch (setjmp(__system.return_jump)) {
-    case SETJUMP:
+    case JC_SETJUMP:
       break;
-    case CONTINUING:
+    case JC_CONTINUING:
       threadListAdd(__system.runnable.prev, run);
       continue;
-    case OVERFLOW:
-      run->state = FINISHED;
+    case JC_OVERFLOW:
+    case JC_INTERNAL:
+      run->state = TS_FINISHED; // TODO: or error
     }
     switch (run->state) {
-    case STARTING:
-      run->state = RUNNING;
+    case TS_STARTING:
+      run->state = TS_RUNNING;
       run->exec.call.func(TID(run), run->exec.call.args);
-      run->state = FINISHED;
+      run->state = TS_FINISHED;
       break;
-    case RUNNING:
-      longjmp(run->exec.run_jump, CONTINUING);
+    case TS_RUNNING:
+      longjmp(run->exec.run_jump, JC_CONTINUING);
       break;
-    case FINISHED:
+    case TS_FINISHED:
       break;
     }
   }
   return 0;
 }
 
-int channelEmpty(Channel *ch) {
-  return ch->head == ch->tail;
+int32_t channelAvailable(Channel *ch) {
+  return ch->head - ch->tail;
 }
 
 void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
-  if (ch->tail + data_size > ch->head) {
+  int32_t avail = channelAvailable(ch);
+  if (data_size > avail) {
     // @@@
-    fprintf(stderr, "no data in channel %u %u!\n", ch->tail, ch->head);
+    fprintf(stderr, "no data in channel %u!\n", avail);
     assert(0);
     return;
   }
@@ -134,8 +136,7 @@ void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
 void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
   if (data_size > ch_size) {
     journal2u("write too large: %u > %u", data_size, ch_size);
-    // TODO: re-enter yield somehow, test this.
-    return;
+    longjmp(__system.return_jump, JC_INTERNAL);
   }
 
   int32_t limit = ch->head + data_size;
@@ -172,6 +173,11 @@ void journal2u(const char *msg, size_t arg1, size_t arg2) {
   channelWrite(&__system.log.base, sizeof(__system.log.space), &ent, sizeof(ent));
 }
 
+void journalBogus(void) {
+  LogEntry toomany[LOG_CHANNEL_ENTRIES + 1];
+  channelWrite(&__system.log.base, sizeof(__system.log.space), &toomany, sizeof(toomany));
+}
+
 void Yield() {
   void *volatile unused;
   void   *yield_stack = (void *)&unused;
@@ -180,12 +186,12 @@ void Yield() {
   // Check for thread-stack overflow.
   if (size > __system.current->cfg.stack_size) {
     journal2u("stack overflow: %u exceeds %u", size, __system.current->cfg.stack_size);
-    longjmp(__system.return_jump, OVERFLOW);
+    longjmp(__system.return_jump, JC_OVERFLOW);
   }
   memcpy(__system.current->cfg.stack, yield_stack, size);
 
-  if (setjmp(__system.current->exec.run_jump) == SETJUMP) {
-    longjmp(__system.return_jump, CONTINUING);
+  if (setjmp(__system.current->exec.run_jump) == JC_SETJUMP) {
+    longjmp(__system.return_jump, JC_CONTINUING);
   }
 
   // size and yield_stack are not volatile, recompute:
