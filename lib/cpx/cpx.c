@@ -138,7 +138,6 @@ void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
     fprintf(stderr, "reader go to sleep\n");
     threadListAdd(ch->readers.prev, __system.current);
     yieldInternal(JC_BLOCKED);
-    return;
   }
   int32_t take = data_size;
   int32_t tidx = ch->tail % ch_size;
@@ -153,7 +152,7 @@ void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
   if (threadListEmpty(&ch->writers)) {
     return;
   }
-  fprintf(stderr, "writer wakeup\n");
+  fprintf(stderr, "writer -> runnable\n");
   Thread *next = threadListPopFront(&ch->writers);
   threadListAdd(__system.runnable.prev, next);
 }
@@ -163,8 +162,9 @@ void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
     journal2u("write too large: %u > %u", data_size, ch_size);
     longjmp(__system.return_jump, JC_INTERNAL);
   }
-
-  int32_t limit = ch->head + data_size;
+  int32_t limit;
+again:
+  limit = ch->head + data_size;
   if (limit > ch->tail + ch_size) {
 
     if (ch->flags & CF_BLOCKING) {
@@ -172,6 +172,8 @@ void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
       fprintf(stderr, "writer go to sleep\n");
       threadListAdd(ch->writers.prev, __system.current);
       yieldInternal(JC_BLOCKED);
+      fprintf(stderr, "writer awake\n");
+      goto again;
     } else {
       // Non-blocking channel full => data loss.
       fprintf(stderr, "@@@ data loss\n");
