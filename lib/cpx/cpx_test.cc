@@ -63,18 +63,24 @@ void test_write_func(ThreadID tid, Args args) {
   for (int32_t i = 0; i < cnt; i++) {
     fprintf(stderr, "write it %d\n", i);
     journal2u("lalala %u", i, 0);
+    Yield();
   }
 }
 
 void test_read_func(ThreadID tid, Args args) {
   TestThread2 *tt2 = (TestThread2 *)tid;
-  int32_t      cnt = Atoi(args.ptr);
-  for (int32_t i = 0; i < cnt; i++) {
+
+  int cnt = -1;
+  if (args.ptr != nullptr) {
+    cnt = Atoi(args.ptr);
+  }
+  for (int32_t i = 0; cnt < 0 || i < cnt; i++) {
     LogEntry ent;
     journalRead(&ent);
     auto rd = test_logs_format(ent);
     fprintf(stderr, "read it %s\n", rd.c_str());
     tt2->messages.push_back(rd);
+    Yield();
   }
 }
 
@@ -234,6 +240,43 @@ TEST(CpxTest, OneBlockingRead) {
   EXPECT_EQ(expect, counts);
 }
 
+TEST(CpxTest, NonBlockingRead) {
+  Thread      writer0;
+  Thread      writer1;
+  TestThread2 reader;
+  uint8_t     stack0[500];
+  uint8_t     stack1[500];
+  uint8_t     stack2[500];
+
+  const int    items = 10;
+  const string each = std::to_string(items);
+
+  auto cfg = NewSystemConfig();
+  cfg.log_flags = CF_NONBLOCKING;
+
+  EXPECT_EQ(0, Init(cfg));
+  EXPECT_EQ(0, Create(&writer0, test_write_func, Args{.ptr = each.c_str()},
+                      NewThreadConfig("write0", stack0, sizeof(stack0))));
+  EXPECT_EQ(0, Create(&writer1, test_write_func, Args{.ptr = each.c_str()},
+                      NewThreadConfig("write1", stack1, sizeof(stack1))));
+  EXPECT_EQ(0, Create(&reader.thread, test_read_func,
+                      Args{
+                          .ptr = nullptr,
+                      },
+                      NewThreadConfig("reader", stack2, sizeof(stack2))));
+
+  EXPECT_EQ(0, ::Run());
+
+  std::unordered_map<string, int> counts;
+  std::unordered_map<string, int> expect;
+
+  auto logs = reader.messages;
+  auto loss_count = __system.log.ch.lost / sizeof(LogEntry);
+
+  EXPECT_EQ(2 * items, loss_count + logs.size());
+  EXPECT_EQ(expect, counts);
+}
+
 TEST(CpxTest, TwoBlockingWriters) {
   Thread      writer0;
   Thread      writer1;
@@ -242,8 +285,7 @@ TEST(CpxTest, TwoBlockingWriters) {
   uint8_t     stack1[500];
   uint8_t     stack2[500];
 
-  const int items = 100;
-
+  const int    items = 100;
   const string each = std::to_string(items);
   const string twice = std::to_string(2 * items);
 
@@ -269,6 +311,49 @@ TEST(CpxTest, TwoBlockingWriters) {
   for (int32_t i = 0; i < items; i++) {
     expect["[write0] lalala " + std::to_string(i)] = 1;
     expect["[write1] lalala " + std::to_string(i)] = 1;
+  }
+
+  EXPECT_EQ(expect, counts);
+}
+
+TEST(CpxTest, TwoBlockingReaders) {
+  Thread      writer;
+  TestThread2 reader0;
+  TestThread2 reader1;
+  uint8_t     stack0[500];
+  uint8_t     stack1[500];
+  uint8_t     stack2[500];
+
+  const int    items = 10;
+  const string each = std::to_string(items);
+  const string twice = std::to_string(2 * items);
+
+  EXPECT_EQ(0, Init(NewSystemConfig()));
+  EXPECT_EQ(0, Create(&writer, test_write_func, Args{.ptr = twice.c_str()},
+                      NewThreadConfig("writer", stack0, sizeof(stack0))));
+  EXPECT_EQ(0, Create(&reader0.thread, test_read_func, Args{.ptr = each.c_str()},
+                      NewThreadConfig("reader0", stack1, sizeof(stack1))));
+  EXPECT_EQ(0, Create(&reader1.thread, test_read_func, Args{.ptr = each.c_str()},
+                      NewThreadConfig("reader1", stack2, sizeof(stack2))));
+
+  EXPECT_EQ(0, ::Run());
+
+  std::unordered_map<string, int> counts;
+  std::unordered_map<string, int> expect;
+
+  auto logs0 = reader0.messages;
+  auto logs1 = reader1.messages;
+  EXPECT_EQ(items, logs0.size());
+  EXPECT_EQ(items, logs1.size());
+  for (int32_t i = 0; i < logs0.size(); i++) {
+    counts[logs0[i]] += 1;
+  }
+  for (int32_t i = 0; i < logs1.size(); i++) {
+    counts[logs1[i]] += 1;
+  }
+
+  for (int32_t i = 0; i < 2 * items; i++) {
+    expect["[writer] lalala " + std::to_string(i)] = 1;
   }
 
   EXPECT_EQ(expect, counts);

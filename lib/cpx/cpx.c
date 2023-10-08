@@ -1,13 +1,10 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "cpx.h"
-
-// bogus
-#include <unistd.h>
-
 #include <assert.h>
 #include <stdlib.h>
+
+#include "lib/cpx/cpx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +13,9 @@ extern "C" {
 System __system;
 
 SystemConfig NewSystemConfig() {
-  return (SystemConfig){};
+  return (SystemConfig){
+      .log_flags = CF_NONE,
+  };
 }
 
 ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size) {
@@ -63,9 +62,7 @@ int Init(SystemConfig cfg) {
 
   threadListInit(&sys->runnable);
 
-  sys->log.ch.flags |= CF_BLOCKING;
-  threadListInit(&sys->log.ch.readers);
-  threadListInit(&sys->log.ch.writers);
+  channelInit(&sys->log.ch, cfg.log_flags);
 
   return 0;
 }
@@ -128,16 +125,24 @@ int Run() {
   return 0;
 }
 
+void channelInit(Channel *ch, int32_t flags) {
+  ch->flags = flags;
+  threadListInit(&ch->readers);
+  threadListInit(&ch->writers);
+}
+
 int32_t channelAvailable(Channel *ch) {
   return ch->head - ch->tail;
 }
 
-void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
-  int32_t avail = channelAvailable(ch);
+int channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
+  int32_t avail;
+again:
+  avail = channelAvailable(ch);
   if (data_size > avail) {
-    fprintf(stderr, "reader go to sleep\n");
     threadListAdd(ch->readers.prev, __system.current);
     yieldInternal(JC_BLOCKED);
+    goto again;
   }
   int32_t take = data_size;
   int32_t tidx = ch->tail % ch_size;
@@ -150,11 +155,11 @@ void channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
   ch->tail += data_size;
 
   if (threadListEmpty(&ch->writers)) {
-    return;
+    return 0;
   }
-  fprintf(stderr, "writer -> runnable\n");
   Thread *next = threadListPopFront(&ch->writers);
   threadListAdd(__system.runnable.prev, next);
+  return 0;
 }
 
 void channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size) {
@@ -167,18 +172,16 @@ again:
   limit = ch->head + data_size;
   if (limit > ch->tail + ch_size) {
 
-    if (ch->flags & CF_BLOCKING) {
+    if ((ch->flags & CF_NONBLOCKING) == 0) {
       // No room to write.
-      fprintf(stderr, "writer go to sleep\n");
       threadListAdd(ch->writers.prev, __system.current);
       yieldInternal(JC_BLOCKED);
-      fprintf(stderr, "writer awake\n");
       goto again;
     } else {
       // Non-blocking channel full => data loss.
-      fprintf(stderr, "@@@ data loss\n");
-      assert(0);
-      ch->tail = limit - ch_size;
+      int32_t new_tail = limit - ch_size;
+      ch->lost += new_tail - ch->tail;
+      ch->tail = new_tail;
     }
   }
 
@@ -196,13 +199,12 @@ again:
   if (threadListEmpty(&ch->readers)) {
     return;
   }
-  fprintf(stderr, "reader wakeup\n");
   Thread *next = threadListPopFront(&ch->readers);
   threadListAdd(__system.runnable.prev, next);
 }
 
-void journalRead(LogEntry *entry) {
-  channelRead(&__system.log.ch, sizeof(__system.log.space), entry, sizeof(*entry));
+int journalRead(LogEntry *entry) {
+  return channelRead(&__system.log.ch, sizeof(__system.log.space), entry, sizeof(*entry));
 }
 
 void journal2u(const char *msg, int32_t arg1, int32_t arg2) {
@@ -211,11 +213,6 @@ void journal2u(const char *msg, int32_t arg1, int32_t arg2) {
   ent.msg = msg;
   ent.arg1 = arg1;
   ent.arg2 = arg2;
-
-  // fprintf(stderr, "journal: ");
-  // fprintf(stderr, msg, arg1, arg2);
-  // fprintf(stderr, "\n");
-
   channelWrite(&__system.log.ch, sizeof(__system.log.space), &ent, sizeof(ent));
 }
 

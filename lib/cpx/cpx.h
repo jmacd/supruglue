@@ -53,11 +53,13 @@ enum JumpCode {
 };
 
 enum ChannelFlags {
-  CF_BLOCKING = 1,
+  CF_NONE = 0,
+  CF_NONBLOCKING = 1,
 };
 
-typedef enum ThreadState ThreadState;
-typedef enum JumpCode    JumpCode;
+typedef enum ThreadState  ThreadState;
+typedef enum JumpCode     JumpCode;
+typedef enum ChannelFlags ChannelFlags;
 
 struct _ThreadConfig {
   uint8_t    *stack;
@@ -86,12 +88,11 @@ struct _Thread {
 };
 
 struct _SystemConfig {
-  size_t unused;
+  ChannelFlags log_flags;
 };
 
 struct _LogEntry {
-  // TODO: timestamp, sequence
-
+  // TODO: timestamp
   ThreadID    tid;
   const char *msg;
   int32_t     arg1;
@@ -102,6 +103,7 @@ struct _Channel {
   uint32_t   flags;
   uint32_t   head;
   uint32_t   tail;
+  uint32_t   lost;
   ThreadList readers;
   ThreadList writers;
   uint8_t    buffer[0];
@@ -115,12 +117,10 @@ struct _LogChannel {
 struct _System {
   SystemConfig cfg;
   LogChannel   log;
-
-  jmp_buf return_jump;
-  void   *run_stack_pos;
-
-  ThreadList runnable;
-  Thread    *current;
+  jmp_buf      return_jump;
+  void        *run_stack_pos;
+  Thread      *current;
+  ThreadList   runnable;
 };
 
 extern System __system;
@@ -136,12 +136,13 @@ int Run();
 
 void Yield();
 
+void    channelInit(Channel *ch, int32_t flags);
 int32_t channelAvailable(Channel *ch);
-void    channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size);
+int     channelRead(Channel *ch, int32_t ch_size, void *data, size_t data_size);
 void    channelWrite(Channel *ch, int32_t ch_size, void *data, size_t data_size);
 void    journalBogus(void);
 void    journal2u(const char *msg, int32_t arg1, int32_t arg2);
-void    journalRead(LogEntry *entry);
+int     journalRead(LogEntry *entry);
 void    yieldInternal(JumpCode jc);
 
 inline ThreadID TID(Thread *th) {
