@@ -5,14 +5,12 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync"
 
 	"github.com/jmacd/supruglue/tools/internal/arch"
 	"github.com/jmacd/supruglue/tools/internal/csv"
 )
 
 func main() {
-	var x sync.Mutex
 	if len(os.Args) != 3 {
 		log.Fatal("usage: %s <arch> <pins.csv>\n", os.Args[0])
 	}

@@ -132,9 +132,9 @@ int Init(SystemConfig cfg);
 
 int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg);
 
-int Run();
+int Run(void);
 
-void Yield();
+void Yield(void);
 
 void    channelInit(Channel *ch, int32_t flags);
 int32_t channelAvailable(Channel *ch);
@@ -145,9 +145,7 @@ void    journal2u(const char *msg, int32_t arg1, int32_t arg2);
 int     journalRead(LogEntry *entry);
 void    yieldInternal(JumpCode jc);
 
-inline ThreadID TID(Thread *th) {
-  return (ThreadID)th;
-}
+ThreadID TID(Thread *th);
 
 #ifdef __cplusplus
 }

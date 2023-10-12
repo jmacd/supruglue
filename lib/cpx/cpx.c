@@ -2,17 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #include <assert.h>
+#include <setjmp.h>
 #include <stdlib.h>
 
 #include "lib/cpx/cpx.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 System __system;
 
-SystemConfig NewSystemConfig() {
+SystemConfig NewSystemConfig(void) {
   return (SystemConfig){
       .log_flags = CF_NONE,
   };
@@ -78,7 +75,7 @@ int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg) {
   return 0;
 }
 
-int Run() {
+int Run(void) {
   while (!threadListEmpty(&__system.runnable)) {
     Thread *volatile run = threadListPopFront(&__system.runnable);
 
@@ -216,7 +213,7 @@ void journal2u(const char *msg, int32_t arg1, int32_t arg2) {
   channelWrite(&__system.log.ch, sizeof(__system.log.space), &ent, sizeof(ent));
 }
 
-void Yield() {
+void Yield(void) {
   yieldInternal(JC_SUSPEND);
 }
 
@@ -248,6 +245,6 @@ void yieldInternal(JumpCode jc) {
   memcpy(yield_stack, __system.current->cfg.stack, size);
 }
 
-#ifdef __cplusplus
+ThreadID TID(Thread *th) {
+  return (ThreadID)th;
 }
-#endif

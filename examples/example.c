@@ -1,5 +1,5 @@
 #include "external/ti-pru-support/include/pru_rpmsg.h"
-#include "lib/cpx/CorePartition.h"
+#include "lib/cpx/cpx.h"
 #include "lib/ui1203/ui1203.h"
 #include <stddef.h>
 

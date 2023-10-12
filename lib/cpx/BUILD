@@ -5,11 +5,11 @@ cc_library(
     srcs = [
 	    "cpx.c",
 	    "args.c",
-    ],
+	    ],
     hdrs = [
 	    "cpx.h",
 	    "args.h",
-    ],
+	    ],
 )
 
 cc_library(

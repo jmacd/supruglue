@@ -1,34 +1,27 @@
-#include "lib/cpx/CorePartition.h"
+#include "lib/cpx/cpx.h"
+#include <setjmp.h>
 #include <stddef.h>
+#include <stdio.h>
 
-void Thread1(void *pValue) {
+void Thread1(ThreadID thid, Args args) {
   while (1) {
-    printf("pval %p\n", pValue);
-    Cpx_Yield();
+    printf("arg %s\n", args.ptr);
+    Yield();
   }
 }
 
-#define NUM_THREADS 2
-
-CpxThread *threads[NUM_THREADS];
-
 int main() {
-  // TODO weirdly -- NUM_THREADS was a byte size, so
-  // what actually allocates.
-  if (Cpx_StaticStart(threads, NUM_THREADS) == false) {
-    return (1);
-  }
+  Args    args1 = {.ptr = "1"};
+  Args    args2 = {.ptr = "2"};
+  Thread  th1;
+  Thread  th2;
+  uint8_t stack1[1024];
+  uint8_t stack2[1024];
 
-  CpxStaticThread th1, th2;
+  Init(NewSystemConfig());
 
-  bool ok1 = Cpx_CreateStaticThread(Thread1, (void *)1, &th1, 256, 100);
-  bool ok2 = Cpx_CreateStaticThread(Thread1, (void *)2, &th2, 256, 200);
+  Create(&th1, Thread1, args1, NewThreadConfig("a", stack1, 1024));
+  Create(&th2, Thread1, args2, NewThreadConfig("b", stack2, 1024));
 
-  printf("started %d %d\n", ok1, ok2);
-
-  Cpx_Join();
-
-  printf("done!\n");
-
-  return 0;
+  return Run();
 }
