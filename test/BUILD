@@ -4,7 +4,7 @@ cc_test(
     copts = [],
     deps = [
         "//supruglue/test32",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -14,7 +14,7 @@ cc_test(
 #    copts = ["-Isupruglue/test32"],
     deps = [
         "//supruglue/test32",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -24,6 +24,6 @@ cc_test(
 #    copts = ["-Isupruglue/test32"],
     deps = [
         "//supruglue/test32",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )

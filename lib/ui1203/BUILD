@@ -17,6 +17,6 @@ cc_test(
     deps = [
 	":ui1203",
         "//supruglue/test32",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )

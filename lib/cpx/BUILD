@@ -32,7 +32,7 @@ cc_test(
         "cpx_test.cc",
 	],
     deps = [
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
         ":cpx",
         ":cpx_test",
     ],
