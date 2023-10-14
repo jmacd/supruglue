@@ -1,25 +1,26 @@
+# -*- Mode: Python -*-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "rpmsg_test32",
+    name = "test32",
     srcs = [
-	"rpmsg_test32.cc",
+	"rpmsg_test32_host.cc",
     ],
     hdrs = [
-	"rpmsg_test32.h",
+	"rpmsg_test32_host.h",
     ],
     deps = [
-        "@com_google_absl//absl/log:initialize",
+        "//lib/rpmsg/am335x:iface",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/synchronization",
     ],
 )
 
 cc_test(
-    name = "rpmsg_test32_test",
+    name = "test",
     srcs = ["rpmsg_test32_test.cc"],
     deps = [
-	":rpmsg_test32",
+	":test32",
         "@com_google_googletest//:gtest_main",
     ],
 )
