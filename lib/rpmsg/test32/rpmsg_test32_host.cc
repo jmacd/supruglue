@@ -3,16 +3,17 @@
 
 #include "rpmsg_test32_host.h"
 #include "absl/log/log.h"
-#include "absl/synchronization/mutex.h"
+#include "rpmsg_test32_chan.h"
 #include <thread>
 
-struct _ClientTransport {};
+struct _ClientTransport {
+  Channel<std::string> chan;
+};
 
 struct _TestTransport {
   _TestTransport() : thread(&_TestTransport::run, this) {
   }
 
-  absl::Mutex     lock;
   std::thread     thread;
   ClientTransport client;
 
@@ -37,10 +38,12 @@ void StopTestTransport(TestTransport *rpmt) {
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
+  transport->chan.send(std::string(data, len));
   return 0;
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
+  transport->chan.receive(std::string(data, len));
   return 0;
 }
 

@@ -8,6 +8,7 @@ cc_library(
     ],
     hdrs = [
 	"rpmsg_test32_host.h",
+	"rpmsg_test32_chan.h",
     ],
     deps = [
         "//lib/rpmsg/am335x:iface",
