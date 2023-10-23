@@ -2,55 +2,57 @@
 // SPDX-License-Identifier: MIT
 
 #include "rpmsg_test32_host.h"
-#include "absl/log/log.h"
 #include "rpmsg_test32_chan.h"
 #include <thread>
 
+ClientTransport *__transport;
+
 struct _ClientTransport {
-  Channel<std::string> chan;
+  Channel<std::string> host_to_pru;
+  Channel<std::string> pru_to_host;
 };
 
 struct _TestTransport {
-  _TestTransport() : thread(&_TestTransport::run, this) {
+  _TestTransport() {
   }
 
-  std::thread     thread;
   ClientTransport client;
-
-  void run() {
-    LOG(INFO) << "hello";
-  }
 };
 
 TestTransport *NewTestTransport(void) {
   return new TestTransport;
 }
 
-ClientTransport *GetClientTransport(TestTransport *host) {
-  return &host->client;
-}
-
 void StartTestTransport(TestTransport *rpmt) {
+  __transport = &rpmt->client;
 }
 
 void StopTestTransport(TestTransport *rpmt) {
-  rpmt->thread.join();
+  __transport = nullptr;
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
-  transport->chan.send(std::string(data, len));
+  transport->pru_to_host.send(std::string(static_cast<const char *>(data), len));
   return 0;
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
-  transport->chan.receive(std::string(data, len));
+  std::string r = transport->host_to_pru.receive();
+  // TODO: should test that *len can hold r.size()?
+  memcpy(data, r.c_str(), r.size());
+  *len = r.size();
   return 0;
 }
 
 int HostSend(TestTransport *transport, const void *data, uint16_t len) {
+  transport->client.host_to_pru.send(std::string(static_cast<const char *>(data), len));
   return 0;
 }
 
 int HostRecv(TestTransport *transport, void *data, uint16_t *len) {
+  std::string r = transport->client.pru_to_host.receive();
+  // TODO: should test that *len can hold r.size()?
+  memcpy(data, r.c_str(), r.size());
+  *len = r.size();
   return 0;
 }

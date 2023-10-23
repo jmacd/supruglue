@@ -19,14 +19,17 @@ public:
   T receive() {
     absl::MutexLock lock(&_lock);
     _has_receiver = true;
-    _lock.Await(Condition([this] { return _has_receiver && _has_value; }));
+    _lock.Await(absl::Condition(
+        +[](Channel<T> *ch) { return ch->_has_receiver && ch->_has_value; }, this));
     _has_receiver = false;
     _has_value = false;
     return std::move(_val);
   };
+
   void send(T &&val) {
     absl::MutexLock lock(&_lock);
-    _lock.Await(Condition([this] { return (_has_receiver && !_has_value); }));
+    _lock.Await(absl::Condition(
+        +[](Channel<T> *ch) { return (ch->_has_receiver && !ch->_has_value); }, this));
     _val = val;
     _has_value = true;
   };

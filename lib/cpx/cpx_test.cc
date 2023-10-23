@@ -3,6 +3,7 @@
 
 #include "lib/cpx/cpx.h"
 #include "lib/cpx/cpx_test_c.h"
+#include "lib/cpx/fmt.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
@@ -33,17 +34,6 @@ vector<ThreadID> test_run_get(void) {
   return result;
 }
 
-string test_logs_format(LogEntry entry) {
-  // sigh. use absl?
-  string result;
-  char   buf[1024];
-  snprintf(buf, sizeof(buf), "[%s] ", ((Thread *)entry.tid)->cfg.name);
-  result += buf;
-  snprintf(buf, sizeof(buf), entry.msg, entry.arg1, entry.arg2);
-  result += buf;
-  return result;
-}
-
 vector<string> test_logs_get() {
   vector<string> result;
 
@@ -53,7 +43,7 @@ vector<string> test_logs_get() {
   while (channelAvailable(&__system.log.ch) != 0) {
     LogEntry ent;
     journalRead(&ent);
-    result.push_back(test_logs_format(ent));
+    result.push_back(Format(&ent));
   }
   return result;
 }
@@ -77,7 +67,7 @@ void test_read_func(ThreadID tid, Args args) {
   for (int32_t i = 0; cnt < 0 || i < cnt; i++) {
     LogEntry ent;
     journalRead(&ent);
-    auto rd = test_logs_format(ent);
+    auto rd = Format(&ent);
     fprintf(stderr, "read it %s\n", rd.c_str());
     tt2->messages.push_back(rd);
     Yield();

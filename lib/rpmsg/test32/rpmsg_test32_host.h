@@ -8,13 +8,11 @@
 extern "C" {
 #endif
 
-#include "lib/rpmsg/am335x/rpmsg_am335x_iface.h"
+#include "lib/rpmsg/rpmsg_iface.h"
 
 typedef struct _TestTransport TestTransport;
 
 TestTransport *NewTestTransport(void);
-
-ClientTransport *GetClientTransport(TestTransport *host);
 
 void StartTestTransport(TestTransport *host);
 void StopTestTransport(TestTransport *host);

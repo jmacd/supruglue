@@ -2,25 +2,28 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "test32",
+    name = "syslog",
     srcs = [
-	"rpmsg_test32_host.cc",
-    ],
+	    "syslog.c",
+	    ],
     hdrs = [
-	"rpmsg_test32_host.h",
-	"rpmsg_test32_chan.h",
-    ],
+	    "syslog.h",
+	    ],
     deps = [
+        "//lib/cpx",
         "//lib/rpmsg",
-        "@com_google_absl//absl/synchronization",
     ],
 )
 
 cc_test(
     name = "test",
-    srcs = ["rpmsg_test32_test.cc"],
+    srcs = [
+        "syslog_test.cc",
+	],
     deps = [
-	":test32",
         "@com_google_googletest//:gtest_main",
+        ":syslog",
+        "//lib/cpx:fmt",
+        "//lib/rpmsg/test32",
     ],
 )

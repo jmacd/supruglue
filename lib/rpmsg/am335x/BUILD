@@ -1,16 +1,16 @@
 # -*- Mode: Python -*-
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "iface",
-    srcs = [
-    ],
-    hdrs = [
-	"rpmsg_am335x_iface.h",
-    ],
-    deps = [
-    ],
-)
+# cc_library(
+#     name = "iface",
+#     srcs = [
+#     ],
+#     hdrs = [
+# 	"rpmsg_am335x_iface.h",
+#     ],
+#     deps = [
+#     ],
+# )
 
 # cc_library(
 #     name = "iface",

@@ -15,6 +15,8 @@ typedef struct _ClientTransport ClientTransport;
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len);
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len);
 
+extern ClientTransport *__transport;
+
 #ifdef __cplusplus
 }
 #endif
