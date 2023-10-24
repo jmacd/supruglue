@@ -24,21 +24,8 @@ cc_library(
     deps = [
 	":cpx",
         "@com_google_absl//absl/strings:str_format",
+        "//tools/toolchain/am335x:incompatible",
     ],
-)
-
-cc_library(
-    name = "cpx_test",
-    srcs = [
-	"cpx_test_c.c",
-    ],
-    hdrs = [
-	"cpx_test_c.h",
-    ],
-    deps = [
-	":cpx",
-    ],
-    testonly = 1,
 )
 
 cc_test(
@@ -50,6 +37,6 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         ":cpx",
         ":fmt",
-        ":cpx_test",
+        "//tools/toolchain/am335x:incompatible",
     ],
 )

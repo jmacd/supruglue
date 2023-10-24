@@ -1,36 +1,32 @@
 # -*- Mode: Python -*-
 package(default_visibility = ["//visibility:public"])
 
-# cc_library(
-#     name = "iface",
-#     srcs = [
-#     ],
-#     hdrs = [
-# 	"rpmsg_am335x_iface.h",
-#     ],
-#     deps = [
-#     ],
-# )
+cc_library(
+    name = "am335x",
+    srcs = [
+#	"rpmsg_am335x.c",
+    ],
+    hdrs = [
+#	"rpmsg_am335x.h",
+    ],
+    deps = [
+        "//tools/toolchain/am335x",
+#        "@ti-pru-support//include",
+        "@ti-pru-support//lib/src/rpmsg_lib",
+    ],
+)
 
 # cc_library(
-#     name = "iface",
+#     name = "am335x",
 #     srcs = [
-# 	"rpmsg_test32_client.cc",
-#     ],
-#     hdrs = [
-# 	"rpmsg_test32_client.h",
+#        "@ti-cgt-pru//:libc_a",
 #     ],
 #     deps = [
-#         "@com_google_absl//absl/log",
-#         "@com_google_absl//absl/synchronization",
+#        "@ti-pru-support//include",
+#        "@ti-pru-support//lib/src/rpmsg_lib",
 #     ],
-# )
-
-# cc_test(
-#     name = "test",
-#     srcs = ["rpmsg_test32_test.cc"],
-#     deps = [
-# 	":client",
-#         "@com_google_googletest//:gtest_main",
-#     ],
+#     target_compatible_with = select({
+#         "//tools/toolchain:am335x": [],
+#         "//conditions:default": ["@platforms//:incompatible"],
+#     }),
 # )

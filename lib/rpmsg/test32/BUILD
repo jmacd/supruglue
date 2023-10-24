@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//lib/rpmsg",
         "@com_google_absl//absl/synchronization",
+        "//tools/toolchain/am335x:incompatible",
     ],
 )
 

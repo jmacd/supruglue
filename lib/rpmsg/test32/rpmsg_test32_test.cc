@@ -17,18 +17,15 @@ TEST(RpmsgTest, ReadWrite) {
   const std::string expect = "abcdefg";
 
   auto t = NewTestTransport();
+  StartTestTransport(t);
 
   std::thread host([t, expect] {
-    StartTestTransport(t);
-
     char     buf[32];
     uint16_t blen = 32;
     EXPECT_EQ(0, HostRecv(t, &buf, &blen));
     EXPECT_EQ(expect, std::string(buf, blen));
 
     EXPECT_EQ(0, HostSend(t, static_cast<const void *>(expect.c_str()), static_cast<uint16_t>(expect.size())));
-
-    StopTestTransport(t);
   });
 
   std::thread client([expect] {
@@ -43,4 +40,6 @@ TEST(RpmsgTest, ReadWrite) {
 
   client.join();
   host.join();
+
+  StopTestTransport(t);
 }

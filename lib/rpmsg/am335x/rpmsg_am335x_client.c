@@ -4,6 +4,13 @@
 #include "lib/rpmsg/rpmsg.h"
 #include <pru_rpmsg.h>
 
+typedef struct _ClientTransport ClientTransport;
+
+int ClientSend(ClientTransport *transport, const void *data, uint16_t len);
+int ClientRecv(ClientTransport *transport, void *data, uint16_t *len);
+
+extern ClientTransport *__transport;
+
 #if 0
 struct pru_rpmsg_transport rpmsg_transport;
 char                       rpmsg_payload[RPMSG_BUF_SIZE];

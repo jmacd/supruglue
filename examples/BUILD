@@ -1,11 +1,11 @@
-
+# -*- Mode: Python -*-
 cc_binary(
     name = "example_pru",
     srcs = ["example.c"],
     deps = [
 	    "//lib/ui1203",
 	    "//lib/cpx",
-	    "//tools/toolchain/am335x",
+	    "//lib/rpmsg/am335x",
 	    ],
     linkopts = [
         "$(location //tools/toolchain/am335x:cmd)",

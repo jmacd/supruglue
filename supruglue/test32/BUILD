@@ -1,3 +1,4 @@
+# -*- Mode: Python -*-
 cc_library(
     name = "test32",
     srcs = [
@@ -15,16 +16,9 @@ cc_library(
     deps = [
 	"//supruglue",
         "@ti-pru-support//include",
-
-        # Note: we can't build this w/o clpru
-        # so we replace it
-        # "@ti-pru-support//lib/src/rpmsg_lib",
+        "//tools/toolchain/am335x:incompatible",
     ],
     visibility = ["//visibility:public"],
-    target_compatible_with = select({
-        "//tools/toolchain:am335x": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 genrule(

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/cpx/cpx.h"
-#include "lib/cpx/cpx_test_c.h"
 #include "lib/cpx/fmt.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -14,6 +13,9 @@ using std::string;
 using std::vector;
 
 using testing::HasSubstr;
+
+ThreadID test_run_vector[32];
+size_t   test_run_vector_size;
 
 typedef struct {
   Thread    thread;
@@ -34,6 +36,34 @@ vector<ThreadID> test_run_get(void) {
   return result;
 }
 
+void test_run_reset(void) {
+  memset(test_run_vector, 0, sizeof(test_run_vector));
+  test_run_vector_size = 0;
+}
+
+void test_run_func(ThreadID tid, Args args) {
+  for (int i = 0; i < 2; i++) {
+    Yield();
+    // This follows the Yield so that we test entry and return to the
+    // coroutine.
+    test_run_vector[test_run_vector_size++] = tid;
+  }
+}
+
+void test_recursive_func(ThreadID tid, Args args) {
+  const char *arg = TakeArg(&args);
+
+  Yield();
+  if (*arg != '0') {
+    char two[2];
+    two[0] = *arg - 1;
+    two[1] = 0;
+    Args rargs;
+    rargs.ptr = two;
+    test_recursive_func(tid, rargs);
+  }
+}
+
 vector<string> test_logs_get() {
   vector<string> result;
 
@@ -51,7 +81,6 @@ vector<string> test_logs_get() {
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
-    fprintf(stderr, "write it %d\n", i);
     journal2u("lalala %u", i, 0);
     Yield();
   }
@@ -68,7 +97,6 @@ void test_read_func(ThreadID tid, Args args) {
     LogEntry ent;
     journalRead(&ent);
     auto rd = Format(&ent);
-    fprintf(stderr, "read it %s\n", rd.c_str());
     tt2->messages.push_back(rd);
     Yield();
   }

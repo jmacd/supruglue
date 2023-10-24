@@ -1,3 +1,4 @@
+# -*- Mode: Python -*-
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
@@ -14,10 +15,17 @@ cc_library(
     ],
     deps = [
         "@ti-pru-support//include",
-        "@ti-pru-support//lib/src/rpmsg_lib",
     ],
     target_compatible_with = select({
         "//tools/toolchain:am335x": [],
         "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+cc_library(
+    name = "incompatible",
+    target_compatible_with = select({
+        "//tools/toolchain:am335x": ["@platforms//:incompatible"],
+        "//conditions:default": [],
     }),
 )

@@ -5,7 +5,6 @@
 
 void main() {
   UI1203_Run_Reader(NULL);
-  Cpx_Join();
-  Cpx_StaticStart(NULL, 10);
+  Init(NewSystemConfig());
   pru_rpmsg_init(NULL, NULL, NULL, 0, 0);
 }
