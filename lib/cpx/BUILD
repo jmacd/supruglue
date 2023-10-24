@@ -32,6 +32,7 @@ cc_test(
     name = "test",
     srcs = [
         "cpx_test.cc",
+        "args_test.cc",
     ],
     deps = [
         "@com_google_googletest//:gtest_main",

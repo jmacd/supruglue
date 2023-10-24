@@ -6,7 +6,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
-#include <setjmp.h>
 #include <unordered_map>
 
 using std::string;
@@ -105,18 +104,6 @@ void test_read_func(ThreadID tid, Args args) {
 void journalBogus(void) {
   LogEntry toomany[LOG_CHANNEL_ENTRIES + 1];
   channelWrite(&__system.log.ch, sizeof(__system.log.space), &toomany, sizeof(toomany));
-}
-
-TEST(ArgsTest, Atoi) {
-  EXPECT_EQ(0, Atoi("0"));
-  EXPECT_EQ(0, Atoi("0 "));
-  EXPECT_EQ(0, Atoi("0 h"));
-  EXPECT_EQ(1, Atoi("1"));
-  EXPECT_EQ(10, Atoi("10"));
-  EXPECT_EQ(15, Atoi("15"));
-  EXPECT_EQ(1501, Atoi("1501"));
-  EXPECT_EQ(1501010, Atoi("1501010 and more"));
-  EXPECT_EQ(15, Atoi("15 12 10"));
 }
 
 TEST(CpxTest, TwoThreads) {

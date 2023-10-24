@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <stdio.h>
+#include <string.h>
 
 #include "lib/cpx/args.h"
 
@@ -28,4 +28,31 @@ int32_t Atoi(const char *p) {
     break;
   }
   return r;
+}
+
+const char *ParseFlag(Args *args, Flags *flags, Flag *match) {
+  Args save = *args;
+
+  const char *arg = TakeArg(args);
+  if (arg == NULL) {
+    return NULL;
+  }
+  const char *find = arg;
+  for (; *find != 0 && *find != '='; find++) {
+  }
+  if (*find == 0) {
+    *args = save;
+    return NULL;
+  }
+  const char *key = save.ptr;
+  const char  len = find - key;
+
+  for (int32_t i = 0; i < flags->num_defs; i++) {
+    if (strncmp(flags->defs[i].key, key, len) == 0) {
+      *match = flags->defs[i];
+      return find + 1;
+    }
+  }
+  *args = save;
+  return NULL;
 }
