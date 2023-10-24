@@ -14,9 +14,6 @@ typedef struct _TestTransport TestTransport;
 
 TestTransport *NewTestTransport(void);
 
-void StartTestTransport(TestTransport *host);
-void StopTestTransport(TestTransport *host);
-
 int HostSend(TestTransport *transport, const void *data, uint16_t len);
 int HostRecv(TestTransport *transport, void *data, uint16_t *len);
 

@@ -6,6 +6,7 @@
 
 #include "lib/cpx/args.h"
 #include "lib/cpx/cpx.h"
+#include "lib/rpmsg/rpmsg_iface.h"
 
 #ifdef __cplusplus
 extern "C" {

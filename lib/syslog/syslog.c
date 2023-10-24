@@ -11,6 +11,6 @@ void SyslogProcess(ThreadID thid, Args args) {
     channelRead(&__system.log.ch, sizeof(__system.log.space), &entry, sizeof(entry));
 
     // TODO: Again, no error check.
-    ClientSend(__transport, &entry, sizeof(entry));
+    ClientSend(&__transport, &entry, sizeof(entry));
   }
 }

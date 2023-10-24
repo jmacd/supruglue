@@ -8,18 +8,15 @@
 #include <thread>
 
 TEST(RpmsgTest, StartStop) {
-  auto t = NewTestTransport();
-  StartTestTransport(t);
-  StopTestTransport(t);
+  NewTestTransport();
 }
 
 TEST(RpmsgTest, ReadWrite) {
   const std::string expect = "abcdefg";
 
   auto t = NewTestTransport();
-  StartTestTransport(t);
 
-  std::thread host([t, expect] {
+  std::thread hthread([t, expect] {
     char     buf[32];
     uint16_t blen = 32;
     EXPECT_EQ(0, HostRecv(t, &buf, &blen));
@@ -28,18 +25,16 @@ TEST(RpmsgTest, ReadWrite) {
     EXPECT_EQ(0, HostSend(t, static_cast<const void *>(expect.c_str()), static_cast<uint16_t>(expect.size())));
   });
 
-  std::thread client([expect] {
-    EXPECT_EQ(0,
-              ClientSend(__transport, static_cast<const void *>(expect.c_str()), static_cast<uint16_t>(expect.size())));
+  std::thread cthread([expect] {
+    EXPECT_EQ(
+        0, ClientSend(&__transport, static_cast<const void *>(expect.c_str()), static_cast<uint16_t>(expect.size())));
 
     char     buf[32];
     uint16_t blen = 32;
-    EXPECT_EQ(0, ClientRecv(__transport, &buf, &blen));
+    EXPECT_EQ(0, ClientRecv(&__transport, &buf, &blen));
     EXPECT_EQ(expect, std::string(buf, blen));
   });
 
-  client.join();
-  host.join();
-
-  StopTestTransport(t);
+  cthread.join();
+  hthread.join();
 }

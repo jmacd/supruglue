@@ -20,7 +20,6 @@ void test_write_func(ThreadID tid, Args args) {
 
 TEST(Syslog, Simple) {
   auto tt = NewTestTransport();
-  StartTestTransport(tt);
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
 
