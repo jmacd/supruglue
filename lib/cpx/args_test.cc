@@ -27,10 +27,10 @@ TEST(ArgsTest, ParseTwoFlags) {
   flags.defs = defs;
   defs[0].key = "key";
   defs[1].key = "letter";
-  EXPECT_EQ("value", std::string(ParseFlag(&args, &flags, &match)));
+  EXPECT_STREQ("value", ParseFlag(&args, &flags, &match));
   EXPECT_EQ("key", match.key);
 
-  EXPECT_EQ("w", std::string(ParseFlag(&args, &flags, &match)));
+  EXPECT_STREQ("w", ParseFlag(&args, &flags, &match));
   EXPECT_EQ("letter", match.key);
 
   EXPECT_EQ(nullptr, ParseFlag(&args, &flags, &match));
@@ -58,10 +58,10 @@ TEST(ArgsTest, ParseFlagsMissing) {
   flags.defs = defs;
   defs[0].key = "k";
 
-  EXPECT_EQ("v", std::string(ParseFlag(&args, &flags, &match)));
+  EXPECT_STREQ("v", ParseFlag(&args, &flags, &match));
   EXPECT_EQ("k", match.key);
 
   EXPECT_EQ(nullptr, ParseFlag(&args, &flags, &match));
-  EXPECT_EQ("other", std::string(TakeArg(&args)));
+  EXPECT_STREQ("other", TakeArg(&args));
   EXPECT_EQ(nullptr, TakeArg(&args));
 }

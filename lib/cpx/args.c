@@ -45,9 +45,10 @@ const char *ParseFlag(Args *args, Flags *flags, Flag *match) {
     return NULL;
   }
   const char *key = save.ptr;
-  const char  len = find - key;
 
-  for (int32_t i = 0; i < flags->num_defs; i++) {
+  size_t  len = find - key;
+  int32_t i = 0;
+  for (; i < flags->num_defs; i++) {
     if (strncmp(flags->defs[i].key, key, len) == 0) {
       *match = flags->defs[i];
       return find + 1;

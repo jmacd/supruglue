@@ -2,9 +2,16 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "cmd",
+    name = "pru0",
     srcs = [
-	"AM335x_PRU_intc_rscTbl.cmd",
+	"pru0.cmd",
+    ],
+)
+
+filegroup(
+    name = "pru1",
+    srcs = [
+	"pru1.cmd",
     ],
 )
 

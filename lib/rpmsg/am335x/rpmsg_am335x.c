@@ -29,11 +29,9 @@
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
 
 // sysevt 16 == pr1_pru_mst_intr[0]_intr_req
-// TODO(jmacd) configure by PRU
 #define SYSEVT_PRU_TO_ARM 16
 
 // sysevt 17 == pr1_pru_mst_intr[1]_intr_req
-// TODO(jmacd) configure by PRU
 #define SYSEVT_ARM_TO_PRU 17
 
 struct _ClientTransport {

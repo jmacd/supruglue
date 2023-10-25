@@ -1,3 +1,4 @@
+# -*- Mode: Python -*-
 cc_test(
     name = "gpio_test",
     srcs = ["gpio_test.cc"],

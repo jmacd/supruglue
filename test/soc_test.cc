@@ -13,6 +13,12 @@ TEST(SocTest, NumWords) {
 }
 
 TEST(SocTest, TestSOC) {
-  test_system *ts = new test_system;
+  test_system *ts = new test_system(0);
   EXPECT_NE(ts, nullptr);
+  EXPECT_EQ(0, PRU_CORE_NUMBER(ts));
+  delete ts;
+
+  ts = new test_system(1);
+  EXPECT_NE(ts, nullptr);
+  EXPECT_EQ(1, PRU_CORE_NUMBER(ts));
 }

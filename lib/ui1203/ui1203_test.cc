@@ -12,7 +12,7 @@ extern "C" {
 }
 
 TEST(Ui1203Test, Output) {
-  test_system *soc = new test_system;
+  test_system *soc = new test_system(0);
 
   UI1203_Reader rdr;
   UI1203_Init_Reader(&rdr, GPIO_PIN(soc, P8_3), GPIO_PIN(soc, P9_25));

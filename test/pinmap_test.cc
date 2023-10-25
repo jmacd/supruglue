@@ -6,7 +6,7 @@
 #include "gtest/gtest.h"
 
 TEST(PinMapTest, GpioMacros) {
-  test_system *soc = new test_system;
+  test_system *soc = new test_system(1);
 
   EXPECT_EQ(3, GPIO_PIN_TO_BANK(P9_25));
   EXPECT_EQ(21, GPIO_PIN_TO_BIT(P9_25));

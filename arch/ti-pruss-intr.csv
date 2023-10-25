@@ -1,0 +1,65 @@
+Number,Signal Name,Source,MII RT Signal Name
+0,pr1_parity_err_intr_pend,PRU-ICSS Parity Logic,PRU-ICSS0 Internal Interrupts
+1,pr1_pru0_r31_status_cnt16,PRU-ICSS PRU0 (Shift Capture),PRU-ICSS0 Internal Interrupts
+2,pr1_pru1_r31_status_cnt16,PRU-ICSS PRU1 (Shift Capture),PRU-ICSS0 Internal Interrupts
+3,pr1_xfr_timeout,PRU-ICSS Scratch Pad,PRU-ICSS0 Internal Interrupts
+4,pr1_uart_urxevt_intr_req,PRU-ICSS UART,PRU-ICSS0 Internal Interrupts
+5,pr1_uart_utxevt_intr_req,PRU-ICSS UART,PRU-ICSS0 Internal Interrupts
+6,pr1_uart_uint_intr_req,PRU-ICSS UART,PRU-ICSS0 Internal Interrupts
+7,pr1_iep_tim_cap_cmp_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+8,pr1_digio_event_req,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+9,pd_wd_exp_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+10,pdi_wd_exp_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+11,latch1_in,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+12,latch0_in,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+13,sync1_out_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+14,sync0_out_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
+15,pr1_ecap_intr_req,PRU-ICSS eCAP,PRU-ICSS0 Internal Interrupts
+16,pr1_pru_mst_intr[0]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+17,pr1_pru_mst_intr[1]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+18,pr1_pru_mst_intr[2]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+19,pr1_pru_mst_intr[3]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+20,pr1_pru_mst_intr[4]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+21,pr1_pru_mst_intr[5]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+22,pr1_pru_mst_intr[6]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+23,pr1_pru_mst_intr[7]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+24,pr1_pru_mst_intr[8]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+25,pr1_pru_mst_intr[9]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+26,pr1_pru_mst_intr[10]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+27,pr1_pru_mst_intr[11]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+28,pr1_pru_mst_intr[12]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+29,pr1_pru_mst_intr[13]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+30,pr1_pru_mst_intr[14]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+31,pr1_pru_mst_intr[15]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
+32,nirq,UART1,PRU-ICSS0 PRU0_RX_ERR
+33,mcasp_x_intr_pend,McASP1,Tx PRU-ICSS0 PRU0_RX_ERR32
+34,mcasp_r_intr_pend,McASP1,Rx PRU-ICSS0 PRU0_RX_SFD
+35,ecap_intr_intr_pend,eCAP1,PRU-ICSS0 PRU0_RX_SOF
+36,ecap_intr_intr_pend,eCAP2,PRU-ICSS0 PRU0_RX_CRC
+37,epwm_intr_intr_pend,eHRPWM2,PRU-ICSS0 PRU0_RX_NIBBLE_ODD
+38,dcan_uerr,DCAN0,PRU-ICSS0 PRU0_RX_OVERFLOW
+39,dcan_int1,DCAN0,PRU-ICSS0 PORT0_TX_UNDERFLOW
+40,dcan_intr,DCAN0,PRU-ICSS0 PORT0_TX_OVERFLOW
+41,POINTRPEND,I2C0,PRU-ICSS0 MDIO_MII_LINK[0]
+42,ecap_intr_intr_pend,eCAP0,PRU-ICSS0 PRU0_RX_EOF
+43,epwm_intr_intr_pend,eHRPWM0,(pr1_mii0_col & pr1_mii0_txen) (external)
+44,SINTERRUPTN,McSPI0,PRU-ICSS0 PRU1_RX_ERR
+45,eqep_intr_intr_pend,eQEP0,PRU-ICSS0 PRU1_RX_ERR32
+46,epwm_intr_intr_pend,eHRPWM1,PRU-ICSS0 PRU1_RX_SFD
+47,c0_misc_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_SOF
+48,c0_tx_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_CRC
+49,c0_rx_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_NIBBLE_ODD
+50,c0_rx_thresh_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_OVERFLOW
+51,nirq,UART0,PRU-ICSS0 PORT1_TX_UNDERFLOW
+52,nirq,UART2,PRU-ICSS0 PORT1_TX_OVERFLOW
+53,gen_intr_pend,ADC_TSC,PRU-ICSS0 MDIO_MII_LINK[1]
+54,mcasp_r_intr_pend,McASP0 Rx,PRU-ICSS0 PRU1_RX_EOF
+55,mcasp_x_intr_pend,McASP0 Tx,(pr1_mii1_col & pr1_mii1_txen) (external)
+56,pwm_trip_zone,eHRPWM0/eHRPWM1/eHR PWM2,
+57,POINTRPEND1,GPIO0,
+58,Emulation Suspend Signal,Debugss,
+59,initiator_sinterrupt_q_n2,Mbox0 - mail_u2_irq (mailbox interrupt for pru1),
+60,initiator_sinterrupt_q_n1,Mbox0 - mail_u1_irq (mailbox interrupt for pru0),
+61,tptc_erint_pend_po,TPTC0 (EDMA),
+62,tpcc_errint_pend_po,TPCC (EDMA),
+63,tpcc_int_pend_po1,TPCC (EDMA),

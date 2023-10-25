@@ -1,4 +1,6 @@
 # -*- Mode: Python -*-
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "test32",
     srcs = [
@@ -18,13 +20,12 @@ cc_library(
         "@ti-pru-support//include",
         "//tools/toolchain/am335x:incompatible",
     ],
-    visibility = ["//visibility:public"],
 )
 
 genrule(
     name = "pinmap_test32_gen",
-    srcs = ["//arch"],
+    srcs = ["//arch:pins"],
     outs = ["pinmap.h"],
-    cmd = "./$(location //tools/cmd/pinmap:pinmap) test32 $(location //arch) > $@",
+    cmd = "./$(location //tools/cmd/pinmap:pinmap) test32 $(location //arch:pins) > $@",
     tools = ["//tools/cmd/pinmap"],
 )

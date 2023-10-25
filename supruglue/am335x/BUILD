@@ -1,3 +1,6 @@
+# -*- Mode: Python -*-
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "am335x",
     srcs = [
@@ -10,14 +13,13 @@ cc_library(
     copts = [
     ],
     deps = ["//supruglue"],
-    visibility = ["//visibility:public"],
 )
 
 genrule(
     name = "pinmap_am335x_gen",
-    srcs = ["//arch"],
+    srcs = ["//arch:pins"],
     outs = ["pinmap.h"],
-    cmd = "./$(location //tools/cmd/pinmap:pinmap) am335x $(location //arch) > $@",
+    cmd = "./$(location //tools/cmd/pinmap:pinmap) am335x $(location //arch:pins) > $@",
     tools = ["//tools/cmd/pinmap"],
 )
 

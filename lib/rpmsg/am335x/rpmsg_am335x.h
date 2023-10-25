@@ -12,6 +12,10 @@
 //
 // In that object, there will be two struct fw_rsc_vdev_vring, which must
 // be passed here.
+//
+// TODO: How does this function get the Args.  How does anyone get args?
+// Maybe it doesn't? This can be a linker-command configuration since we
+// will use rpmsg to get the args etc.
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev_vring *vring0, struct fw_rsc_vdev_vring *vring1);
 
 #endif // LIB_RPMSG_AM335X_RPMSG_AM335X_H
