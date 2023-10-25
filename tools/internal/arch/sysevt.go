@@ -2,10 +2,11 @@ package arch
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type SysEvt struct {
-	Number          int
+	Number          string // Parsed as string, always int
 	SignalName      string
 	Source          string
 	MIIRTSignalName string
@@ -13,10 +14,10 @@ type SysEvt struct {
 
 func (p SysEvt) Validate() error {
 	if p.SignalName == "" {
-		return fmt.Errorf("system event empty name: %d", p.Number)
+		return fmt.Errorf("system event empty name: %s", p.Number)
 	}
-	if p.Number < 0 || p.Number > 63 {
-		return fmt.Errorf("system event range: %s: %d", p.SignalName, p.Number)
+	if _, err := strconv.ParseInt(p.Number, 10, 64); err != nil {
+		return fmt.Errorf("system event range: %w", err)
 	}
 
 	return nil

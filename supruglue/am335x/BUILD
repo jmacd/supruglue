@@ -4,11 +4,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "am335x",
     srcs = [
+        "soc.c",
     ],
     hdrs = [
         "gpio.h",
         "soc.h",
         ":pinmap_am335x_gen",
+        ":sysevts_am335x_gen",
     ],
     copts = [
     ],
@@ -23,3 +25,10 @@ genrule(
     tools = ["//tools/cmd/pinmap"],
 )
 
+genrule(
+    name = "sysevts_am335x_gen",
+    srcs = ["//arch:sysevts"],
+    outs = ["sysevts.h"],
+    cmd = "./$(location //tools/cmd/sysevts:sysevts) am335x $(location //arch:sysevts) > $@",
+    tools = ["//tools/cmd/sysevts"],
+)

@@ -1,8 +1,6 @@
-build --cxxopt='-std=c++14'
-build --cxxopt='-Wall'
-build --copt='-Wall'
-#build --cxxopt='-Werror'
-#build --copt='-Werror'
+build:host --cxxopt='-std=c++14'
+build:host --cxxopt='-Wall'
+build:host --copt='-Wall'
 
 # linker_files not working, can't sandbox the `ar` step
 build --spawn_strategy=standalone

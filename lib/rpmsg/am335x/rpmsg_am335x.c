@@ -4,6 +4,8 @@
 #include "rpmsg_am335x.h"
 #include "external/ti-pru-support/include/pru_rpmsg.h"
 #include "lib/rpmsg/rpmsg_iface.h"
+#include "supruglue/am335x/soc.h"
+#include "supruglue/am335x/sysevts.h"
 
 // These two system events are wired to the PRU automatically by the
 // pru_rpmsg driver.
@@ -28,12 +30,6 @@
 // In the TRM these interrupts are labeled pr1_pru_mst_intr[0,1,2,3]_intr_req
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
 
-// sysevt 16 == pr1_pru_mst_intr[0]_intr_req
-#define SYSEVT_PRU_TO_ARM 16
-
-// sysevt 17 == pr1_pru_mst_intr[1]_intr_req
-#define SYSEVT_ARM_TO_PRU 17
-
 struct _ClientTransport {
   struct pru_rpmsg_transport channel;
 };
@@ -47,7 +43,10 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev_vring *vring0, stru
   const int channel_port = 30;
 
   // Initialize two vrings using system events on dedicated channels.
-  pru_rpmsg_init(&transport->channel, vring0, vring1, SYSEVT_PRU_TO_ARM, SYSEVT_ARM_TO_PRU);
+  int core = PRU_CORE_NUMBER();
+  int pru_to_arm = (core == 0 ? SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ : SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ);
+  int arm_to_pru = (core == 0 ? SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ : SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ);
+  pru_rpmsg_init(&transport->channel, vring0, vring1, pru_to_arm, arm_to_pru);
 
   // Create the RPMsg channel between the PRU and the ARM.
   while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport->channel, channel_name, channel_port) != PRU_RPMSG_SUCCESS) {

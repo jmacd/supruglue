@@ -6,7 +6,7 @@ const uint32_t allbits = 0xffffffff;
 const uint32_t halfbits = 0x0ff00ff0;
 
 TEST(GpioTest, Register) {
-  test_system *soc = new test_system(0);
+  test_system *soc = new test_system;
 
   for (int i = 0; i < GPIO_NUM_REGISTERS; i++) {
     gpio_register *gpio = &soc->gpio_banks[i];
@@ -42,7 +42,7 @@ TEST(GpioTest, Register) {
 }
 
 TEST(GpioTest, Ctor) {
-  test_system *soc = new test_system(0);
+  test_system *soc = new test_system;
 
   gpio_pin pin = GPIO_PIN(soc, P9_25);
 

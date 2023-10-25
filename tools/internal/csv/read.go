@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -42,11 +41,7 @@ func Read[T Validator](name string, file io.Reader) ([]T, error) {
 	for _, row := range rows {
 		xing := map[string]interface{}{}
 		for i, v := range row {
-			if num, err := strconv.ParseInt(v, 10, 64); err == nil {
-				xing[legend[i]] = num
-			} else {
-				xing[legend[i]] = v
-			}
+			xing[legend[i]] = v
 		}
 		data, err := json.Marshal(xing)
 		if err != nil {

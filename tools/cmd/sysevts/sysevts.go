@@ -41,8 +41,6 @@ func main() {
 #ifndef %s
 #define %s
 
-#include "supruglue/sysevts.h"
-
 %s
 
 #endif // %s
@@ -54,8 +52,8 @@ func main() {
 			}
 			cppname := "SYSEVT_" + sysevt.SignalName
 			cppname = strings.ReplaceAll(cppname, "-", "_")
-			cppname = strings.ReplaceAll(cppname, "[", "_")
-			cppname = strings.ReplaceAll(cppname, "]", "_")
+			cppname = strings.ReplaceAll(cppname, "[", "")
+			cppname = strings.ReplaceAll(cppname, "]", "")
 			cppname = strings.ReplaceAll(cppname, " ", "_")
 			cppname = strings.ReplaceAll(cppname, "__", "_")
 			cppname = strings.ToUpper(cppname)

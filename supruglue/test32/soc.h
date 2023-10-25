@@ -12,16 +12,9 @@
 
 #define WORDSZ sizeof(uint32_t)
 
-#define PRU_CORE_NUMBER(soc) ((soc)->core_number)
-
 struct test_system {
-  test_system(int core_number);
+  test_system();
 
-  void Start(const std::function<void()> &f) {
-    f();
-  }
-
-  int            core_number;
   gpio_register *gpio_banks;
 };
 
