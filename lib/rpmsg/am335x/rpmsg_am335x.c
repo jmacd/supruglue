@@ -2,10 +2,27 @@
 // SPDX-License-Identifier: MIT
 
 #include "rpmsg_am335x.h"
+#include "external/ti-pru-support/include/am335x/pru_intc.h"
 #include "external/ti-pru-support/include/pru_rpmsg.h"
 #include "lib/rpmsg/rpmsg_iface.h"
 #include "supruglue/am335x/soc.h"
 #include "supruglue/am335x/sysevts.h"
+#include <string.h>
+
+// The following is documented in pru-software-support-package
+// and declared in linux-x.y.z/include/uapi/linux/virtio_config.h
+// with the comment "Driver has used its parts of the config, and
+// is happy".
+#define VIRTIO_CONFIG_S_DRIVER_OK 4
+
+// Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
+// at linux/drivers/rpmsg/rpmsg_pru.c.
+//
+// Port numbers are not well documented.  Using 30 and 31 for pru0 and
+// pru1 is common practice.
+#define RPMSG_CHANNEL_NAME "rpmsg-pru"
+#define RPMSG_CHANNEL_PORT_0 30
+#define RPMSG_CHANNEL_PORT_1 30
 
 // These two system events are wired to the PRU automatically by the
 // pru_rpmsg driver.
@@ -32,33 +49,69 @@
 
 struct _ClientTransport {
   struct pru_rpmsg_transport channel;
+
+  // This event needs to be cleared when messages are received.
+  int8_t sysevt_arm_to_pru;
+
+  // Note: maybe unused
+  int16_t sysevt_pru_to_arm;
+
+  // The peer address is initially 0, which case with no messages ever
+  // received, we can't really send.
+  uint16_t rpmsg_peer_src_addr;
+
+  // Equals the message source address.
+  int16_t channel_port;
 };
 
-int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev_vring *vring0, struct fw_rsc_vdev_vring *vring1) {
-  // Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
-  // at linux/drivers/rpmsg/rpmsg_pru.c.
-  //
-  // TODO: this is also configured in the user-space program, via the device file.
-  char      channel_name[32] = "rpmsg-pru";
-  const int channel_port = 30;
+int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
+              struct fw_rsc_vdev_vring *vring1) {
+  // Zero memory.
+  memset(transport, 0, sizeof(transport));
 
-  // Initialize two vrings using system events on dedicated channels.
-  int core = PRU_CORE_NUMBER();
-  int pru_to_arm = (core == 0 ? SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ : SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ);
-  int arm_to_pru = (core == 0 ? SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ : SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ);
-  pru_rpmsg_init(&transport->channel, vring0, vring1, pru_to_arm, arm_to_pru);
-
-  // Create the RPMsg channel between the PRU and the ARM.
-  while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport->channel, channel_name, channel_port) != PRU_RPMSG_SUCCESS) {
+  // Ensure the virtio driver is ready.
+  volatile uint8_t *status = &vdev->status;
+  while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
   }
 
-  return 0;
+  // The system events and port are core-specific.
+  if (PRU_CORE_NUMBER() == 0) {
+    transport->channel_port = RPMSG_CHANNEL_PORT_0;
+    transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
+    transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
+  } else {
+    transport->channel_port = RPMSG_CHANNEL_PORT_1;
+    transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
+    transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
+  }
+
+  // Clear the incoming system event. TODO separate interrupt logic
+  CT_INTC.SICR_bit.STS_CLR_IDX = transport->sysevt_arm_to_pru;
+
+  int ret;
+  ret = pru_rpmsg_init(&transport->channel, vring0, vring1, transport->sysevt_pru_to_arm, transport->sysevt_arm_to_pru);
+  if (ret != PRU_RPMSG_SUCCESS) {
+    return ret;
+  }
+
+  // Create the RPMsg channel between the PRU and the ARM.
+  while ((ret = pru_rpmsg_channel(RPMSG_NS_CREATE, &transport->channel, RPMSG_CHANNEL_NAME, transport->channel_port)) ==
+         PRU_RPMSG_NO_BUF_AVAILABLE) {
+  }
+
+  return ret;
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
-  return 0;
+  if (transport->rpmsg_peer_src_addr == 0) {
+    // In case we have never received.  TODO: error handling, this is made up.
+    return PRU_RPMSG_NO_KICK;
+  }
+  return pru_rpmsg_send(&transport->channel, transport->channel_port, transport->rpmsg_peer_src_addr, data, len);
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
-  return 0;
+  // TODO clear the interrupt (before) here.
+  uint16_t my_dst_addr;
+  return pru_rpmsg_receive(&transport->channel, &transport->rpmsg_peer_src_addr, &my_dst_addr, data, len);
 }

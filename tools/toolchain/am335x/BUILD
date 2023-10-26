@@ -22,6 +22,7 @@ cc_library(
     ],
     deps = [
         "@ti-pru-support//include",
+        "@ti-pru-support//include/am335x",
     ],
     target_compatible_with = select({
         "//tools/toolchain:am335x": [],
