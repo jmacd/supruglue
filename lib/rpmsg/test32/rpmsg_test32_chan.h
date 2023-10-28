@@ -5,6 +5,7 @@
 #define LIB_RPMSG_TEST32_RPMSG_TEST32_CHAN_H
 
 #include "absl/synchronization/mutex.h"
+#include <optional>
 
 template <class T> class Channel {
 public:
@@ -16,7 +17,8 @@ protected:
   Channel(const Channel &other) = delete;
 
 public:
-  T receive() {
+  // causes opposite send() to get a value
+  std::optional<T> receive() {
     absl::MutexLock lock(&_lock);
     _has_receiver = true;
     _lock.Await(absl::Condition(
@@ -26,22 +28,59 @@ public:
     return std::move(_val);
   };
 
-  void send(T &&val) {
+  // causes opposite send() to get an error
+  void sender_transient() {
+    absl::MutexLock lock(&_lock);
+    _has_receiver = true;
+    _has_error = true;
+    printf("tranhere\n");
+    _lock.Await(absl::Condition(
+        +[](Channel<T> *ch) {
+          printf("cond1 %d %d\n", ch->_has_receiver ? 1 : 0, ch->_has_value ? 1 : 0);
+          return ch->_has_receiver && ch->_has_value;
+        },
+        this));
+    printf("or this\n");
+    _has_receiver = false;
+    _has_error = false;
+    _has_value = false;
+  }
+
+  // causes opposite receive () to get a value
+  int send(T &&val) {
+    absl::MutexLock lock(&_lock);
+    printf("sendhere\n");
+    _lock.Await(absl::Condition(
+        +[](Channel<T> *ch) {
+          printf("cond2 %d %d\n", ch->_has_receiver ? 1 : 0, ch->_has_value ? 1 : 0);
+          return (ch->_has_receiver && !ch->_has_value);
+        },
+        this));
+    printf("now this\n");
+    _has_value = true;
+    if (_has_error) {
+      _val.reset();
+      return -1;
+    }
+    _val = val;
+    return 0;
+  };
+
+  // causes opposite receive() to get an error
+  void receiver_transient() {
     absl::MutexLock lock(&_lock);
     _lock.Await(absl::Condition(
         +[](Channel<T> *ch) { return (ch->_has_receiver && !ch->_has_value); }, this));
-    _val = val;
+    _val.reset();
     _has_value = true;
-  };
-
-  void close() {
   }
 
 protected:
-  T           _val;
-  bool        _has_value{false};
-  bool        _has_receiver{false};
-  absl::Mutex _lock;
+  absl::Mutex      _lock;
+  std::optional<T> _val;
+  bool             _has_value{false};
+  bool             _has_receiver{false};
+  bool             _has_error{false};
 };
 
 #endif // LIB_RPMSG_TEST32_RPMSG_TEST32_CHAN_H

@@ -1,4 +1,4 @@
-build:host --cxxopt='-std=c++14'
+build:host --cxxopt='-std=c++17'
 build:host --cxxopt='-Wall'
 build:host --copt='-Wall'
 

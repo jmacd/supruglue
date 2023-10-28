@@ -14,8 +14,10 @@ typedef struct _TestTransport TestTransport;
 
 TestTransport *NewTestTransport(void);
 
-int HostSend(TestTransport *transport, const void *data, uint16_t len);
-int HostRecv(TestTransport *transport, void *data, uint16_t *len);
+int  HostRecv(TestTransport *transport, void *data, uint16_t *len);
+int  HostSend(TestTransport *transport, const void *data, uint16_t len);
+void HostTransientReceiveError(TestTransport *transport);
+void HostTransientSendError(TestTransport *transport);
 
 #ifdef __cplusplus
 }
