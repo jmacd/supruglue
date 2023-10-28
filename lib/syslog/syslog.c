@@ -13,7 +13,7 @@ void SyslogProcess(ThreadID thid, Args args) {
 
     while ((ret = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
       // TODO: not clear what kind of fallback reporting can be done
-      // when a permanent error is returned.
+      // when a permanent error is returned.  Counters?
     }
   }
 }

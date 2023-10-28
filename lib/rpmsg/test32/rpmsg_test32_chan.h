@@ -33,30 +33,18 @@ public:
     absl::MutexLock lock(&_lock);
     _has_receiver = true;
     _has_error = true;
-    printf("tranhere\n");
     _lock.Await(absl::Condition(
-        +[](Channel<T> *ch) {
-          printf("cond1 %d %d\n", ch->_has_receiver ? 1 : 0, ch->_has_value ? 1 : 0);
-          return ch->_has_receiver && ch->_has_value;
-        },
-        this));
-    printf("or this\n");
+        +[](Channel<T> *ch) { return ch->_has_receiver && ch->_has_value; }, this));
     _has_receiver = false;
     _has_error = false;
     _has_value = false;
   }
 
-  // causes opposite receive () to get a value
+  // causes opposite receive() to get a value
   int send(T &&val) {
     absl::MutexLock lock(&_lock);
-    printf("sendhere\n");
     _lock.Await(absl::Condition(
-        +[](Channel<T> *ch) {
-          printf("cond2 %d %d\n", ch->_has_receiver ? 1 : 0, ch->_has_value ? 1 : 0);
-          return (ch->_has_receiver && !ch->_has_value);
-        },
-        this));
-    printf("now this\n");
+        +[](Channel<T> *ch) { return (ch->_has_receiver && !ch->_has_value); }, this));
     _has_value = true;
     if (_has_error) {
       _val.reset();

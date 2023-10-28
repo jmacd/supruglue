@@ -60,3 +60,35 @@ TEST(Syslog, Simple) {
 
   EXPECT_EQ(expect, res);
 }
+
+TEST(Syslog, WithTransients) {
+  auto tt = NewTestTransport();
+
+  EXPECT_EQ(0, Init(NewSystemConfig()));
+
+  Thread  writer;
+  Thread  syslog;
+  uint8_t stack0[500];
+  uint8_t stack1[500];
+
+  EXPECT_EQ(0, Create(&writer, test_write_func, Args{.ptr = "1"}, NewThreadConfig("writer", stack0, sizeof(stack0))));
+  EXPECT_EQ(0, Create(&syslog, SyslogProcess, Args{.ptr = ""}, NewThreadConfig("syslog", stack1, sizeof(stack1))));
+
+  std::thread client([tt] {
+    // Some transients.
+    HostTransientSendError(tt);
+    HostTransientSendError(tt);
+    HostTransientSendError(tt);
+
+    LogEntry entry;
+    uint16_t blen = sizeof(entry);
+
+    EXPECT_EQ(0, HostRecv(tt, &entry, &blen));
+    EXPECT_EQ(blen, sizeof(entry));
+    EXPECT_EQ("[writer] write 0", Format(&entry));
+  });
+
+  EXPECT_EQ(0, ::Run());
+
+  client.join();
+}
