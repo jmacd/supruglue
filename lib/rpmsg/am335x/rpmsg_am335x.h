@@ -7,6 +7,8 @@
 #include "external/ti-pru-support/include/rsc_types.h"
 #include "lib/rpmsg/rpmsg_iface.h"
 
+#define PRU_RPMSG_NO_PEER_ADDR (-5)
+
 // rpmsg is initialized through a static resource table, which is identified
 // via a linker command file (e.g., AM335x_PRU_intc_rscTbl.cmd)
 //

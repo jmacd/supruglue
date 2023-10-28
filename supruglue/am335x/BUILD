@@ -29,6 +29,6 @@ genrule(
     name = "sysevts_am335x_gen",
     srcs = ["//arch:sysevts"],
     outs = ["sysevts.h"],
-    cmd = "./$(location //tools/cmd/sysevts:sysevts) am335x $(location //arch:sysevts) > $@",
+    cmd = "./$(location //tools/cmd/sysevts:sysevts) $(location //arch:sysevts) > $@",
     tools = ["//tools/cmd/sysevts"],
 )

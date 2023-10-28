@@ -1,4 +1,4 @@
-Number,Signal Name,Source,MII RT Signal Name
+Event Number,Signal Name,Source,MII RT Signal Name
 0,pr1_parity_err_intr_pend,PRU-ICSS Parity Logic,PRU-ICSS0 Internal Interrupts
 1,pr1_pru0_r31_status_cnt16,PRU-ICSS PRU0 (Shift Capture),PRU-ICSS0 Internal Interrupts
 2,pr1_pru1_r31_status_cnt16,PRU-ICSS PRU1 (Shift Capture),PRU-ICSS0 Internal Interrupts

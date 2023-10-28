@@ -11,23 +11,15 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 3 {
-		log.Fatal("usage: %s <arch> <sysevts.csv>\n", os.Args[0])
+	if len(os.Args) != 2 {
+		log.Fatal("usage: %s <sysevts.csv>\n", os.Args[0])
 	}
 
-	hw := os.Args[1]
-	inp := os.Args[2]
+	inp := os.Args[1]
 
-	switch hw {
-	case "test32":
-	case "am335x":
-	default:
-		log.Fatal("unknown hardware: ", hw)
-	}
+	guard := strings.ToUpper("supruglue_include_sysevts_h")
 
-	guard := strings.ToUpper("supruglue_" + hw + "_include_sysevts_h")
-
-	sysevts, err := csv.ReadFile[arch.SysEvt](inp)
+	sysevts, err := csv.ReadFile[arch.SystemEvent](inp)
 	if err != nil {
 		log.Fatal("parse sysevts file: ", err)
 	}
@@ -50,13 +42,7 @@ func main() {
 			if sysevt.SignalName == "nirq" {
 				continue
 			}
-			cppname := "SYSEVT_" + sysevt.SignalName
-			cppname = strings.ReplaceAll(cppname, "-", "_")
-			cppname = strings.ReplaceAll(cppname, "[", "")
-			cppname = strings.ReplaceAll(cppname, "]", "")
-			cppname = strings.ReplaceAll(cppname, " ", "_")
-			cppname = strings.ReplaceAll(cppname, "__", "_")
-			cppname = strings.ToUpper(cppname)
+			cppname := sysevt.CPPName()
 
 			sb.WriteString("\n")
 			sb.WriteString(fmt.Sprintf("// Event: %s\n", sysevt.SignalName))
@@ -64,9 +50,9 @@ func main() {
 
 			sb.WriteString("#define ")
 			sb.WriteString(cppname)
-			sb.WriteString(" ")
+			sb.WriteString(" ((int8_t)")
 			sb.WriteString(fmt.Sprint(sysevt.Number))
-			sb.WriteString("\n")
+			sb.WriteString(")\n")
 		}
 		return sb.String()
 	}(), guard)

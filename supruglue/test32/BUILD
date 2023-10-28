@@ -8,8 +8,8 @@ cc_library(
         "soc.cc",
     ],
     hdrs = [
-	"gpio.h",
-	"soc.h",
+        "gpio.h",
+        "soc.h",
         ":pinmap_test32_gen",
         ":sysevts_test32_gen",
     ],
@@ -17,9 +17,9 @@ cc_library(
         "-Ibazel-out/supruglue/test32",
     ],
     deps = [
-	"//supruglue",
-        "@ti-pru-support//include",
+        "//supruglue",
         "//tools/toolchain/am335x:incompatible",
+        "@ti-pru-support//include",
     ],
 )
 
@@ -35,6 +35,6 @@ genrule(
     name = "sysevts_test32_gen",
     srcs = ["//arch:sysevts"],
     outs = ["sysevts.h"],
-    cmd = "./$(location //tools/cmd/sysevts:sysevts) test32 $(location //arch:sysevts) > $@",
+    cmd = "./$(location //tools/cmd/sysevts:sysevts) $(location //arch:sysevts) > $@",
     tools = ["//tools/cmd/sysevts"],
 )

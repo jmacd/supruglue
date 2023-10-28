@@ -7,10 +7,13 @@
 void SyslogProcess(ThreadID thid, Args args) {
   for (;;) {
     LogEntry entry;
-    // TODO: Note no error return check, it's always 0.
-    channelRead(&__system.log.ch, sizeof(__system.log.space), &entry, sizeof(entry));
 
-    // TODO: Again, no error check.
-    ClientSend(&__transport, &entry, sizeof(entry));
+    // TODO: blocking read, no error.
+    int ret = channelRead(&__system.log.ch, sizeof(__system.log.space), &entry, sizeof(entry));
+
+    while ((ret = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
+      // TODO: not clear what kind of fallback reporting can be done
+      // when a permanent error is returned.
+    }
   }
 }

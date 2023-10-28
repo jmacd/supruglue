@@ -22,7 +22,7 @@
 // pru1 is common practice.
 #define RPMSG_CHANNEL_NAME "rpmsg-pru"
 #define RPMSG_CHANNEL_PORT_0 30
-#define RPMSG_CHANNEL_PORT_1 30
+#define RPMSG_CHANNEL_PORT_1 31
 
 // These two system events are wired to the PRU automatically by the
 // pru_rpmsg driver.
@@ -103,11 +103,21 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
+  // TODO: what kind of fallback?
+
+  // Transient cases
+  // PRU_RPMSG_NO_PEER_ADDR
+  // PRU_RPMSG_NO_BUF_AVAILABLE
+
+  // Permanent cases
+  // PRU_RPMSG_BUF_TOO_SMALL
+  // PRU_RPMSG_INVALID_HEAD;
   if (transport->rpmsg_peer_src_addr == 0) {
-    // In case we have never received.  TODO: error handling, this is made up.
-    return PRU_RPMSG_NO_KICK;
+    // In case we have never received.
+    return PRU_RPMSG_NO_PEER_ADDR;
   }
-  return pru_rpmsg_send(&transport->channel, transport->channel_port, transport->rpmsg_peer_src_addr, data, len);
+  return pru_rpmsg_send(&transport->channel, transport->channel_port, transport->rpmsg_peer_src_addr, (void *)data,
+                        len);
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {

@@ -6,7 +6,7 @@ cc_library(
     srcs = [
     ],
     hdrs = [
-	"rpmsg_iface.h",
+        "rpmsg_iface.h",
     ],
     deps = [],
 )

@@ -1,17 +1,20 @@
 # -*- Mode: Python -*-
 cc_binary(
     name = "example_pru0",
-    srcs = ["example.c"],
-    deps = [
-	    "//lib/ui1203",
-	    "//lib/cpx",
-	    "//lib/rpmsg/am335x",
-	    ],
-    linkopts = [
-        "$(location //tools/toolchain/am335x:pru0)",
+    srcs = [
+        "example.c",
+        ":irqgen",
     ],
     additional_linker_inputs = [
-        "//tools/toolchain/am335x:pru0",
+        "//tools/toolchain/am335x:pru0_cmd",
+    ],
+    linkopts = [
+        "$(location //tools/toolchain/am335x:pru0_cmd)",
+    ],
+    deps = [
+        "//lib/cpx",
+        "//lib/rpmsg/am335x",
+        "//lib/ui1203",
     ],
 )
 
@@ -19,7 +22,20 @@ cc_binary(
     name = "local",
     srcs = ["local.c"],
     deps = [
-	"//lib/cpx",
-	"//supruglue/test32",
-	],
+        "//lib/cpx",
+        "//supruglue/test32",
+    ],
+)
+
+genrule(
+    name = "irqgen",
+    srcs = [
+        "//tools/toolchain/am335x:pru0_irq",
+        "//arch:sysevts",
+    ],
+    outs = [
+        "rsc.c",
+    ],
+    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //tools/toolchain/am335x:pru0_irq) > $@",
+    tools = ["//tools/cmd/irqgen"],
 )

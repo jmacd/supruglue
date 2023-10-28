@@ -23,8 +23,6 @@ filegroup(
 
 cc_toolchain(
     name = "pru_toolchain",
-    toolchain_identifier = "pru-toolchain",
-    toolchain_config = ":pru_toolchain_config",
     all_files = ":wrappers_all",
     compiler_files = ":wrappers_all",
     dwp_files = ":wrappers_all",
@@ -32,6 +30,8 @@ cc_toolchain(
     objcopy_files = ":wrappers_all",
     strip_files = ":wrappers_all",
     supports_param_files = 0,
+    toolchain_config = ":pru_toolchain_config",
+    toolchain_identifier = "pru-toolchain",
 )
 
 load(":cc_toolchain_config.bzl", "cc_toolchain_config")
@@ -57,7 +57,7 @@ constraint_value(
 platform(
     name = "real_pru",
     constraint_values = [
-	":am335x",
+        ":am335x",
         "@platforms//os:osx",
         "@platforms//cpu:arm64",
         "@io_bazel_rules_go//go/toolchain:cgo_off",

@@ -4,40 +4,40 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "cpx",
     srcs = [
-	"cpx.c",
-	"args.c",
+        "args.c",
+        "cpx.c",
     ],
     hdrs = [
-	"cpx.h",
-	"args.h",
+        "args.h",
+        "cpx.h",
     ],
 )
 
 cc_library(
     name = "fmt",
     srcs = [
-	"fmt.cc",
+        "fmt.cc",
     ],
     hdrs = [
-	"fmt.h",
+        "fmt.h",
     ],
     deps = [
-	":cpx",
-        "@com_google_absl//absl/strings:str_format",
+        ":cpx",
         "//tools/toolchain/am335x:incompatible",
+        "@com_google_absl//absl/strings:str_format",
     ],
 )
 
 cc_test(
     name = "test",
     srcs = [
-        "cpx_test.cc",
         "args_test.cc",
+        "cpx_test.cc",
     ],
     deps = [
-        "@com_google_googletest//:gtest_main",
         ":cpx",
         ":fmt",
         "//tools/toolchain/am335x:incompatible",
+        "@com_google_googletest//:gtest_main",
     ],
 )
