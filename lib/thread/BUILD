@@ -2,25 +2,24 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "cpx",
+    name = "thread",
     srcs = [
-        "cpx.c",
+        "thread.c",
     ],
     hdrs = [
-        "cpx.h",
+        "thread.h",
     ],
     deps = [
-        "//lib/thread",
+	"//lib/args",
+	"//lib/list",
     ],
 )
 
 cc_test(
     name = "test",
-    srcs = [
-        "cpx_test.cc",
-    ],
+    srcs = ["thread_test.cc"],
     deps = [
-        ":cpx",
+        ":thread",
         "@com_google_googletest//:gtest_main",
     ],
 )

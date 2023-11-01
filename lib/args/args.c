@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "lib/cpx/args.h"
+#include "lib/args/args.h"
 
 const char *TakeArg(Args *args) {
   if (*args->ptr == 0) {

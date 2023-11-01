@@ -6,7 +6,12 @@
 #include "lib/cpx/cpx.h"
 
 std::string Format(LogEntry *entry) {
-  std::string hdr = absl::StrFormat("[%s] ", ((Thread *)entry->tid)->cfg.name);
+  std::string hdr = "[-] ";
+
+  Thread *th = reinterpret_cast<Thread *>(entry->tid);
+  if (th != nullptr) {
+    hdr = absl::StrFormat("[%s] ", th->cfg.name);
+  }
 
   auto fmt2str = absl::ParsedFormat<'u', 'u'>::New(entry->msg);
   if (fmt2str) {
@@ -18,6 +23,6 @@ std::string Format(LogEntry *entry) {
     std::string res = absl::StrFormat(*fmt1str, entry->arg1);
     return hdr + res;
   }
-  // TODO shrug. this library is too strict! ok.
+  // TODO shrug.
   return "invalid!";
 }

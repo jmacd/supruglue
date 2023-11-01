@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/cpx/cpx.h"
-#include "lib/cpx/fmt.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
@@ -61,49 +60,6 @@ void test_recursive_func(ThreadID tid, Args args) {
     rargs.ptr = two;
     test_recursive_func(tid, rargs);
   }
-}
-
-vector<string> test_logs_get() {
-  vector<string> result;
-
-  // TODO: not called from a thread, test only.  Cannot yield or
-  // block, etc.  Replace me!  See test_read_func.
-
-  while (channelAvailable(&__system.log.ch) != 0) {
-    LogEntry ent;
-    journalRead(&ent);
-    result.push_back(Format(&ent));
-  }
-  return result;
-}
-
-void test_write_func(ThreadID tid, Args args) {
-  int32_t cnt = Atoi(args.ptr);
-  for (int32_t i = 0; i < cnt; i++) {
-    journal2u("lalala %u", i, 0);
-    Yield();
-  }
-}
-
-void test_read_func(ThreadID tid, Args args) {
-  TestThread2 *tt2 = (TestThread2 *)tid;
-
-  int cnt = -1;
-  if (args.ptr != nullptr) {
-    cnt = Atoi(args.ptr);
-  }
-  for (int32_t i = 0; cnt < 0 || i < cnt; i++) {
-    LogEntry ent;
-    journalRead(&ent);
-    auto rd = Format(&ent);
-    tt2->messages.push_back(rd);
-    Yield();
-  }
-}
-
-void journalBogus(void) {
-  LogEntry toomany[LOG_CHANNEL_ENTRIES + 1];
-  channelWrite(&__system.log.ch, sizeof(__system.log.space), &toomany, sizeof(toomany));
 }
 
 TEST(CpxTest, TwoThreads) {
@@ -203,21 +159,6 @@ TEST(CpxTest, MultiOverflow) {
   EXPECT_THAT(logs[1], HasSubstr("[b] stack overflow"));
 }
 
-TEST(CpxTest, WriteSizeError) {
-  Thread  thread;
-  uint8_t stack[500];
-
-  auto test_func = [](ThreadID tid, Args args) { journalBogus(); };
-
-  EXPECT_EQ(0, Init(NewSystemConfig()));
-  EXPECT_EQ(0, Create(&thread, test_func, Args{.ptr = ""}, NewThreadConfig("inval", stack, sizeof(stack))));
-  EXPECT_EQ(0, ::Run());
-
-  auto logs = test_logs_get();
-  EXPECT_EQ(1, logs.size());
-  EXPECT_THAT(logs[0], HasSubstr("[inval] write too large"));
-}
-
 TEST(CpxTest, OneBlockingRead) {
   Thread      writer;
   TestThread2 reader;
@@ -242,43 +183,6 @@ TEST(CpxTest, OneBlockingRead) {
     counts[logs[i]]++;
   }
 
-  EXPECT_EQ(expect, counts);
-}
-
-TEST(CpxTest, NonBlockingRead) {
-  Thread      writer0;
-  Thread      writer1;
-  TestThread2 reader;
-  uint8_t     stack0[500];
-  uint8_t     stack1[500];
-  uint8_t     stack2[500];
-
-  const int    items = 10;
-  const string each = std::to_string(items);
-
-  auto cfg = NewSystemConfig();
-  cfg.log_flags = CF_NONBLOCKING;
-
-  EXPECT_EQ(0, Init(cfg));
-  EXPECT_EQ(0, Create(&writer0, test_write_func, Args{.ptr = each.c_str()},
-                      NewThreadConfig("write0", stack0, sizeof(stack0))));
-  EXPECT_EQ(0, Create(&writer1, test_write_func, Args{.ptr = each.c_str()},
-                      NewThreadConfig("write1", stack1, sizeof(stack1))));
-  EXPECT_EQ(0, Create(&reader.thread, test_read_func,
-                      Args{
-                          .ptr = nullptr,
-                      },
-                      NewThreadConfig("reader", stack2, sizeof(stack2))));
-
-  EXPECT_EQ(0, ::Run());
-
-  std::unordered_map<string, int> counts;
-  std::unordered_map<string, int> expect;
-
-  auto logs = reader.messages;
-  auto loss_count = __system.log.ch.lost / sizeof(LogEntry);
-
-  EXPECT_EQ(2 * items, loss_count + logs.size());
   EXPECT_EQ(expect, counts);
 }
 
@@ -360,6 +264,28 @@ TEST(CpxTest, TwoBlockingReaders) {
   for (int32_t i = 0; i < 2 * items; i++) {
     expect["[writer] lalala " + std::to_string(i)] = 1;
   }
+
+  EXPECT_EQ(expect, counts);
+}
+
+TEST(CpxTest, NonBlockingWrite) {
+  Thread  writer;
+  uint8_t stack[500];
+
+  const int    items = LOG_CHANNEL_ENTRIES + 1;
+  const string each = std::to_string(items);
+
+  auto cfg = NewSystemConfig();
+  cfg.log_flags = CF_LOGGING;
+
+  EXPECT_EQ(0, Init(cfg));
+  EXPECT_EQ(
+      0, Create(&writer, test_write_func, Args{.ptr = each.c_str()}, NewThreadConfig("write", stack, sizeof(stack))));
+
+  EXPECT_EQ(0, ::Run());
+
+  vector<string> counts = test_logs_get();
+  vector<string> expect;
 
   EXPECT_EQ(expect, counts);
 }

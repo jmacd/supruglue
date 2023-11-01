@@ -1,7 +1,7 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "lib/cpx/args.h"
+#include "lib/args/args.h"
 #include "gtest/gtest.h"
 
 TEST(ArgsTest, Atoi) {

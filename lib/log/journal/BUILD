@@ -2,28 +2,24 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "syslog",
+    name = "journal",
     srcs = [
-        "syslog.c",
+        "journal.c",
     ],
     hdrs = [
-        "syslog.h",
-    ],
+        "journal.h",
+	],
     deps = [
-        "//lib/cpx",
-        "//lib/rpmsg",
+	"//lib/list",
+	"//lib/thread",
     ],
 )
 
 cc_test(
     name = "test",
-    srcs = [
-        "syslog_test.cc",
-    ],
+    srcs = ["journal_test.cc"],
     deps = [
-        ":syslog",
-        "//lib/cpx:fmt",
-        "//lib/rpmsg/test32",
+        ":journal",
         "@com_google_googletest//:gtest_main",
     ],
 )

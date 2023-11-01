@@ -10,12 +10,47 @@
 #include <thread>
 #include <unordered_set>
 
+vector<string> test_logs_get() {
+  vector<string> result;
+
+  // TODO: not called from a thread, test only.  Cannot yield or
+  // block, etc.  Replace me!  See test_read_func.
+
+  while (channelAvailable(&__system.log.ch, sizeof(__system.log.space)) != 0) {
+    LogEntry ent;
+    journalRead(&ent);
+    result.push_back(Format(&ent));
+  }
+  return result;
+}
+
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
     journal2u("write %u", i, 0);
     Yield();
   }
+}
+
+void test_read_func(ThreadID tid, Args args) {
+  TestThread2 *tt2 = (TestThread2 *)tid;
+
+  int cnt = -1;
+  if (args.ptr != nullptr) {
+    cnt = Atoi(args.ptr);
+  }
+  for (int32_t i = 0; cnt < 0 || i < cnt; i++) {
+    LogEntry ent;
+    journalRead(&ent);
+    auto rd = Format(&ent);
+    tt2->messages.push_back(rd);
+    Yield();
+  }
+}
+
+void journalBogus(void) {
+  LogEntry toomany[LOG_CHANNEL_ENTRIES + 1];
+  channelWrite(&__system.log.ch, sizeof(__system.log.space), &toomany, sizeof(toomany));
 }
 
 TEST(Syslog, Simple) {
