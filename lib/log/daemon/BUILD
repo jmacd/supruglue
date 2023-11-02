@@ -22,7 +22,7 @@ cc_test(
     ],
     deps = [
         ":daemon",
-        "//lib/cpx:fmt",
+        "//lib/log/fmt",
         "//lib/rpmsg/test32",
         "@com_google_googletest//:gtest_main",
     ],

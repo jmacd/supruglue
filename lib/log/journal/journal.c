@@ -18,20 +18,35 @@ void JournalInit(Journal *jl) {
   }
 }
 
+void journalRead(Journal *jl, Entry *record) {
+  Block *block = BlockListFront(&jl->data);
+  *record = block->entries[block->cursor++];
+
+  if (block->cursor != block->count) {
+    return;
+  }
+  BlockListRemove(block);
+  block->count = 0;
+  block->cursor = 0;
+  BlockListPushBack(&jl->free, block);
+}
+
 int JournalRead(Journal *jl, Entry *record) {
   if (BlockListEmpty(&jl->data)) {
     return -1;
   }
-  Block *block = BlockListFront(&jl->data);
-  *record = block->entries[block->cursor++];
 
-  if (block->cursor == block->count) {
-    BlockListRemove(block);
-    block->count = 0;
-    block->cursor = 0;
-    BlockListPushBack(&jl->free, block);
-  }
+  journalRead(jl, record);
   return 0;
+}
+
+int JournalReadWait(Journal *jl, Entry *record, ThreadID reader) {
+  // Note: we expect one of these calls, otherwise not safe.
+  if (BlockListEmpty(&jl->data)) {
+    jl->reader = reader;
+    // YieldBlocked();
+  }
+  return journalRead(jl, record)
 }
 
 static Entry *getEntry(Journal *jl) {
@@ -86,4 +101,10 @@ void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int3
   entry->msg = msg;
   entry->arg1 = arg1;
   entry->arg2 = arg2;
+
+  // if (jl->reader != 0) {
+  //   ThreadID reader = jl->reader;
+  //   jl->reader = 0;
+  //   Wakeup(reader);
+  // }
 }

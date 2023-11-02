@@ -4,7 +4,7 @@
 #ifndef LIB_SYSLOG_PROC_H
 #define LIB_SYSLOG_PROC_H
 
-#include "lib/cpx/args.h"
+#include "lib/args/args.h"
 #include "lib/cpx/cpx.h"
 #include "lib/rpmsg/rpmsg_iface.h"
 

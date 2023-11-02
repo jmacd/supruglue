@@ -84,10 +84,6 @@ int Run(void) {
   return 0;
 }
 
-void Yield(void) {
-  yieldInternal(JC_SUSPEND);
-}
-
 void yieldInternal(JumpCode jc) {
   void *volatile unused;
   void   *yield_stack = (void *)&unused;
@@ -115,4 +111,12 @@ void yieldInternal(JumpCode jc) {
   size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
   memcpy(yield_stack, __system.current->cfg.stack, size);
+}
+
+void Yield(void) {
+  yieldInternal(JC_SUSPEND);
+}
+
+void YieldBlocked(void) {
+  yieldInternal(JC_BLOCKED);
 }

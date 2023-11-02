@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "absl/strings/str_format.h"
-#include "lib/cpx/fmt.h"
+#include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/test32/rpmsg_test32_host.h"
 #include "lib/syslog/syslog.h"
 #include "gtest/gtest.h"

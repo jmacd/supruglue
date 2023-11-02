@@ -57,7 +57,7 @@ int Run(void);
 
 void Yield(void);
 
-void yieldInternal(JumpCode jc);
+void YieldBlocked();
 
 #ifdef __cplusplus
 }

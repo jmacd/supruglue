@@ -41,11 +41,13 @@ struct _Block {
 struct _Journal {
   BlockList free;
   BlockList data;
+  ThreadID  reader;
   Block     blocks[NUM_BLOCKS];
 };
 
 void JournalInit(Journal *jl);
 int  JournalRead(Journal *jl, Entry *record);
+int  JournalReadWait(Journal *jl, Entry *record, ThreadID reader);
 void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2);
 
 #ifdef __cplusplus
