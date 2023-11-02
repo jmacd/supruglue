@@ -55,15 +55,26 @@ static Entry *getEntry(Journal *jl) {
     return &block->entries[block->count++];
   }
 
+  // Recycle the previous block from the back of the block list.
   Block *swap = BlockListPrev(block);
   BlockListRemove(swap);
   BlockListPushBack(&jl->data, swap);
 
+  int32_t loss = NUM_PER_BLOCK + 1;
+  // If an overflow record is being lost, retain its loss count.
+  if (swap->entries[0].msg == overflowMessage) {
+    loss += swap->entries[0].arg1 - 1;
+  }
+
+  // Block is now the second-newest record, and its entry[0] is the
+  // oldest entry after a new gap in the log.
   Entry *entry = &block->entries[0];
   entry->tid = 0;
   entry->msg = overflowMessage;
-  entry->arg1 = NUM_PER_BLOCK;
+  entry->arg1 = loss;
   entry->arg2 = 0;
+
+  // Swap is the newest record.
   swap->count = 1;
   swap->cursor = 0;
   return &swap->entries[0];
