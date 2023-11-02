@@ -8,12 +8,20 @@
 #include "lib/thread/thread.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern const char *const overflowMessage;
+
 typedef struct _Journal Journal;
 typedef struct _Entry   Entry;
+typedef struct _Block   Block;
 
-#define NUM_JOURNAL_ENTRIES 16U
+#define NUM_PER_BLOCK 8
+#define NUM_BLOCKS 4
 
-SUPRUGLUE_DECLARE_LIST(EntryList, Entry);
+SUPRUGLUE_DECLARE_LIST(BlockList, Block);
 
 struct _Entry {
   // TODO: timestamp
@@ -21,19 +29,27 @@ struct _Entry {
   const char *msg;
   int32_t     arg1;
   int32_t     arg2;
-  EntryList   list;
+};
+
+struct _Block {
+  BlockList list;
+  int32_t   count;
+  int32_t   cursor;
+  Entry     entries[NUM_PER_BLOCK];
 };
 
 struct _Journal {
-  EntryList freelist;
-  EntryList pending;
-  Entry     space[NUM_JOURNAL_ENTRIES];
+  BlockList free;
+  BlockList data;
+  Block     blocks[NUM_BLOCKS];
 };
-
-extern Journal __journal;
 
 void JournalInit(Journal *jl);
 int  JournalRead(Journal *jl, Entry *record);
 void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LIB_LOG_JOURNAL_JOURNAL_H

@@ -2,44 +2,77 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/log/journal/journal.h"
+#include <stdio.h>
+#include <string.h>
 
-SUPRUGLUE_DEFINE_LIST(EntryList, Entry, list);
+SUPRUGLUE_DEFINE_LIST(BlockList, Block, list);
+
+const char *const overflowMessage = "** OVERFLOW **: dropped %u records";
 
 void JournalInit(Journal *jl) {
-  EntryListInit(&jl->pending);
-  EntryListInit(&jl->freelist);
-  for (int i = 0; i < NUM_JOURNAL_ENTRIES; i++) {
-    EntryListPushBack(&jl->freelist, &jl->space[i]);
+  memset(jl, 0, sizeof(*jl));
+  BlockListInit(&jl->data);
+  BlockListInit(&jl->free);
+  for (int i = 0; i < NUM_BLOCKS; i++) {
+    BlockListPushBack(&jl->free, &jl->blocks[i]);
   }
 }
 
 int JournalRead(Journal *jl, Entry *record) {
-  if (EntryListEmpty(&jl->pending)) {
+  if (BlockListEmpty(&jl->data)) {
     return -1;
   }
-  Entry *first = EntryListPopFront(&jl->pending);
-  *record = *first;
-  EntryListPushBack(&jl->freelist, first);
+  Block *block = BlockListFront(&jl->data);
+  *record = block->entries[block->cursor++];
+
+  if (block->cursor == block->count) {
+    BlockListRemove(block);
+    block->count = 0;
+    block->cursor = 0;
+    BlockListPushBack(&jl->free, block);
+  }
   return 0;
 }
 
-void collapse(Journal *jl) {
-  //   ent->msg = "** OVERFLOW **: dropped %u records";
-  Entry *p = EntryListFront(&jl->pending);
-
-  for (int i = 0; i < (NUM_JOURNAL_ENTRIES / 2) - 1; i++) {
-    p = EntryListNext(p);
+static Entry *getEntry(Journal *jl) {
+  Block *block;
+  // Empty case: add the first block.
+  if (BlockListEmpty(&jl->data)) {
+    block = BlockListPopFront(&jl->free);
+    BlockListPushBack(&jl->data, block);
+  } else {
+    block = BlockListBack(&jl->data);
   }
+
+  // If the first block is full and there is a free block, use it.
+  if (block->count == NUM_PER_BLOCK && !BlockListEmpty(&jl->free)) {
+    block = BlockListPopFront(&jl->free);
+    BlockListPushBack(&jl->data, block);
+  }
+
+  // If the block has room, use it.
+  if (block->count < NUM_PER_BLOCK) {
+    return &block->entries[block->count++];
+  }
+
+  Block *swap = BlockListPrev(block);
+  BlockListRemove(swap);
+  BlockListPushBack(&jl->data, swap);
+
+  Entry *entry = &block->entries[0];
+  entry->tid = 0;
+  entry->msg = overflowMessage;
+  entry->arg1 = NUM_PER_BLOCK;
+  entry->arg2 = 0;
+  swap->count = 1;
+  swap->cursor = 0;
+  return &swap->entries[0];
 }
 
 void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2) {
-  if (EntryListEmpty(&jl->freelist)) {
-    collapse(jl);
-  }
-  Entry *fill = EntryListPopFront(&jl->freelist);
-  fill->msg = msg;
-  fill->arg1 = arg1;
-  fill->arg2 = arg2;
-  fill->tid = tid;
-  EntryListPushBack(&jl->pending, fill);
+  Entry *entry = getEntry(jl);
+  entry->tid = tid;
+  entry->msg = msg;
+  entry->arg1 = arg1;
+  entry->arg2 = arg2;
 }

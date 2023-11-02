@@ -23,6 +23,7 @@ extern "C" {
   void   LTYPE##Init(LTYPE *l);                                                                                        \
   void   LTYPE##Add(LTYPE *prev, LTYPE *next, LTYPE *ins);                                                             \
   void   LTYPE##PushBack(LTYPE *l, ETYPE *i);                                                                          \
+  void   LTYPE##PushFront(LTYPE *l, ETYPE *i);                                                                         \
   void   LTYPE##Delete(LTYPE *next, LTYPE *prev);                                                                      \
   ETYPE *LTYPE##Remove(ETYPE *f);                                                                                      \
   ETYPE *LTYPE##PopBack(LTYPE *l);                                                                                     \
@@ -32,6 +33,7 @@ extern "C" {
   ETYPE *LTYPE##Back(LTYPE *f);                                                                                        \
   int    LTYPE##End(LTYPE *f, ETYPE *i);                                                                               \
   ETYPE *LTYPE##Next(ETYPE *f);                                                                                        \
+  ETYPE *LTYPE##Prev(ETYPE *f);                                                                                        \
   size_t LTYPE##Length(LTYPE *l);
 
 #define SUPRUGLUE_DEFINE_LIST(LTYPE, ETYPE, LNAME)                                                                     \
@@ -51,6 +53,8 @@ extern "C" {
   }                                                                                                                    \
                                                                                                                        \
   void LTYPE##PushBack(LTYPE *l, ETYPE *i) { LTYPE##Add(l->prev, l, &i->LNAME); }                                      \
+                                                                                                                       \
+  void LTYPE##PushFront(LTYPE *l, ETYPE *i) { LTYPE##Add(l, l->next, &i->LNAME); }                                     \
                                                                                                                        \
   void LTYPE##Delete(LTYPE *next, LTYPE *prev) {                                                                       \
     next->prev = prev;                                                                                                 \
@@ -84,6 +88,8 @@ extern "C" {
   int LTYPE##End(LTYPE *f, ETYPE *i) { return f == &i->LNAME; }                                                        \
                                                                                                                        \
   ETYPE *LTYPE##Next(ETYPE *f) { return LTYPE##Entry(f->LNAME.next); }                                                 \
+                                                                                                                       \
+  ETYPE *LTYPE##Prev(ETYPE *f) { return LTYPE##Entry(f->LNAME.prev); }                                                 \
                                                                                                                        \
   size_t LTYPE##Length(LTYPE *l) {                                                                                     \
     LTYPE *p;                                                                                                          \
