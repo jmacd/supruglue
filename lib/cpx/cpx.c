@@ -22,7 +22,7 @@ int Init(SystemConfig cfg) {
   sys->cfg = cfg;
 
   ThreadListInit(&sys->runnable);
-
+  JournalInit(&sys->journal);
   return 0;
 }
 
@@ -94,10 +94,11 @@ void yieldInternal(JumpCode jc) {
   int32_t size = (int32_t)((size_t)__system.run_stack_pos - (size_t)yield_stack);
 
   // Check for thread-stack overflow.
-  // if (size > __system.current->cfg.stack_size) {
-  //   journal2u("stack overflow: %u exceeds %u", size, __system.current->cfg.stack_size);
-  //   longjmp(__system.return_jump, JC_OVERFLOW);
-  // }
+  if (size > __system.current->cfg.stack_size) {
+    JournalWrite(&__system.journal, TID(__system.current), "stack overflow: %u exceeds %u", size,
+                 __system.current->cfg.stack_size);
+    longjmp(__system.return_jump, JC_OVERFLOW);
+  }
   memcpy(__system.current->cfg.stack, yield_stack, size);
 
   switch (setjmp(__system.current->exec.run_jump)) {

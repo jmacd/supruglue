@@ -1,11 +1,11 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "lib/cpx/fmt.h"
+#include "fmt.h"
 #include "absl/strings/str_format.h"
 #include "lib/cpx/cpx.h"
 
-std::string Format(LogEntry *entry) {
+std::string Format(Entry *entry) {
   std::string hdr = "[-] ";
 
   Thread *th = reinterpret_cast<Thread *>(entry->tid);

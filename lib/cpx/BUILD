@@ -11,6 +11,7 @@ cc_library(
     ],
     deps = [
         "//lib/thread",
+        "//lib/log/journal",
     ],
 )
 
@@ -21,6 +22,7 @@ cc_test(
     ],
     deps = [
         ":cpx",
+        "//lib/log/fmt",
         "@com_google_googletest//:gtest_main",
     ],
 )

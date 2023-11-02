@@ -4,9 +4,9 @@
 #ifndef LIB_CPX_FMT_H
 #define LIB_CPX_FMT_H
 
-#include "lib/cpx/cpx.h"
+#include "lib/log/journal/journal.h"
 #include <string>
 
-std::string Format(LogEntry *entry);
+std::string Format(Entry *entry);
 
 #endif // LIB_CPX_FMT_H

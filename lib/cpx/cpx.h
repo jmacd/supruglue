@@ -7,6 +7,7 @@
 #include <setjmp.h>
 
 #include "lib/args/args.h"
+#include "lib/log/journal/journal.h"
 #include "lib/thread/thread.h"
 
 #ifdef __cplusplus
@@ -41,6 +42,7 @@ struct _System {
   void        *run_stack_pos;
   Thread      *current;
   ThreadList   runnable;
+  Journal      journal;
 };
 
 extern System __system;
