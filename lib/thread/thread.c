@@ -5,6 +5,10 @@
 
 SUPRUGLUE_DEFINE_LIST(ThreadList, Thread, list);
 
+SystemYield *__system_yield;
+Thread      *__system_current;
+ThreadList   __system_runnable;
+
 ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size) {
   return (ThreadConfig){
       .nice = 0,
@@ -12,8 +16,4 @@ ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size
       .stack_size = stack_size,
       .name = name,
   };
-}
-
-ThreadID TID(Thread *th) {
-  return (ThreadID)th;
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/log/journal/journal.h"
+#include "lib/sync/sync.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -18,35 +19,25 @@ void JournalInit(Journal *jl) {
   }
 }
 
-void journalRead(Journal *jl, Entry *record) {
+int JournalRead(Journal *jl, Entry *record, JournalFlags flags) {
+  if (BlockListEmpty(&jl->data)) {
+    if ((flags & JF_BLOCKING) == 0) {
+      return -1;
+    }
+    SemaDown(&jl->lock);
+  }
+
   Block *block = BlockListFront(&jl->data);
   *record = block->entries[block->cursor++];
 
   if (block->cursor != block->count) {
-    return;
+    return 0;
   }
   BlockListRemove(block);
   block->count = 0;
   block->cursor = 0;
   BlockListPushBack(&jl->free, block);
-}
-
-int JournalRead(Journal *jl, Entry *record) {
-  if (BlockListEmpty(&jl->data)) {
-    return -1;
-  }
-
-  journalRead(jl, record);
   return 0;
-}
-
-int JournalReadWait(Journal *jl, Entry *record, ThreadID reader) {
-  // Note: we expect one of these calls, otherwise not safe.
-  if (BlockListEmpty(&jl->data)) {
-    jl->reader = reader;
-    // YieldBlocked();
-  }
-  return journalRead(jl, record)
 }
 
 static Entry *getEntry(Journal *jl) {
@@ -102,9 +93,5 @@ void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int3
   entry->arg1 = arg1;
   entry->arg2 = arg2;
 
-  // if (jl->reader != 0) {
-  //   ThreadID reader = jl->reader;
-  //   jl->reader = 0;
-  //   Wakeup(reader);
-  // }
+  SemaUp(&jl->lock);
 }

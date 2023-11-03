@@ -12,6 +12,7 @@ cc_library(
     deps = [
 	"//lib/list",
 	"//lib/thread",
+	"//lib/sync",
     ],
 )
 

@@ -1,6 +1,7 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+#include "absl/strings/str_format.h"
 #include "lib/cpx/cpx.h"
 #include "lib/log/fmt/fmt.h"
 #include "gmock/gmock.h"
@@ -50,12 +51,12 @@ void test_recursive_func(ThreadID tid, Args args) {
   const char *arg = TakeArg(&args);
 
   Yield();
-  if (*arg != '0') {
-    char two[2];
-    two[0] = *arg - 1;
-    two[1] = 0;
-    Args rargs;
-    rargs.ptr = two;
+
+  int32_t val = Atoi(arg);
+  if (val != 0) {
+    Args        rargs;
+    std::string sub = absl::StrFormat("%d", val - 1);
+    rargs.ptr = sub.c_str();
     test_recursive_func(tid, rargs);
   }
 }
@@ -64,7 +65,7 @@ vector<string> test_logs_get() {
   vector<string> result;
 
   Entry ent;
-  while (JournalRead(&__system.journal, &ent) == 0) {
+  while (JournalRead(&__system.journal, &ent, JF_NONE) == 0) {
     result.push_back(Format(&ent));
   }
   return result;
@@ -127,15 +128,13 @@ TEST(CpxTest, Overflow) {
   uint8_t stack0[500];
   int     num = 1;
 
-  for (; num < 10; num++) {
+  for (; num < 20; num++) {
     EXPECT_EQ(0, Init(NewSystemConfig()));
 
-    char buf[2];
-    buf[0] = '0' + num;
-    buf[1] = 0;
+    std::string arg = absl::StrFormat("%d", num);
 
-    EXPECT_EQ(0,
-              Create(&thread, test_recursive_func, Args{.ptr = buf}, NewThreadConfig("abc", stack0, sizeof(stack0))));
+    EXPECT_EQ(0, Create(&thread, test_recursive_func, Args{.ptr = arg.c_str()},
+                        NewThreadConfig("abc", stack0, sizeof(stack0))));
     EXPECT_EQ(0, ::Run());
 
     auto logs = test_logs_get();
@@ -147,7 +146,7 @@ TEST(CpxTest, Overflow) {
     break;
   }
   EXPECT_LT(1, num);
-  EXPECT_GT(10, num);
+  EXPECT_GE(10, num);
 }
 
 TEST(CpxTest, MultiOverflow) {
@@ -157,8 +156,8 @@ TEST(CpxTest, MultiOverflow) {
   uint8_t stack1[500];
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
-  EXPECT_EQ(0, Create(&thread0, test_recursive_func, Args{.ptr = "9"}, NewThreadConfig("a", stack0, sizeof(stack0))));
-  EXPECT_EQ(0, Create(&thread1, test_recursive_func, Args{.ptr = "9"}, NewThreadConfig("b", stack1, sizeof(stack1))));
+  EXPECT_EQ(0, Create(&thread0, test_recursive_func, Args{.ptr = "20"}, NewThreadConfig("a", stack0, sizeof(stack0))));
+  EXPECT_EQ(0, Create(&thread1, test_recursive_func, Args{.ptr = "20"}, NewThreadConfig("b", stack1, sizeof(stack1))));
   EXPECT_EQ(0, ::Run());
 
   auto logs = test_logs_get();

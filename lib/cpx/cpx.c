@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <setjmp.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,7 +22,7 @@ int Init(SystemConfig cfg) {
   memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
 
-  ThreadListInit(&sys->runnable);
+  ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
   return 0;
 }
@@ -33,15 +34,15 @@ int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg) {
   thread->exec.call.func = func;
   thread->exec.call.args = args;
   thread->state = TS_STARTING;
-  ThreadListPushBack(&__system.runnable, thread);
+  ThreadListPushBack(&__system_runnable, thread);
   return 0;
 }
 
-int Run(void) {
-  while (!ThreadListEmpty(&__system.runnable)) {
-    Thread *volatile run = ThreadListPopFront(&__system.runnable);
+int __run(void) {
+  while (!ThreadListEmpty(&__system_runnable)) {
+    Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
-    __system.current = run;
+    __system_current = run;
     __system.run_stack_pos = (void *)&run;
 
     switch (setjmp(__system.return_jump)) {
@@ -51,7 +52,7 @@ int Run(void) {
       break;
     case JC_SUSPEND:
       //  Running thread yielded.
-      ThreadListPushBack(&__system.runnable, run);
+      ThreadListPushBack(&__system_runnable, run);
       continue;
     case JC_BLOCKED:
       //  Running thread became blocked by another.
@@ -90,14 +91,14 @@ void yieldInternal(JumpCode jc) {
   int32_t size = (int32_t)((size_t)__system.run_stack_pos - (size_t)yield_stack);
 
   // Check for thread-stack overflow.
-  if (size > __system.current->cfg.stack_size) {
-    JournalWrite(&__system.journal, TID(__system.current), "stack overflow: %u exceeds %u", size,
-                 __system.current->cfg.stack_size);
+  if (size > __system_current->cfg.stack_size) {
+    JournalWrite(&__system.journal, TID(__system_current), "stack overflow: %u exceeds %u", size,
+                 __system_current->cfg.stack_size);
     longjmp(__system.return_jump, JC_OVERFLOW);
   }
-  memcpy(__system.current->cfg.stack, yield_stack, size);
+  memcpy(__system_current->cfg.stack, yield_stack, size);
 
-  switch (setjmp(__system.current->exec.run_jump)) {
+  switch (setjmp(__system_current->exec.run_jump)) {
   case JC_SETJUMP:
     longjmp(__system.return_jump, jc);
   case JC_RESUME:
@@ -110,13 +111,13 @@ void yieldInternal(JumpCode jc) {
   yield_stack = (void *)&unused;
   size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
-  memcpy(yield_stack, __system.current->cfg.stack, size);
+  memcpy(yield_stack, __system_current->cfg.stack, size);
 }
 
-void Yield(void) {
-  yieldInternal(JC_SUSPEND);
-}
-
-void YieldBlocked(void) {
-  yieldInternal(JC_BLOCKED);
+int Run(void) {
+  __system_yield = &yieldInternal;
+  int err = __run();
+  __system_yield = NULL;
+  __system_current = NULL;
+  return err;
 }

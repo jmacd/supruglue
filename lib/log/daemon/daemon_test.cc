@@ -2,19 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 #include "absl/strings/str_format.h"
+#include "lib/log/daemon/daemon.h"
 #include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/test32/rpmsg_test32_host.h"
-#include "lib/syslog/syslog.h"
 #include "gtest/gtest.h"
 
 #include <thread>
 #include <unordered_set>
 
-vector<string> test_logs_get() {
-  vector<string> result;
-
-  // TODO: not called from a thread, test only.  Cannot yield or
-  // block, etc.  Replace me!  See test_read_func.
+std::vector<std::string> test_logs_get() {
+  std::vector<std::string> result;
 
   while (channelAvailable(&__system.log.ch, sizeof(__system.log.space)) != 0) {
     LogEntry ent;

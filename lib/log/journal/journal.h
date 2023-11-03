@@ -5,6 +5,7 @@
 #define LIB_LOG_JOURNAL_JOURNAL_H
 
 #include "lib/list/list.h"
+#include "lib/sync/sync.h"
 #include "lib/thread/thread.h"
 #include <stdint.h>
 
@@ -22,6 +23,13 @@ typedef struct _Block   Block;
 #define NUM_BLOCKS 4
 
 SUPRUGLUE_DECLARE_LIST(BlockList, Block);
+
+enum _JournalFlags {
+  JF_NONE = 0,
+  JF_BLOCKING = 1,
+};
+
+typedef enum _JournalFlags JournalFlags;
 
 struct _Entry {
   // TODO: timestamp
@@ -41,13 +49,12 @@ struct _Block {
 struct _Journal {
   BlockList free;
   BlockList data;
-  ThreadID  reader;
+  LockWord  lock;
   Block     blocks[NUM_BLOCKS];
 };
 
 void JournalInit(Journal *jl);
-int  JournalRead(Journal *jl, Entry *record);
-int  JournalReadWait(Journal *jl, Entry *record, ThreadID reader);
+int  JournalRead(Journal *jl, Entry *record, JournalFlags flags);
 void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2);
 
 #ifdef __cplusplus

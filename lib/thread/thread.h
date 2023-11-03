@@ -33,6 +33,18 @@ enum ThreadState {
 
 typedef enum ThreadState ThreadState;
 
+enum JumpCode {
+  JC_SETJUMP = 0,
+  JC_SUSPEND = 1,
+  JC_RESUME = 2,
+  JC_OVERFLOW = 3,
+  JC_INTERNAL = 4,
+  JC_BLOCKED = 5,
+  JC_UNBLOCKED = 6,
+};
+
+typedef enum JumpCode JumpCode;
+
 struct _ThreadConfig {
   const char *name;
   uint8_t    *stack;
@@ -56,7 +68,23 @@ struct _Thread {
 
 ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size);
 
-ThreadID TID(Thread *th);
+typedef void(SystemYield)(JumpCode jc);
+
+extern SystemYield *__system_yield;
+extern Thread      *__system_current;
+extern ThreadList   __system_runnable;
+
+static inline ThreadID TID(Thread *th) {
+  return (ThreadID)th;
+}
+
+static inline void Yield(void) {
+  (*__system_yield)(JC_SUSPEND);
+}
+
+static inline void YieldBlocked(void) {
+  (*__system_yield)(JC_BLOCKED);
+}
 
 #ifdef __cplusplus
 }
