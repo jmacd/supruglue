@@ -3,11 +3,12 @@
 
 #include "rpmsg_am335x.h"
 #include "external/ti-pru-support/include/am335x/pru_intc.h"
-#include "external/ti-pru-support/include/pru_rpmsg.h"
 #include "lib/rpmsg/rpmsg_iface.h"
 #include "supruglue/am335x/soc.h"
 #include "supruglue/am335x/sysevts.h"
 #include <string.h>
+
+ClientTransport __transport;
 
 // The following is documented in pru-software-support-package
 // and declared in linux-x.y.z/include/uapi/linux/virtio_config.h
@@ -46,23 +47,6 @@
 //
 // In the TRM these interrupts are labeled pr1_pru_mst_intr[0,1,2,3]_intr_req
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
-
-struct _ClientTransport {
-  struct pru_rpmsg_transport channel;
-
-  // This event needs to be cleared when messages are received.
-  int8_t sysevt_arm_to_pru;
-
-  // Note: maybe unused
-  int16_t sysevt_pru_to_arm;
-
-  // The peer address is initially 0, which case with no messages ever
-  // received, we can't really send.
-  uint16_t rpmsg_peer_src_addr;
-
-  // Equals the message source address.
-  int16_t channel_port;
-};
 
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
               struct fw_rsc_vdev_vring *vring1) {

@@ -1,7 +1,6 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include <assert.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +62,8 @@ int __run(void) {
       run->state = TS_FINISHED;
       break;
     default:
-      assert(0);
+      // assert(0);
+      break;
     }
     switch (run->state) {
     case TS_STARTING:
@@ -103,7 +103,7 @@ void yieldInternal(JumpCode jc) {
   case JC_RESUME:
     break;
   default:
-    assert(0);
+    // assert(0);
   }
 
   //  size and yield_stack are not volatile, recompute:

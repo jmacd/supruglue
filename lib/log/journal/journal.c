@@ -15,7 +15,8 @@ void JournalInit(Journal *jl) {
   LockInit(&jl->lock);
   BlockListInit(&jl->data);
   BlockListInit(&jl->free);
-  for (int i = 0; i < NUM_BLOCKS; i++) {
+  int i;
+  for (i = 0; i < NUM_BLOCKS; i++) {
     BlockListPushBack(&jl->free, &jl->blocks[i]);
   }
 }

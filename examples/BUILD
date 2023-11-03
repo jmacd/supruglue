@@ -14,7 +14,7 @@ cc_binary(
     deps = [
         "//lib/cpx",
         "//lib/rpmsg/am335x",
-        "//lib/ui1203",
+        "//lib/log/daemon",
     ],
 )
 

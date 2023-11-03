@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "sync.h"
-#include <assert.h>
 
 void LockInit(LockWord *word) {
-  assert(word->value == 0);
+  // assert(word->value == 0);
   ThreadListInit(&word->waiters);
 }
 
