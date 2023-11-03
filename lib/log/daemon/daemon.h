@@ -12,8 +12,8 @@
 extern "C" {
 #endif
 
-// This is a cpx thread that reads log messages from other threads and
-// conveys them over rpmsg to the host.
+// Thread that reads log messages from other threads and conveys them
+// over rpmsg to the host.
 
 void SyslogProcess(ThreadID thid, Args args);
 

@@ -92,8 +92,7 @@ void yieldInternal(JumpCode jc) {
 
   // Check for thread-stack overflow.
   if (size > __system_current->cfg.stack_size) {
-    JournalWrite(&__system.journal, TID(__system_current), "stack overflow: %u exceeds %u", size,
-                 __system_current->cfg.stack_size);
+    PRULOG_2U(FATAL, "stack overflow: %u exceeds %u", size, __system_current->cfg.stack_size);
     longjmp(__system.return_jump, JC_OVERFLOW);
   }
   memcpy(__system_current->cfg.stack, yield_stack, size);

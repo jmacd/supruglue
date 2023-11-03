@@ -24,12 +24,21 @@ typedef struct _Block   Block;
 
 SUPRUGLUE_DECLARE_LIST(BlockList, Block);
 
-enum _JournalFlags {
-  JF_NONE = 0,
-  JF_BLOCKING = 1,
+enum _JournalReadFlags {
+  JR_NONE = 0,
+  JR_BLOCKING = 0x1,
 };
 
-typedef enum _JournalFlags JournalFlags;
+enum _JournalWriteFlags {
+  JW_NONE = 0,
+  JW_YIELD = 0x1,
+  JW_INFO = 0x10 | JW_YIELD,    // INFO will Yield
+  JW_WARNING = 0x20 | JW_YIELD, // WARNING will Yield
+  JW_FATAL = 0x40,              // FATAL will not Yield
+};
+
+typedef enum _JournalReadFlags  JournalReadFlags;
+typedef enum _JournalWriteFlags JournalWriteFlags;
 
 struct _Entry {
   // TODO: timestamp
@@ -54,8 +63,11 @@ struct _Journal {
 };
 
 void JournalInit(Journal *jl);
-int  JournalRead(Journal *jl, Entry *record, JournalFlags flags);
-void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2);
+int  JournalRead(Journal *jl, Entry *record, JournalReadFlags flags);
+void JournalWrite(Journal *jl, ThreadID tid, const char *fmt, int32_t arg1, int32_t arg2, JournalWriteFlags flags);
+
+#define PRULOG_2U(level, fmt, arg1, arg2)                                                                              \
+  JournalWrite(&__system.journal, TID(__system_current), (fmt), (arg1), (arg2), JW_##level)
 
 #ifdef __cplusplus
 }

@@ -24,6 +24,7 @@ cc_test(
         ":daemon",
         "//lib/log/fmt",
         "//lib/rpmsg/test32",
+        "@com_google_absl//absl/log",
         "@com_google_googletest//:gtest_main",
     ],
 )

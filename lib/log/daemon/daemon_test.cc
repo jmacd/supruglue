@@ -1,8 +1,10 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+#include "daemon.h"
+
+#include "absl/log/log.h"
 #include "absl/strings/str_format.h"
-#include "lib/log/daemon/daemon.h"
 #include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/test32/rpmsg_test32_host.h"
 #include "gtest/gtest.h"
@@ -10,44 +12,11 @@
 #include <thread>
 #include <unordered_set>
 
-std::vector<std::string> test_logs_get() {
-  std::vector<std::string> result;
-
-  while (channelAvailable(&__system.log.ch, sizeof(__system.log.space)) != 0) {
-    LogEntry ent;
-    journalRead(&ent);
-    result.push_back(Format(&ent));
-  }
-  return result;
-}
-
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
-    journal2u("write %u", i, 0);
-    Yield();
+    PRULOG_2U(INFO, "write %u", i, 0); // Logs always yield
   }
-}
-
-void test_read_func(ThreadID tid, Args args) {
-  TestThread2 *tt2 = (TestThread2 *)tid;
-
-  int cnt = -1;
-  if (args.ptr != nullptr) {
-    cnt = Atoi(args.ptr);
-  }
-  for (int32_t i = 0; cnt < 0 || i < cnt; i++) {
-    LogEntry ent;
-    journalRead(&ent);
-    auto rd = Format(&ent);
-    tt2->messages.push_back(rd);
-    Yield();
-  }
-}
-
-void journalBogus(void) {
-  LogEntry toomany[LOG_CHANNEL_ENTRIES + 1];
-  channelWrite(&__system.log.ch, sizeof(__system.log.space), &toomany, sizeof(toomany));
 }
 
 TEST(Syslog, Simple) {
@@ -76,13 +45,26 @@ TEST(Syslog, Simple) {
     expect.insert(absl::StrFormat("[writer1] write %u", i));
   }
 
-  std::thread client([tt, &res] {
-    for (int i = 0; i < 200; i++) {
-      LogEntry entry;
+  int howmany = 0;
+  int overflowed = 0;
+  int overflows = 0;
+
+  std::thread client([tt, &res, &howmany, &overflows, &overflowed] {
+    // read until we receive the correct number, counting skips
+    for (int got = 0; got < 200;) {
+      Entry    entry;
       uint16_t blen = sizeof(entry);
       EXPECT_EQ(0, HostRecv(tt, &entry, &blen));
       EXPECT_EQ(blen, sizeof(entry));
-      res.insert(Format(&entry));
+      howmany++;
+      if (entry.msg == overflowMessage) {
+        overflows++;
+        overflowed += entry.arg1;
+        got += entry.arg1;
+      } else {
+        res.insert(Format(&entry));
+        got += 1;
+      }
     }
   });
 
@@ -90,7 +72,13 @@ TEST(Syslog, Simple) {
 
   client.join();
 
-  EXPECT_EQ(expect, res);
+  // The number of overflows and overflowed counts are logical.
+  EXPECT_EQ(overflowed + howmany - 200, overflows);
+
+  // Make sure the logs we received were all expected
+  for (auto arg : res) {
+    EXPECT_NE(expect.end(), expect.find(arg));
+  }
 }
 
 TEST(Syslog, WithTransients) {
@@ -112,7 +100,7 @@ TEST(Syslog, WithTransients) {
     HostTransientSendError(tt);
     HostTransientSendError(tt);
 
-    LogEntry entry;
+    Entry    entry;
     uint16_t blen = sizeof(entry);
 
     EXPECT_EQ(0, HostRecv(tt, &entry, &blen));

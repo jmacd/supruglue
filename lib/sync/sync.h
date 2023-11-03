@@ -20,6 +20,7 @@ struct _LockWord {
   ThreadList waiters;
 };
 
+void LockInit(LockWord *lockword);
 void SemaDown(LockWord *lockword);
 void SemaUp(LockWord *lockword);
 

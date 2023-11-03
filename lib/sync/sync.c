@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include "sync.h"
+#include <assert.h>
+
+void LockInit(LockWord *word) {
+  assert(word->value == 0);
+  ThreadListInit(&word->waiters);
+}
 
 void SemaDown(LockWord *word) {
   if (--word->value < 0) {

@@ -12,6 +12,7 @@ const char *const overflowMessage = "** OVERFLOW **: dropped %u records";
 
 void JournalInit(Journal *jl) {
   memset(jl, 0, sizeof(*jl));
+  LockInit(&jl->lock);
   BlockListInit(&jl->data);
   BlockListInit(&jl->free);
   for (int i = 0; i < NUM_BLOCKS; i++) {
@@ -19,9 +20,9 @@ void JournalInit(Journal *jl) {
   }
 }
 
-int JournalRead(Journal *jl, Entry *record, JournalFlags flags) {
+int JournalRead(Journal *jl, Entry *record, JournalReadFlags flags) {
   if (BlockListEmpty(&jl->data)) {
-    if ((flags & JF_BLOCKING) == 0) {
+    if ((flags & JR_BLOCKING) == 0) {
       return -1;
     }
     SemaDown(&jl->lock);
@@ -86,7 +87,7 @@ static Entry *getEntry(Journal *jl) {
   return &swap->entries[0];
 }
 
-void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2) {
+void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2, JournalWriteFlags flags) {
   Entry *entry = getEntry(jl);
   entry->tid = tid;
   entry->msg = msg;
@@ -94,4 +95,8 @@ void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int3
   entry->arg2 = arg2;
 
   SemaUp(&jl->lock);
+
+  if ((flags & JW_YIELD) != 0) {
+    Yield();
+  }
 }

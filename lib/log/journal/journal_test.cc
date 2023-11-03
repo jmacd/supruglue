@@ -10,13 +10,13 @@
 
 void testWrite(Journal *jl, int32_t o, int32_t n) {
   for (int32_t i = o; i < n; i++) {
-    JournalWrite(jl, i, "nice journal", i, i + 1);
+    JournalWrite(jl, i, "nice journal", i, i + 1, JW_NONE);
   }
 }
 
 void testRead(Journal *jl, int32_t i) {
   Entry entry;
-  EXPECT_EQ(0, JournalRead(jl, &entry, JF_NONE));
+  EXPECT_EQ(0, JournalRead(jl, &entry, JR_NONE));
   EXPECT_EQ(i, entry.tid);
   EXPECT_STREQ("nice journal", entry.msg);
   EXPECT_EQ(i, entry.arg1);
@@ -25,7 +25,7 @@ void testRead(Journal *jl, int32_t i) {
 
 void testReadOverflow(Journal *jl, int32_t i) {
   Entry entry;
-  EXPECT_EQ(0, JournalRead(jl, &entry, JF_NONE));
+  EXPECT_EQ(0, JournalRead(jl, &entry, JR_NONE));
   EXPECT_EQ(0, entry.tid);
   EXPECT_STREQ(overflowMessage, entry.msg);
   EXPECT_EQ(i, entry.arg1);
@@ -36,7 +36,7 @@ TEST(Journal, EmptyRead) {
   Journal jl;
   JournalInit(&jl);
   Entry entry;
-  EXPECT_EQ(-1, JournalRead(&jl, &entry, JF_NONE));
+  EXPECT_EQ(-1, JournalRead(&jl, &entry, JR_NONE));
 }
 
 TEST(Journal, WriteRead) {
@@ -48,7 +48,7 @@ TEST(Journal, WriteRead) {
     testRead(&jl, i);
   }
   Entry entry;
-  EXPECT_EQ(-1, JournalRead(&jl, &entry, JF_NONE));
+  EXPECT_EQ(-1, JournalRead(&jl, &entry, JR_NONE));
 }
 
 TEST(Journal, OneOverflow) {
@@ -69,7 +69,7 @@ TEST(Journal, OneOverflow) {
   // Followed by a singleton on the final block.
   testRead(&jl, TOTAL);
   Entry entry;
-  EXPECT_EQ(-1, JournalRead(&jl, &entry, JF_NONE));
+  EXPECT_EQ(-1, JournalRead(&jl, &entry, JR_NONE));
 }
 
 TEST(Journal, RepeatOverflow) {
@@ -84,12 +84,12 @@ TEST(Journal, RepeatOverflow) {
       for (int i = 0; i < TOTAL * repeat; i++) {
         // write so many
         for (int w = 0; w < writes; w++) {
-          JournalWrite(&jl, 2 * i, "repeat", 0, 0);
+          JournalWrite(&jl, 2 * i, "repeat", 0, 0, JW_NONE);
         }
         // read so many (fewer)
         for (int r = 0; r < reads; r++) {
           Entry entry;
-          EXPECT_EQ(0, JournalRead(&jl, &entry, JF_NONE));
+          EXPECT_EQ(0, JournalRead(&jl, &entry, JR_NONE));
           if (entry.msg == overflowMessage) {
             counted += entry.arg1;
           } else {
@@ -101,7 +101,7 @@ TEST(Journal, RepeatOverflow) {
       // test the total count
       for (int32_t i = 0; i < TOTAL; i++) {
         Entry entry;
-        if (JournalRead(&jl, &entry, JF_NONE) < 0) {
+        if (JournalRead(&jl, &entry, JR_NONE) < 0) {
           break;
         }
 

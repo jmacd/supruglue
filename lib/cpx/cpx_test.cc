@@ -65,7 +65,7 @@ vector<string> test_logs_get() {
   vector<string> result;
 
   Entry ent;
-  while (JournalRead(&__system.journal, &ent, JF_NONE) == 0) {
+  while (JournalRead(&__system.journal, &ent, JR_NONE) == 0) {
     result.push_back(Format(&ent));
   }
   return result;
