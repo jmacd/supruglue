@@ -13,6 +13,8 @@ struct _Thing {
   ThingList L;
 };
 
+SUPRUGLUE_DEFINE_LIST_INLINE(ThingList, Thing, L);
+
 SUPRUGLUE_DEFINE_LIST(ThingList, Thing, L);
 
 TEST(ListTest, Basic) {

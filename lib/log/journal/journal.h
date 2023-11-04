@@ -62,6 +62,8 @@ struct _Journal {
   Block     blocks[NUM_BLOCKS];
 };
 
+SUPRUGLUE_DEFINE_LIST_INLINE(BlockList, Block, list);
+
 void JournalInit(Journal *jl);
 int  JournalRead(Journal *jl, Entry *record, JournalReadFlags flags);
 void JournalWrite(Journal *jl, ThreadID tid, const char *fmt, int32_t arg1, int32_t arg2, JournalWriteFlags flags);

@@ -104,6 +104,7 @@ void yieldInternal(JumpCode jc) {
     break;
   default:
     // assert(0);
+    break;
   }
 
   //  size and yield_stack are not volatile, recompute:

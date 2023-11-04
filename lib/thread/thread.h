@@ -66,6 +66,8 @@ struct _Thread {
   } exec;
 };
 
+SUPRUGLUE_DEFINE_LIST_INLINE(ThreadList, Thread, list);
+
 ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size);
 
 typedef void(SystemYield)(JumpCode jc);
