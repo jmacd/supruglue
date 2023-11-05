@@ -10,12 +10,10 @@
 #include "supruglue/gpio.h"
 #include "supruglue/soc.h"
 
-#define WORDSZ sizeof(uint32_t)
-
 struct test_system {
   test_system();
 
-  gpio_register *gpio_banks;
+  gpio_bank *gpio_banks;
 };
 
 #endif // SUPRUGLUE_TEST_SUPRUGLUE_SOC_H

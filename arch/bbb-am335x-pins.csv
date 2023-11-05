@@ -93,3 +93,7 @@ P9_43,GND,,,,,,,,,,P9_43
 P9_44,GND,,,,,,,,,,P9_44
 P9_45,GND,,,,,,,,,,P9_45
 P9_46,GND,,,,,,,,,,P9_46
+ULED1,ULED1,,,,,,,,gpio1_21,53,ULED1
+ULED2,ULED2,,,,,,,,gpio1_22,54,ULED2
+ULED3,ULED3,,,,,,,,gpio1_23,55,ULED3
+ULED4,ULED4,,,,,,,,gpio1_24,56,ULED4

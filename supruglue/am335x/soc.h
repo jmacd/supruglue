@@ -4,6 +4,10 @@
 #ifndef SUPRUGLUE_AM335X_SOC_H
 #define SUPRUGLUE_AM335X_SOC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define WORDSZ sizeof(uint32_t)
 
 // This macro assumes standard linker commands, i.e., normal
@@ -13,5 +17,9 @@
 
 // Dummy variable for PRU_CORE_NUMBER check.
 extern void *__dummy;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SUPRUGLUE_AM335X_SOC_H

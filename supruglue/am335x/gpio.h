@@ -5,26 +5,29 @@
 #define SUPRUGLUE_AM335X_GPIO_H
 
 #include "soc.h"
-#include "supruglue/gpio.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // See table 2.2 of the TRM for these addresses.
-#define GPIO_BANK0(soc) ((supruglue_gpio *)0x44e07000)
-#define GPIO_BANK1(soc) ((supruglue_gpio *)0x4804c000)
-#define GPIO_BANK2(soc) ((supruglue_gpio *)0x481ac000)
-#define GPIO_BANK3(soc) ((supruglue_gpio *)0x481ae000)
+#define GPIO_BANK0(soc) ((gpio_bank *)0x44e07000)
+#define GPIO_BANK1(soc) ((gpio_bank *)0x4804c000)
+#define GPIO_BANK2(soc) ((gpio_bank *)0x481ac000)
+#define GPIO_BANK3(soc) ((gpio_bank *)0x481ae000)
 
-// See TRM 25.4.1.
+#include "supruglue/gpio.h"
 
-// For clearing the GPIO registers
-#define GPIOREG_CLEARDATAOUT NUM_WORDS(0x190)
+inline void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v) {
+  g[r] = (gpio_bank)v;
+}
 
-// For setting the GPIO registers
-#define GPIOREG_SETDATAOUT NUM_WORDS(0x194)
+inline uint32_t GPIO_GetRegister(gpio_bank *g, int r) {
+  return (uint32_t)g[r];
+}
 
-// For reading the GPIO registers
-#define GPIOREG_DATAOUT NUM_WORDS(0x13C)
-
-// For writing the GPIO registers
-#define GPIOREG_DATAIN NUM_WORDS(0x138)
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SUPRUGLUE_AM335X_GPIO_H

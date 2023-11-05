@@ -10,6 +10,10 @@
 
 #define PRU_RPMSG_NO_PEER_ADDR (-5)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _ClientTransport {
   struct pru_rpmsg_transport channel;
 
@@ -38,5 +42,9 @@ struct _ClientTransport {
 // will use rpmsg to get the args etc.
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
               struct fw_rsc_vdev_vring *vring1);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LIB_RPMSG_AM335X_RPMSG_AM335X_H

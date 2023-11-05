@@ -13,8 +13,9 @@ cc_binary(
     ],
     deps = [
         "//lib/cpx",
-        "//lib/rpmsg/am335x",
         "//lib/log/daemon",
+        "//lib/rpmsg/am335x",
+        "//supruglue/am335x",
     ],
 )
 

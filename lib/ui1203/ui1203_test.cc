@@ -1,15 +1,11 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "gtest/gtest.h"
-
 #include "supruglue/test32/gpio.h"
 #include "supruglue/test32/pinmap.h"
 #include "supruglue/test32/soc.h"
-
-extern "C" {
 #include "ui1203.h"
-}
+#include "gtest/gtest.h"
 
 TEST(Ui1203Test, Output) {
   test_system *soc = new test_system;

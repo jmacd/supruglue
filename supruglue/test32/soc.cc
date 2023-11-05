@@ -5,5 +5,5 @@
 #include "supruglue/test32/gpio.h"
 
 test_system::test_system() {
-  this->gpio_banks = new gpio_register[GPIO_NUM_REGISTERS]();
+  this->gpio_banks = new gpio_bank[GPIO_NUM_REGISTERS]();
 }

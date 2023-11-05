@@ -9,7 +9,7 @@ TEST(GpioTest, Register) {
   test_system *soc = new test_system;
 
   for (int i = 0; i < GPIO_NUM_REGISTERS; i++) {
-    gpio_register *gpio = &soc->gpio_banks[i];
+    gpio_bank *gpio = &soc->gpio_banks[i];
 
     // Clear al bits
     GPIO_SetRegister(gpio, GPIOREG_CLEARDATAOUT, allbits);
@@ -46,11 +46,11 @@ TEST(GpioTest, Ctor) {
 
   gpio_pin pin = GPIO_PIN(soc, P9_25);
 
-  EXPECT_EQ(GPIO_REGISTER3(soc), pin.reg);
-  EXPECT_EQ(GPIO_PIN_TO_BIT(P9_25), pin.bit);
+  EXPECT_EQ(GPIO_BANK3(soc), pin.bank);
+  EXPECT_EQ(GPIO_PIN_TO_BIT_NUM(P9_25), pin.bit);
 
   pin = GPIO_PIN(soc, P8_3);
 
-  EXPECT_EQ(GPIO_REGISTER1(soc), pin.reg);
-  EXPECT_EQ(GPIO_PIN_TO_BIT(P8_3), pin.bit);
+  EXPECT_EQ(GPIO_BANK1(soc), pin.bank);
+  EXPECT_EQ(GPIO_PIN_TO_BIT_NUM(P8_3), pin.bit);
 }

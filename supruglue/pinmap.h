@@ -6,9 +6,10 @@
 
 #include "supruglue.h"
 
-#define GPIO_PIN_TO_BANK(pin) _JOIN(pin, _gpio_bank)
-#define GPIO_PIN_TO_BIT(pin) _JOIN(pin, _gpio_bit)
+// These match the code generated in of tools/cmd/pinmap/pinmap.go
 
-#define GPIO_PIN_TO_REGISTER(soc, pin) pin##_gpio_register(soc)
+#define GPIO_PIN_TO_BANK_NUM(pin) _JOIN(pin, _GPIO_BANK_NUM)
+#define GPIO_PIN_TO_BIT_NUM(pin) _JOIN(pin, _GPIO_BIT_NUM)
+#define GPIO_PIN_TO_REGISTER(soc, pin) pin##_GPIO_BANK(soc)
 
 #endif // SUPRUGLUE_PINMAP_H
