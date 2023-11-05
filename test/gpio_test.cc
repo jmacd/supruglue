@@ -45,12 +45,14 @@ TEST(GpioTest, Ctor) {
   test_system *soc = new test_system;
 
   gpio_pin pin = GPIO_PIN(soc, P9_25);
-
   EXPECT_EQ(GPIO_BANK3(soc), pin.bank);
   EXPECT_EQ(GPIO_PIN_TO_BIT_NUM(P9_25), pin.bit);
 
   pin = GPIO_PIN(soc, P8_3);
-
   EXPECT_EQ(GPIO_BANK1(soc), pin.bank);
   EXPECT_EQ(GPIO_PIN_TO_BIT_NUM(P8_3), pin.bit);
+
+  pin = GPIO_PIN(soc, ULED2);
+  EXPECT_EQ(GPIO_BANK1(soc), pin.bank);
+  EXPECT_EQ(GPIO_PIN_TO_BIT_NUM(ULED2), pin.bit);
 }
