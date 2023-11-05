@@ -11,7 +11,7 @@ cc_library(
 	],
     testonly = True,
     deps = [
-	"//lib/cpx",
+	"//lib/coroutine",
 	"//tools/toolchain/am335x:incompatible",
         "@com_google_absl//absl/strings:str_format",
     ],

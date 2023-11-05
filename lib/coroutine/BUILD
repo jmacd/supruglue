@@ -2,12 +2,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "cpx",
+    name = "coroutine",
     srcs = [
-        "cpx.c",
+        "coroutine.c",
     ],
     hdrs = [
-        "cpx.h",
+        "coroutine.h",
     ],
     deps = [
         "//lib/thread",
@@ -18,10 +18,10 @@ cc_library(
 cc_test(
     name = "test",
     srcs = [
-        "cpx_test.cc",
+        "coroutine_test.cc",
     ],
     deps = [
-        ":cpx",
+        ":coroutine",
         "//lib/log/fmt",
         "@com_google_googletest//:gtest_main",
     ],

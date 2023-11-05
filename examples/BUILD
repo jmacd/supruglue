@@ -12,7 +12,7 @@ cc_binary(
         "$(location //tools/toolchain/am335x:pru0_cmd)",
     ],
     deps = [
-        "//lib/cpx",
+        "//lib/coroutine",
         "//lib/log/daemon",
         "//lib/rpmsg/am335x",
         "//supruglue/am335x",
@@ -23,7 +23,7 @@ cc_binary(
     name = "local",
     srcs = ["local.c"],
     deps = [
-        "//lib/cpx",
+        "//lib/coroutine",
         "//supruglue/test32",
     ],
 )

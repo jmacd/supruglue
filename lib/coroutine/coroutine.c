@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lib/cpx/cpx.h"
+#include "lib/coroutine/coroutine.h"
 
 System __system;
 

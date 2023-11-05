@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "absl/strings/str_format.h"
-#include "lib/cpx/cpx.h"
+#include "lib/coroutine/coroutine.h"
 #include "lib/log/fmt/fmt.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -71,7 +71,7 @@ vector<string> test_logs_get() {
   return result;
 }
 
-TEST(CpxTest, TwoThreads) {
+TEST(CoroutineTest, TwoThreads) {
   TestThread1 threads[2];
   uint32_t    regs[2] = {0, 0};
 
@@ -98,7 +98,7 @@ TEST(CpxTest, TwoThreads) {
   EXPECT_EQ(2, regs[1]);
 }
 
-TEST(CpxTest, TwiceAlternating) {
+TEST(CoroutineTest, TwiceAlternating) {
   Thread  threads[2];
   uint8_t stack0[1024];
   uint8_t stack1[1024];
@@ -123,7 +123,7 @@ TEST(CpxTest, TwiceAlternating) {
   EXPECT_EQ(expect, test_run_get());
 }
 
-TEST(CpxTest, Overflow) {
+TEST(CoroutineTest, Overflow) {
   Thread  thread;
   uint8_t stack0[500];
   int     num = 1;
@@ -149,7 +149,7 @@ TEST(CpxTest, Overflow) {
   EXPECT_GE(10, num);
 }
 
-TEST(CpxTest, MultiOverflow) {
+TEST(CoroutineTest, MultiOverflow) {
   Thread  thread0;
   Thread  thread1;
   uint8_t stack0[500];

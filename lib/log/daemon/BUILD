@@ -10,7 +10,7 @@ cc_library(
         "daemon.h",
     ],
     deps = [
-        "//lib/cpx",
+        "//lib/coroutine",
         "//lib/rpmsg",
     ],
 )

@@ -4,7 +4,7 @@
 #include "external/ti-pru-support/include/am335x/pru_cfg.h"
 #include "external/ti-pru-support/include/pru_virtio_ids.h"
 #include "lib/args/args.h"
-#include "lib/cpx/cpx.h"
+#include "lib/coroutine/coroutine.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/rpmsg/am335x/rpmsg_am335x.h"
 #include "supruglue/am335x/gpio.h"

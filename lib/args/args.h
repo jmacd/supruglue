@@ -1,8 +1,8 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#ifndef LIB_CPX_ARGS_H
-#define LIB_CPX_ARGS_H
+#ifndef LIB_ARGS_ARGS_H
+#define LIB_ARGS_ARGS_H
 
 #include <stdint.h>
 
@@ -36,4 +36,4 @@ int32_t Atoi(const char *arg);
 }
 #endif
 
-#endif // LIB_CPX_ARGS_H
+#endif // LIB_ARGS_ARGS_H

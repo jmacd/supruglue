@@ -1,8 +1,8 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#ifndef LIB_CPX_CPX_H
-#define LIB_CPX_CPX_H
+#ifndef LIB_COROUTINE_COROUTINE_H
+#define LIB_COROUTINE_COROUTINE_H
 
 #include <setjmp.h>
 
@@ -45,4 +45,4 @@ int Run(void);
 }
 #endif
 
-#endif // LIB_CPX_CPX_H
+#endif // LIB_COROUTINE_COROUTINE_H
