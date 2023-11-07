@@ -5,8 +5,20 @@
 #include "supruglue/soc.h"
 #include <stdint.h>
 
+#include "lib/gpio/gpio-defs.h"
+
+#if defined(SUPRUGLUE_AM335X)
+#include "lib/gpio/am335x/gpio.h"
+#elif defined(SUPRUGLUE_TEST32)
+#include "lib/gpio/test32/gpio.h"
+#endif
+
 #ifndef SUPRUGLUE_GPIO_H
 #define SUPRUGLUE_GPIO_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // See TRM 25.4.1.x
 //
@@ -45,12 +57,6 @@ enum _GpioBankNumber {
 
 typedef enum _GpioBankNumber GpioBankNumber;
 
-typedef uint32_t gpio_bank;
-
-void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v);
-
-uint32_t GPIO_GetRegister(gpio_bank *g, int r);
-
 typedef struct {
   gpio_bank *bank;
   int        bit;
@@ -71,5 +77,9 @@ static inline void GPIO_SetPin(gpio_pin pin, int value) {
     __x.bit = GPIO_PIN_TO_BIT_NUM(pin);                                                                                \
     __x;                                                                                                               \
   })
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SUPRUGLUE_GPIO_H

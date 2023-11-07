@@ -1,10 +1,11 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#ifndef SUPRUGLUE_AM335X_GPIO_H
-#define SUPRUGLUE_AM335X_GPIO_H
+#include "lib/gpio/gpio-defs.h"
+#include "supruglue/am335x/soc.h"
 
-#include "soc.h"
+#ifndef LIB_GPIO_AM335X_GPIO_H
+#define LIB_GPIO_AM335X_GPIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,8 +16,6 @@ extern "C" {
 #define GPIO_BANK1(soc) ((gpio_bank *)0x4804c000)
 #define GPIO_BANK2(soc) ((gpio_bank *)0x481ac000)
 #define GPIO_BANK3(soc) ((gpio_bank *)0x481ae000)
-
-#include "supruglue/gpio.h"
 
 inline void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v) {
   g[r] = (gpio_bank)v;
@@ -30,4 +29,4 @@ inline uint32_t GPIO_GetRegister(gpio_bank *g, int r) {
 }
 #endif
 
-#endif // SUPRUGLUE_AM335X_GPIO_H
+#endif // LIB_GPIO_AM335X_GPIO_H

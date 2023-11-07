@@ -1,5 +1,5 @@
+#include "lib/gpio/gpio.h"
 #include "supruglue/pinmap-arch.h"
-#include "supruglue/test32/gpio.h"
 #include "gtest/gtest.h"
 
 const uint32_t allbits = 0xffffffff;
@@ -9,7 +9,7 @@ TEST(GpioTest, Register) {
   test_system *soc = new test_system;
 
   for (int i = 0; i < GPIO_NUM_REGISTERS; i++) {
-    gpio_bank *gpio = &soc->gpio_banks[i];
+    gpio_bank *gpio = reinterpret_cast<gpio_bank *>(&soc->gpio_banks[i]);
 
     // Clear al bits
     GPIO_SetRegister(gpio, GPIOREG_CLEARDATAOUT, allbits);
@@ -55,4 +55,20 @@ TEST(GpioTest, Ctor) {
   pin = GPIO_PIN(soc, ULED2);
   EXPECT_EQ(GPIO_BANK1(soc), pin.bank);
   EXPECT_EQ(GPIO_PIN_TO_BIT_NUM(ULED2), pin.bit);
+}
+
+TEST(GpioTest, PinmapMacros) {
+  test_system *soc = new test_system;
+
+  EXPECT_EQ(3, GPIO_PIN_TO_BANK_NUM(P9_25));
+  EXPECT_EQ(21, GPIO_PIN_TO_BIT_NUM(P9_25));
+  EXPECT_EQ(GPIO_BANK3(soc), GPIO_PIN_TO_REGISTER(soc, P9_25));
+
+  EXPECT_EQ(1, GPIO_PIN_TO_BANK_NUM(P8_3));
+  EXPECT_EQ(6, GPIO_PIN_TO_BIT_NUM(P8_3));
+  EXPECT_EQ(GPIO_BANK1(soc), GPIO_PIN_TO_REGISTER(soc, P8_3));
+
+  EXPECT_EQ(1, GPIO_PIN_TO_BANK_NUM(ULED1));
+  EXPECT_EQ(21, GPIO_PIN_TO_BIT_NUM(ULED1));
+  EXPECT_EQ(GPIO_BANK1(soc), GPIO_PIN_TO_REGISTER(soc, ULED1));
 }

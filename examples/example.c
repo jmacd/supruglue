@@ -5,9 +5,9 @@
 #include "external/ti-pru-support/include/pru_virtio_ids.h"
 #include "lib/args/args.h"
 #include "lib/coroutine/coroutine.h"
+#include "lib/gpio/gpio.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/rpmsg/am335x/rpmsg_am335x.h"
-#include "supruglue/am335x/gpio.h"
 #include "supruglue/pinmap-arch.h"
 
 #define NUM_RESOURCES 1

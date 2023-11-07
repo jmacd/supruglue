@@ -2,22 +2,18 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "ui1203",
-    srcs = [
-        "ui1203.c",
-    ],
+    name = "test32",
     hdrs = [
-        "ui1203.h",
+        "gpio.h"
     ],
-    deps = ["//supruglue"],
 )
 
 cc_test(
-    name = "test",
-    srcs = ["ui1203_test.cc"],
+    name = "gpio_test",
+    srcs = ["gpio_test.cc"],
     deps = [
-        ":ui1203",
         "//supruglue/test32",
+        "//lib/gpio",
         "@com_google_googletest//:gtest_main",
     ],
 )

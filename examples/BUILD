@@ -14,6 +14,7 @@ cc_binary(
     deps = [
         "//lib/coroutine",
         "//lib/log/daemon",
+        "//lib/gpio",
         "//lib/rpmsg/am335x",
         "//supruglue/am335x",
     ],

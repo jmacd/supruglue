@@ -4,23 +4,17 @@
 #ifndef SUPRUGLUE_TEST_SUPRUGLUE_GPIO_H
 #define SUPRUGLUE_TEST_SUPRUGLUE_GPIO_H
 
+#include <algorithm>
 #include <stdint.h>
 
-#include "soc.h"
+#include "lib/gpio/gpio-defs.h"
+#include "lib/gpio/gpio.h"
+#include "supruglue/test32/soc.h"
 
-#define GPIOREG_CLEARDATAOUT 0
-#define GPIOREG_SETDATAOUT 1
-#define GPIOREG_DATAOUT 2
-#define GPIOREG_DATAIN 3
-
-#define GPIO_NUM_REGISTERS 4
-
-#define GPIO_BANK0(soc) (&(soc)->gpio_banks[0])
-#define GPIO_BANK1(soc) (&(soc)->gpio_banks[1])
-#define GPIO_BANK2(soc) (&(soc)->gpio_banks[2])
-#define GPIO_BANK3(soc) (&(soc)->gpio_banks[3])
-
-#include "supruglue/gpio.h"
+#define GPIO_BANK0(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[0]))
+#define GPIO_BANK1(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[1]))
+#define GPIO_BANK2(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[2]))
+#define GPIO_BANK3(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[3]))
 
 inline void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v) {
   switch (r) {
