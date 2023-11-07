@@ -2,13 +2,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "am335x",
+    name = "debug",
     srcs = [
-        "soc.c",
+	    #"debug.c",
     ],
     hdrs = [
-        "gpio.h",
-        "soc.h",
+            #"debug.h",
     ],
     deps = ["//supruglue"],
 )

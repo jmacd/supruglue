@@ -22,6 +22,8 @@ int Init(SystemConfig cfg) {
   sys->cfg = cfg;
 
   ThreadListInit(&__system_runnable);
+
+  // TODO: bug here, this is blocking?
   JournalInit(&sys->journal);
   return 0;
 }

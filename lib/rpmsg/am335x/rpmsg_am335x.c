@@ -5,7 +5,7 @@
 #include "external/ti-pru-support/include/am335x/pru_intc.h"
 #include "lib/rpmsg/rpmsg_iface.h"
 #include "supruglue/am335x/soc.h"
-#include "supruglue/am335x/sysevts.h"
+#include "supruglue/sysevts-arch.h"
 #include <string.h>
 
 ClientTransport __transport;

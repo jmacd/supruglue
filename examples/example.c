@@ -8,7 +8,7 @@
 #include "lib/log/daemon/daemon.h"
 #include "lib/rpmsg/am335x/rpmsg_am335x.h"
 #include "supruglue/am335x/gpio.h"
-#include "supruglue/am335x/pinmap.h"
+#include "supruglue/pinmap-arch.h"
 
 #define NUM_RESOURCES 1
 
@@ -88,71 +88,41 @@ void test_write_func(ThreadID tid, Args args) {
   }
 }
 
-void setOutput(gpio_pin pin) {
-  GPIO_SetRegister(pin.bank, GPIOREG_OE, ~(1 << pin.bit) & GPIO_GetRegister(pin.bank, GPIOREG_OE));
-}
-
 void toggle_blue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(soc, P9_25);
-  setOutput(pin);
 
   while (1) {
     GPIO_SetPin(pin, 1);
-    __delay_cycles(1000000);
+    __delay_cycles(100000000);
     Yield();
 
     GPIO_SetPin(pin, 0);
-    __delay_cycles(1000000);
+    __delay_cycles(100000000);
     Yield();
   }
 }
 
 void toggle_yellow(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(soc, P9_23);
-  setOutput(pin);
 
   while (1) {
     GPIO_SetPin(pin, 1);
-    __delay_cycles(1000000);
+    __delay_cycles(100000000);
     Yield();
 
     GPIO_SetPin(pin, 0);
-    __delay_cycles(1000000);
+    __delay_cycles(100000000);
     Yield();
   }
 }
 
-void GPIO_Uled1(int val) {
-  GPIO_SetPin(GPIO_PIN(__system, ULED1), val);
-}
-void GPIO_Uled2(int val) {
-  GPIO_SetPin(GPIO_PIN(__system, ULED2), val);
-}
-void GPIO_Uled3(int val) {
-  GPIO_SetPin(GPIO_PIN(__system, ULED3), val);
-}
-void GPIO_Uled4(int val) {
-  GPIO_SetPin(GPIO_PIN(__system, ULED4), val);
-}
-
-// for (;;) {
-//   GPIO_Uled1(1);
-//   GPIO_Uled2(1);
-//   GPIO_Uled3(1);
-//   GPIO_Uled4(1);
-//   __delay_cycles(100000000);
-//   GPIO_Uled1(0);
-//   GPIO_Uled2(0);
-//   GPIO_Uled3(0);
-//   GPIO_Uled4(0);
-//   __delay_cycles(100000000);
-// }
-
 void main() {
-  Thread  writer, blue, yellow;
-  Thread  syslog;
-  uint8_t stack0[100];
-  uint8_t stack1[100];
+  Thread blue;
+  Thread yellow;
+  // Thread writer;
+  // Thread syslog;
+  // uint8_t stack0[100];
+  // uint8_t stack1[100];
   uint8_t stack2[100];
   uint8_t stack3[100];
   Args    args1, args2;
@@ -161,15 +131,15 @@ void main() {
   // Allow OCP master port access by the PRU.
   CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
-  err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
-
   Init(NewSystemConfig());
 
-  args1.ptr = "1";
-  args2.ptr = "";
+  // err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
 
-  err = Create(&writer, test_write_func, args1, NewThreadConfig("writer", stack0, sizeof(stack0)));
-  err = Create(&syslog, SyslogProcess, args2, NewThreadConfig("syslog", stack1, sizeof(stack1)));
+  // args1.ptr = "1";
+  // args2.ptr = "";
+
+  // // err = Create(&writer, test_write_func, args1, NewThreadConfig("writer", stack0, sizeof(stack0)));
+  // // err = Create(&syslog, SyslogProcess, args2, NewThreadConfig("syslog", stack1, sizeof(stack1)));
   err = Create(&blue, toggle_blue, args2, NewThreadConfig("blue", stack2, sizeof(stack2)));
   err = Create(&yellow, toggle_yellow, args2, NewThreadConfig("yellow", stack3, sizeof(stack3)));
 

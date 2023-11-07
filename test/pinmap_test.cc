@@ -1,8 +1,8 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+#include "supruglue/pinmap-arch.h"
 #include "supruglue/test32/gpio.h"
-#include "supruglue/test32/pinmap.h"
 #include "gtest/gtest.h"
 
 TEST(PinMapTest, GpioMacros) {
