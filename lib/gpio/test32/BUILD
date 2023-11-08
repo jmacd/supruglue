@@ -15,8 +15,8 @@ cc_test(
     name = "gpio_test",
     srcs = ["gpio_test.cc"],
     deps = [
-        "//supruglue/test32",
         "//lib/gpio",
+        "//supruglue/test32",
         "@com_google_googletest//:gtest_main",
     ],
 )

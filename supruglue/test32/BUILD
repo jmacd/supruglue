@@ -3,13 +3,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "test32",
-    srcs = [
-        "soc.cc",
-    ],
     hdrs = [
         "soc.h",
-    ],
-    copts = [
     ],
     deps = [
         "//supruglue",

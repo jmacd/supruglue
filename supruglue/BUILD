@@ -3,21 +3,11 @@
 cc_library(
     name = "supruglue",
     hdrs = [
-        "pinmap.h",
         "soc.h",
         "supruglue.h",
-        ":pinmap_gen",
         ":sysevts_gen",
     ],
     visibility = ["//visibility:public"],
-)
-
-genrule(
-    name = "pinmap_gen",
-    srcs = ["//arch:pins"],
-    outs = ["pinmap-arch.h"],
-    cmd = "./$(location //tools/cmd/pinmap:pinmap) $(location //arch:pins) > $@",
-    tools = ["//tools/cmd/pinmap"],
 )
 
 genrule(

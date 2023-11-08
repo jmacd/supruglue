@@ -11,7 +11,8 @@
 #include "supruglue/soc.h"
 
 struct test_system {
-  test_system();
+  test_system() {
+  }
 
   int32_t gpio_banks[GPIO_NUM_REGISTERS];
 };

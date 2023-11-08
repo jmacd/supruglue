@@ -7,8 +7,8 @@
 #include "lib/coroutine/coroutine.h"
 #include "lib/gpio/gpio.h"
 #include "lib/log/daemon/daemon.h"
+#include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
-#include "supruglue/pinmap-arch.h"
 
 #define NUM_RESOURCES 1
 

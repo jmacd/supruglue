@@ -1,14 +1,18 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#ifndef SUPRUGLUE_TEST_SUPRUGLUE_GPIO_H
-#define SUPRUGLUE_TEST_SUPRUGLUE_GPIO_H
+#ifndef LIB_GPIO_TEST32_GPIO_H
+#define LIB_GPIO_TEST32_GPIO_H
 
 #include <algorithm>
 #include <stdint.h>
 
 #include "lib/gpio/gpio-defs.h"
 #include "supruglue/test32/soc.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define GPIO_BANK0(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[0]))
 #define GPIO_BANK1(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[1]))
@@ -45,4 +49,8 @@ inline uint32_t GPIO_GetRegister(gpio_bank *g, int r) {
   return 0;
 }
 
-#endif // SUPRUGLUE_TEST_SUPRUGLUE_GPIO_H
+#ifdef __cplusplus
+}
+#endif
+
+#endif // LIB_GPIO_TEST32_GPIO_H

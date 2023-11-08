@@ -1,7 +1,10 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "supruglue/pinmap.h"
+#ifndef LIB_GPIO_GPIO_H
+#define LIB_GPIO_GPIO_H
+
+#include "lib/pinmap/pinmap.h"
 #include "supruglue/soc.h"
 #include <stdint.h>
 
@@ -12,9 +15,6 @@
 #elif defined(SUPRUGLUE_TEST32)
 #include "lib/gpio/test32/gpio.h"
 #endif
-
-#ifndef SUPRUGLUE_GPIO_H
-#define SUPRUGLUE_GPIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,4 +40,4 @@ static inline void GPIO_SetPin(gpio_pin pin, int value) {
 }
 #endif
 
-#endif // SUPRUGLUE_GPIO_H
+#endif // LIB_GPIO_GPIO_H

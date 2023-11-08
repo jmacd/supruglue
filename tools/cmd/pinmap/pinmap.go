@@ -32,7 +32,7 @@ func main() {
 #ifndef %s
 #define %s
 
-#include "supruglue/pinmap.h"
+#include "lib/pinmap/pinmap-defs.h"
 
 %s
 

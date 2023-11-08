@@ -6,6 +6,9 @@ cc_library(
     hdrs = [
         "gpio-defs.h",
     ],
+    deps = [
+        "//lib/pinmap",
+    ],
 )
 
 cc_library(

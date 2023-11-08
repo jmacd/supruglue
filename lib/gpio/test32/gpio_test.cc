@@ -1,5 +1,6 @@
 #include "lib/gpio/gpio.h"
-#include "supruglue/pinmap-arch.h"
+#include "lib/pinmap/pinmap-defs.h"
+#include "lib/pinmap/pinmap.h"
 #include "gtest/gtest.h"
 
 const uint32_t allbits = 0xffffffff;
