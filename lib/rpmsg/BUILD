@@ -3,8 +3,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "defs",
-    srcs = [
-    ],
     hdrs = [
         "rpmsg-defs.h",
     ],
@@ -12,8 +10,6 @@ cc_library(
 
 cc_library(
     name = "rpmsg",
-    srcs = [
-    ],
     hdrs = [
         "rpmsg.h",
     ],

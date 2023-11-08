@@ -8,7 +8,6 @@
 #include <stdint.h>
 
 #include "lib/gpio/gpio-defs.h"
-#include "lib/gpio/gpio.h"
 #include "supruglue/test32/soc.h"
 
 #define GPIO_BANK0(soc) (reinterpret_cast<gpio_bank *>(&(soc)->gpio_banks[0]))
