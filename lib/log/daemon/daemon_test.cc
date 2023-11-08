@@ -5,8 +5,10 @@
 
 #include "absl/log/log.h"
 #include "absl/strings/str_format.h"
+#include "lib/coroutine/coroutine.h"
 #include "lib/log/fmt/fmt.h"
-#include "lib/rpmsg/test32/rpmsg_test32_host.h"
+#include "lib/log/journal/journal.h"
+#include "lib/rpmsg/rpmsg.h"
 #include "gtest/gtest.h"
 
 #include <thread>

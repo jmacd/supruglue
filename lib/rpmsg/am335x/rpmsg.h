@@ -6,7 +6,7 @@
 
 #include "external/ti-pru-support/include/pru_rpmsg.h"
 #include "external/ti-pru-support/include/rsc_types.h"
-#include "lib/rpmsg/rpmsg_iface.h"
+#include "lib/rpmsg/rpmsg-defs.h"
 
 #define PRU_RPMSG_NO_PEER_ADDR (-5)
 

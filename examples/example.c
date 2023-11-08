@@ -7,7 +7,7 @@
 #include "lib/coroutine/coroutine.h"
 #include "lib/gpio/gpio.h"
 #include "lib/log/daemon/daemon.h"
-#include "lib/rpmsg/am335x/rpmsg_am335x.h"
+#include "lib/rpmsg/rpmsg.h"
 #include "supruglue/pinmap-arch.h"
 
 #define NUM_RESOURCES 1
@@ -125,8 +125,9 @@ void main() {
   // uint8_t stack1[100];
   uint8_t stack2[100];
   uint8_t stack3[100];
-  Args    args1, args2;
-  int     err;
+  // Args    args1;
+  Args args2;
+  int  err;
 
   // Allow OCP master port access by the PRU.
   CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
@@ -136,7 +137,7 @@ void main() {
   // err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
 
   // args1.ptr = "1";
-  // args2.ptr = "";
+  args2.ptr = "";
 
   // // err = Create(&writer, test_write_func, args1, NewThreadConfig("writer", stack0, sizeof(stack0)));
   // // err = Create(&syslog, SyslogProcess, args2, NewThreadConfig("syslog", stack1, sizeof(stack1)));

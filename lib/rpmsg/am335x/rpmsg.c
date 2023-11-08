@@ -1,9 +1,11 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "rpmsg_am335x.h"
+#include "rpmsg.h"
+#include <stdint.h>
+
 #include "external/ti-pru-support/include/am335x/pru_intc.h"
-#include "lib/rpmsg/rpmsg_iface.h"
+#include "lib/rpmsg/rpmsg-defs.h"
 #include "supruglue/am335x/soc.h"
 #include "supruglue/sysevts-arch.h"
 #include <string.h>
@@ -47,7 +49,7 @@ ClientTransport __transport;
 //
 // In the TRM these interrupts are labeled pr1_pru_mst_intr[0,1,2,3]_intr_req
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
-
+#if 0
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
               struct fw_rsc_vdev_vring *vring1) {
   // Zero memory.
@@ -109,3 +111,4 @@ int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
   uint16_t my_dst_addr;
   return pru_rpmsg_receive(&transport->channel, &transport->rpmsg_peer_src_addr, &my_dst_addr, data, len);
 }
+#endif

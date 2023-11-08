@@ -1,8 +1,7 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "lib/rpmsg/rpmsg_iface.h"
-#include "rpmsg_test32_host.h"
+#include "rpmsg.h"
 #include "gtest/gtest.h"
 
 #include <thread>

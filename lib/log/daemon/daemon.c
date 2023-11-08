@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "daemon.h"
-#include "lib/rpmsg/rpmsg_iface.h"
+#include "lib/coroutine/coroutine.h"
+#include "lib/rpmsg/rpmsg.h"
 
 void SyslogProcess(ThreadID thid, Args args) {
   for (;;) {

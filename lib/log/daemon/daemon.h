@@ -5,8 +5,7 @@
 #define LIB_SYSLOG_PROC_H
 
 #include "lib/args/args.h"
-#include "lib/coroutine/coroutine.h"
-#include "lib/rpmsg/rpmsg_iface.h"
+#include "lib/thread/thread.h"
 
 #ifdef __cplusplus
 extern "C" {

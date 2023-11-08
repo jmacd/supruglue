@@ -1,8 +1,8 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "rpmsg_test32_host.h"
-#include "rpmsg_test32_chan.h"
+#include "rpmsg.h"
+#include "chan.h"
 #include <thread>
 
 struct _TestTransport {
