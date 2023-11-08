@@ -9,5 +9,7 @@ cc_library(
     hdrs = [
             #"debug.h",
     ],
-    deps = ["//supruglue"],
+    deps = [
+        "//lib/soc",
+    ],
 )

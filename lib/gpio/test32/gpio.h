@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 #include "lib/gpio/gpio-defs.h"
-#include "supruglue/test32/soc.h"
+#include "lib/soc/soc.h"
 
 #ifdef __cplusplus
 extern "C" {

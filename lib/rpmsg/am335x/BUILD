@@ -11,7 +11,7 @@ cc_library(
     ],
     deps = [
         "//lib/rpmsg:defs",
-        "//supruglue/am335x",
+        "//lib/soc",
         "//tools/toolchain/am335x",
         "@ti-pru-support//lib/src/rpmsg_lib",
     ],

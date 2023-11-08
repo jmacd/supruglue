@@ -8,7 +8,7 @@
 
 #define GPIO_NUM_REGISTERS 4
 
-#include "supruglue/soc.h"
+#include "lib/soc/soc.h"
 
 struct test_system {
   test_system() {

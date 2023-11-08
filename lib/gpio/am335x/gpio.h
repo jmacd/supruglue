@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/gpio/gpio-defs.h"
-#include "supruglue/am335x/soc.h"
+#include "lib/soc/soc.h"
 
 #ifndef LIB_GPIO_AM335X_GPIO_H
 #define LIB_GPIO_AM335X_GPIO_H

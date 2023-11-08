@@ -3,11 +3,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "am335x",
-    srcs = [
-        "soc.c",
-    ],
     hdrs = [
         "soc.h",
     ],
-    deps = ["//supruglue"],
+    srcs = [
+        "soc.c",
+    ],
+    deps = [
+        "//lib/soc:defs",
+    ],
 )

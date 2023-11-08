@@ -15,8 +15,8 @@ cc_binary(
         "//lib/coroutine",
         "//lib/log/daemon",
         "//lib/gpio",
-        "//lib/rpmsg/am335x",
-        "//supruglue/am335x",
+        "//lib/rpmsg",
+        "//tools/toolchain/am335x",
     ],
 )
 
@@ -25,7 +25,6 @@ cc_binary(
     srcs = ["local.c"],
     deps = [
         "//lib/coroutine",
-        "//supruglue/test32",
     ],
 )
 

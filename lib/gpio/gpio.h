@@ -5,7 +5,7 @@
 #define LIB_GPIO_GPIO_H
 
 #include "lib/pinmap/pinmap.h"
-#include "supruglue/soc.h"
+#include "lib/soc/soc.h"
 #include <stdint.h>
 
 #include "lib/gpio/gpio-defs.h"

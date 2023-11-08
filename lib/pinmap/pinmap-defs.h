@@ -4,7 +4,7 @@
 #ifndef LIB_PINMAP_PINMAP_DEFS_H
 #define LIB_PINMAP_PINMAP_DEFS_H
 
-#include "supruglue/supruglue.h"
+#include "lib/soc/soc.h"
 
 // These match the code generated in of tools/cmd/pinmap/pinmap.go
 

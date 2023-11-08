@@ -7,7 +7,7 @@ cc_library(
         "soc.h",
     ],
     deps = [
-        "//supruglue",
+        "//lib/soc:defs",
         "//tools/toolchain/am335x:incompatible",
         "@ti-pru-support//include",
     ],
