@@ -19,7 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 static inline int GPIO_GetPin(gpio_pin pin) {
   return (GPIO_GetRegister(pin.bank, GPIOREG_DATAIN) & (1 << pin.bit)) != 0;
 }
@@ -27,14 +26,6 @@ static inline int GPIO_GetPin(gpio_pin pin) {
 static inline void GPIO_SetPin(gpio_pin pin, int value) {
   GPIO_SetRegister(pin.bank, value ? GPIOREG_SETDATAOUT : GPIOREG_CLEARDATAOUT, 1 << pin.bit);
 }
-
-#define GPIO_PIN(soc, pin)                                                                                             \
-  ({                                                                                                                   \
-    gpio_pin __x;                                                                                                      \
-    __x.bank = GPIO_PIN_TO_REGISTER(soc, pin);                                                                         \
-    __x.bit = GPIO_PIN_TO_BIT_NUM(pin);                                                                                \
-    __x;                                                                                                               \
-  })
 
 #ifdef __cplusplus
 }

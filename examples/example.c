@@ -89,7 +89,7 @@ void test_write_func(ThreadID tid, Args args) {
 }
 
 void toggle_blue(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(soc, P9_25);
+  gpio_pin pin = GPIO_PIN(P9_25);
 
   while (1) {
     GPIO_SetPin(pin, 1);
@@ -103,7 +103,7 @@ void toggle_blue(ThreadID tid, Args args) {
 }
 
 void toggle_yellow(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(soc, P9_23);
+  gpio_pin pin = GPIO_PIN(P9_23);
 
   while (1) {
     GPIO_SetPin(pin, 1);

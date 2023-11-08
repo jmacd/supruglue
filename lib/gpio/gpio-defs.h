@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#include "lib/soc/soc.h"
+
 // See TRM 25.4.1.x
 //
 // Note these constants are defined in the am335x TRM, but are used
@@ -47,10 +49,20 @@ typedef enum _GpioBankNumber GpioBankNumber;
 
 typedef uint32_t gpio_bank;
 
-typedef struct {
+struct _gpio_pin {
   gpio_bank *bank;
   int        bit;
-} gpio_pin;
+};
+
+typedef struct _gpio_pin gpio_pin;
+
+#define GPIO_PIN(pin)                                                                                                  \
+  ({                                                                                                                   \
+    gpio_pin __x;                                                                                                      \
+    __x.bank = GPIO_PIN_TO_REGISTER(pin);                                                                              \
+    __x.bit = GPIO_PIN_TO_BIT_NUM(pin);                                                                                \
+    __x;                                                                                                               \
+  })
 
 void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v);
 

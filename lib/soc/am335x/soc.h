@@ -8,7 +8,11 @@
 extern "C" {
 #endif
 
-#define WORDSZ sizeof(uint32_t)
+inline void SystemOnChipSetup() {
+}
+
+inline void SystemOnChipTeardown() {
+}
 
 // This macro assumes standard linker commands, i.e., normal
 // assignment of the PRU_DMEM_0_1 section to pru0 (0x0000...0x2000) and

@@ -6,6 +6,9 @@ cc_library(
     hdrs = [
         "soc.h",
     ],
+    srcs = [
+        "soc.cc",
+    ],
     deps = [
         "//lib/soc:defs",
         "//tools/toolchain/am335x:incompatible",

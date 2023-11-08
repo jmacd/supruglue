@@ -69,7 +69,7 @@ func main() {
 
 			sb.WriteString("#define ")
 			sb.WriteString(cppname)
-			sb.WriteString(fmt.Sprint("_GPIO_BANK(soc) GPIO_BANK", gbank, "(soc)\n"))
+			sb.WriteString(fmt.Sprint("_GPIO_BANK GPIO_BANK", gbank, "\n"))
 
 			if pruNum, has := pin.PRUHasGpioFastOutput(); has {
 				fbit, err := pin.PRUGpioFastOutputBit()
