@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "lib/gpio/gpio.h"
 #include "lib/pinmap/pinmap.h"
+#include "lib/soc/soc.h"
 
 void uled1(int val) {
   GPIO_SetPin(GPIO_PIN(ULED1), val);
@@ -25,15 +26,11 @@ void flash() {
     uled2(0);
     uled3(0);
     uled4(0);
-#if defined(SUPRUGLUE_AM335X)
-    __delay_cycles(100000000);
-#endif
+    SystemOnChipDelay(100000000);
     uled1(1);
     uled2(1);
     uled3(1);
     uled4(1);
-#if defined(SUPRUGLUE_AM335X)
-    __delay_cycles(100000000);
-#endif
+    SystemOnChipDelay(100000000);
   }
 }

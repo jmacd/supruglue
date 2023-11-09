@@ -13,7 +13,7 @@ cc_library(
 	"//lib/list",
 	"//lib/thread",
 	"//lib/sync",
-        #"//lib/debug",
+        "//lib/debug",
     ],
 )
 

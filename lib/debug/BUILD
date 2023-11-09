@@ -10,6 +10,7 @@ cc_library(
         "debug.h",
     ],
     deps = [
+        "//lib/soc",
         "//lib/pinmap",
         "//lib/gpio",
     ],

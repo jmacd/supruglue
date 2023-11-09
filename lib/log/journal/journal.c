@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/log/journal/journal.h"
-// #include "lib/debug/debug.h"
+#include "lib/debug/debug.h"
 #include "lib/sync/sync.h"
 #include <stdio.h>
 #include <string.h>

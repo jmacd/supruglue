@@ -20,13 +20,17 @@ typedef struct soc_test32 soc_test32;
 
 extern soc_test32 *__soc;
 
-inline void SystemOnChipSetup() {
+static inline void SystemOnChipSetup() {
   __soc = (soc_test32 *)calloc(1, sizeof(soc_test32));
 }
 
-inline void SystemOnChipTeardown() {
+static inline void SystemOnChipTeardown() {
   free(__soc);
   __soc = NULL;
+}
+
+static inline void SystemOnChipDelay(int32_t cycles) {
+  // noop
 }
 
 #ifdef __cplusplus

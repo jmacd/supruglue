@@ -8,8 +8,11 @@ cc_library(
     ],
     srcs = [
         "soc.c",
+        "sleep.s",
     ],
     deps = [
         "//lib/soc:defs",
+
+        "//tools/toolchain/am335x",
     ],
 )

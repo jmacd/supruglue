@@ -4,14 +4,24 @@
 #ifndef SUPRUGLUE_AM335X_SOC_H
 #define SUPRUGLUE_AM335X_SOC_H
 
+#include "lib/soc/soc-defs.h"
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-inline void SystemOnChipSetup() {
+// Defined in sleep.s.
+extern void sleep_cycles(int value);
+
+static inline void SystemOnChipSetup() {
 }
 
-inline void SystemOnChipTeardown() {
+static inline void SystemOnChipTeardown() {
+}
+
+static inline void SystemOnChipDelay(int32_t cycles) {
+  sleep_cycles(cycles);
 }
 
 // This macro assumes standard linker commands, i.e., normal

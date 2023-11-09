@@ -4,6 +4,8 @@
 #ifndef LIB_SOC_SOC_DEFS_H
 #define LIB_SOC_SOC_DEFS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,8 +20,10 @@ extern "C" {
 
 #define GPIO_NUM_REGISTERS 4
 
-inline void SystemOnChipSetup();
-inline void SystemOnChipTeardown();
+static inline void SystemOnChipSetup();
+static inline void SystemOnChipTeardown();
+
+static inline void SystemOnChipDelay(int32_t cycles);
 
 #ifdef __cplusplus
 }
