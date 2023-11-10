@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "lib/coroutine/coroutine.h"
+#include "lib/debug/debug.h"
 
 System __system;
 
@@ -20,10 +21,7 @@ int Init(SystemConfig cfg) {
   System *sys = &__system;
   memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
-
   ThreadListInit(&__system_runnable);
-
-  // TODO: bug here, this is blocking?
   JournalInit(&sys->journal);
   return 0;
 }
@@ -97,6 +95,7 @@ void yieldInternal(JumpCode jc) {
     PRULOG_2U(FATAL, "stack overflow: %u exceeds %u", size, __system_current->cfg.stack_size);
     longjmp(__system.return_jump, JC_OVERFLOW);
   }
+
   memcpy(__system_current->cfg.stack, yield_stack, size);
 
   switch (setjmp(__system_current->exec.run_jump)) {

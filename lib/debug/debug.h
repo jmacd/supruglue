@@ -13,7 +13,8 @@ void uled2(int val);
 void uled3(int val);
 void uled4(int val);
 
-void flash();
+void flash(int n);
+void solid(int n);
 
 #ifdef __cplusplus
 }

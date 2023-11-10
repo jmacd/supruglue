@@ -10,6 +10,7 @@ cc_binary(
     ],
     linkopts = [
         "$(location //tools/toolchain/am335x:pru0_cmd)",
+        "--stack_size=0x1000",
     ],
     deps = [
         "//lib/coroutine",
