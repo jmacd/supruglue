@@ -6,6 +6,7 @@
 
 #include "lib/args/args.h"
 #include "lib/list/list.h"
+#include "lib/soc/soc.h"
 #include <setjmp.h>
 #include <stdint.h>
 
@@ -87,6 +88,9 @@ static inline void Yield(void) {
 static inline void YieldBlocked(void) {
   (*__system_yield)(JC_BLOCKED);
 }
+
+#define SUPRUGLUE_DEFINE_THREAD(name, stackSize)                                                                       \
+  SUPRUGLUE_DEFINE_THINGS(name, Thread, thread, uint8_t, stack, stackSize)
 
 #ifdef __cplusplus
 }

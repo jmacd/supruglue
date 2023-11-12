@@ -6,16 +6,21 @@
 
 #include <stdint.h>
 
-#include "lib/coroutine/coroutine.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef uint64_t cycle_t;
-typedef uint64_t duration_t;
+#include "lib/time/time-defs.h"
 
-void Sleep(pru_dur_t d);
+#if defined(SUPRUGLUE_AM335X)
+#include "lib/time/am335x/time.h"
+#elif defined(SUPRUGLUE_TEST32)
+#include "lib/time/test32/time.h"
+#endif
+
+void Sleep(duration_t d);
+
+int TimeInit(void);
 
 #ifdef __cplusplus
 }

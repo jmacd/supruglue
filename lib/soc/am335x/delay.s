@@ -1,6 +1,6 @@
-;;  Sleep cycles is like __delay_cycles but dynamic.
-    .global sleep_cycles
-sleep_cycles:
+;;  SystemOnChipDelay is like __delay_cycles but dynamic.
+    .global SystemOnChipDelay
+SystemOnChipDelay:
     ; Subtract this SUB, the return JMP, and the two cycles it took to
     ; get here (or so).
     SUB     r14, r14, 4

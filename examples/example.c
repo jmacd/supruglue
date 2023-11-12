@@ -134,37 +134,30 @@ void toggle_both(ThreadID tid, Args args) {
   }
 }
 
+SUPRUGLUE_DEFINE_THREAD(writer, 256);
+SUPRUGLUE_DEFINE_THREAD(syslog, 256);
+SUPRUGLUE_DEFINE_THREAD(blue, 256);
+SUPRUGLUE_DEFINE_THREAD(yellow, 256);
+
 void main() {
-  Thread blue;
-  Thread yellow;
-  // Thread writer;
-  // Thread syslog;
-  // uint8_t stack0[100];
-  // uint8_t stack1[100];
-  uint8_t stack2[64];
-  uint8_t stack3[64];
-  // Args    args1;
+  Args args1;
   Args args2;
-  int  err;
+  int  err = 0;
 
-  // Allow OCP master port access by the PRU.
-  CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
-
-  // flash(4);
+  SystemOnChipSetup();
 
   Init(NewSystemConfig());
 
-  // // err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0,
-  // &resourceTable.rpmsg_vring1);
+  err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
 
-  // // args1.ptr = "1";
-  // args2.ptr = "";
+  args1.ptr = "1";
+  args2.ptr = "0";
 
-  // // err = Create(&writer, test_write_func, args1, NewThreadConfig("writer", stack0, sizeof(stack0)));
-  // // err = Create(&syslog, SyslogProcess, args2, NewThreadConfig("syslog", stack1, sizeof(stack1)));
-  err = Create(&blue, toggle_blue, args2, NewThreadConfig("blue", stack2, sizeof(stack2)));
-  err = Create(&yellow, toggle_yellow, args2, NewThreadConfig("yellow", stack3, sizeof(stack3)));
-  //  err = Create(&yellow, toggle_both, args2, NewThreadConfig("yellow", stack3, sizeof(stack3)));
+  // TODO change the signature here.
+  err = Create(&writer.thread, test_write_func, args1, NewThreadConfig("writer", writer.stack, sizeof(blue.stack)));
+  err = Create(&syslog.thread, SyslogProcess, args2, NewThreadConfig("syslog", syslog.stack, sizeof(syslog.stack)));
+  err = Create(&blue.thread, toggle_blue, args2, NewThreadConfig("blue", blue.stack, sizeof(blue.stack)));
+  err = Create(&yellow.thread, toggle_yellow, args2, NewThreadConfig("yellow", yellow.stack, sizeof(yellow.stack)));
 
   err = Run();
 }

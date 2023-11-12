@@ -2,25 +2,24 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "thread",
-    srcs = [
-        "thread.c",
-    ],
+    name = "test32",
     hdrs = [
-        "thread.h",
+        "time.h"
+    ],
+    srcs = [
+        "time.cc",
     ],
     deps = [
-	"//lib/args",
-	"//lib/list",
-        "//lib/soc",
+            "//lib/time:defs",
+	    "//lib/thread",
     ],
 )
 
 cc_test(
-    name = "test",
-    srcs = ["thread_test.cc"],
+    name = "time_test",
+    srcs = ["time_test.cc"],
     deps = [
-        ":thread",
+        "//lib/time",
         "@com_google_googletest//:gtest_main",
     ],
 )
