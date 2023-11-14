@@ -27,8 +27,7 @@ struct _Schedule {
   ScheduleItem queue[0];
 };
 
-#define SUPRUGLUE_DEFINE_SCHEDULE(name, size)                                                                          \
-  SUPRUGLUE_DEFINE_THINGS(name, Schedule, schedule, ScheduleItem, items, size)
+#define SUPRUGLUE_DEFINE_SCHEDULE(name, size) SUPRUGLUE_DEFINE_THINGS(name, Schedule, pending, ScheduleItem, size)
 
 #ifdef __cplusplus
 }

@@ -90,8 +90,8 @@ TEST(CoroutineTest, TwoThreads) {
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
 
-  EXPECT_EQ(0, Create(&threads[0].thread, test_func, Args{.ptr = "1"}, NewThreadConfig("a", stack0, 1024)));
-  EXPECT_EQ(0, Create(&threads[1].thread, test_func, Args{.ptr = "2"}, NewThreadConfig("b", stack1, 1024)));
+  EXPECT_EQ(0, Create(&threads[0].thread, test_func, Args{.ptr = "1"}, "a", 1024)));
+  EXPECT_EQ(0, Create(&threads[1].thread, test_func, Args{.ptr = "2"}, "b", 1024)));
 
   EXPECT_EQ(0, ::Run());
   EXPECT_EQ(1, regs[0]);

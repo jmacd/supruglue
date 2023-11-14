@@ -19,17 +19,15 @@ SystemConfig NewSystemConfig(void) {
 
 int Init(SystemConfig cfg) {
   System *sys = &__system;
-  memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
   return 0;
 }
 
-int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg) {
-  memset(thread, 0, sizeof(*thread));
-  memset(cfg.stack, 0, cfg.stack_size);
-  thread->cfg = cfg;
+int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t stack_size) {
+  thread->name = name;
+  thread->stack_size = stack_size;
   thread->exec.call.func = func;
   thread->exec.call.args = args;
   thread->state = TS_STARTING;
@@ -91,12 +89,12 @@ void yieldInternal(JumpCode jc) {
   int32_t size = (int32_t)((size_t)__system.run_stack_pos - (size_t)yield_stack);
 
   // Check for thread-stack overflow.
-  if (size > __system_current->cfg.stack_size) {
-    PRULOG_2U(FATAL, "stack overflow: %u exceeds %u", size, __system_current->cfg.stack_size);
+  if (size > __system_current->stack_size) {
+    PRULOG_2U(FATAL, "stack overflow: %u exceeds %u", size, __system_current->stack_size);
     longjmp(__system.return_jump, JC_OVERFLOW);
   }
 
-  memcpy(__system_current->cfg.stack, yield_stack, size);
+  memcpy(__system_current->stack, yield_stack, size);
 
   switch (setjmp(__system_current->exec.run_jump)) {
   case JC_SETJUMP:
@@ -112,7 +110,7 @@ void yieldInternal(JumpCode jc) {
   yield_stack = (void *)&unused;
   size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
-  memcpy(yield_stack, __system_current->cfg.stack, size);
+  memcpy(yield_stack, __system_current->stack, size);
 }
 
 int Run(void) {

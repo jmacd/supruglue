@@ -10,7 +10,7 @@ std::string Format(Entry *entry) {
 
   Thread *th = reinterpret_cast<Thread *>(entry->tid);
   if (th != nullptr) {
-    hdr = absl::StrFormat("[%s] ", th->cfg.name);
+    hdr = absl::StrFormat("[%s] ", th->name);
   }
 
   auto fmt2str = absl::ParsedFormat<'u', 'u'>::New(entry->msg);

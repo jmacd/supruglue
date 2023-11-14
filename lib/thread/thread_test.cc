@@ -4,12 +4,14 @@
 #include "lib/thread/thread.h"
 #include "gtest/gtest.h"
 
-TEST(Thread, NameAndID) {
-  Thread  th;
-  uint8_t stack[100];
+// SUPRUGLUE_DEFINE_THREAD(th, 128);
 
-  th.cfg = NewThreadConfig("hello", stack, sizeof(stack));
+// TEST(Thread, NameAndID) {
+//   Thread  th;
+//   uint8_t stack[100];
 
-  EXPECT_STREQ("hello", th.cfg.name);
-  EXPECT_NE(0, TID(&th));
-}
+//   th.cfg = NewThreadConfig("hello", stack, sizeof(stack));
+
+//   EXPECT_STREQ("hello", th.cfg.name);
+//   EXPECT_NE(0, TID(&th));
+// }

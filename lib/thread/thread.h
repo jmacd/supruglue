@@ -17,10 +17,8 @@ extern "C" {
 typedef uintptr_t ThreadID;
 
 struct _Thread;
-struct _ThreadConfig;
 
-typedef struct _Thread       Thread;
-typedef struct _ThreadConfig ThreadConfig;
+typedef struct _Thread Thread;
 
 SUPRUGLUE_DECLARE_LIST(ThreadList, Thread);
 
@@ -46,17 +44,11 @@ enum JumpCode {
 
 typedef enum JumpCode JumpCode;
 
-struct _ThreadConfig {
-  const char *name;
-  uint8_t    *stack;
-  int32_t     stack_size;
-  uint8_t     nice;
-};
-
 struct _Thread {
-  ThreadConfig cfg;
-  ThreadList   list;
-  ThreadState  state;
+  ThreadList  list;
+  const char *name;
+  int32_t     stack_size;
+  ThreadState state;
 
   union {
     jmp_buf run_jump;
@@ -65,11 +57,11 @@ struct _Thread {
       Args        args;
     } call;
   } exec;
+
+  uint8_t stack[0];
 };
 
 SUPRUGLUE_DEFINE_LIST_INLINE(ThreadList, Thread, list);
-
-ThreadConfig NewThreadConfig(const char *name, uint8_t *stack, size_t stack_size);
 
 typedef void(SystemYield)(JumpCode jc);
 
@@ -89,8 +81,7 @@ static inline void YieldBlocked(void) {
   (*__system_yield)(JC_BLOCKED);
 }
 
-#define SUPRUGLUE_DEFINE_THREAD(name, stackSize)                                                                       \
-  SUPRUGLUE_DEFINE_THINGS(name, Thread, thread, uint8_t, stack, stackSize)
+#define SUPRUGLUE_DEFINE_THREAD(nam, stack_size) SUPRUGLUE_DEFINE_THINGS(nam, Thread, thread, uint8_t, stack_size)
 
 #ifdef __cplusplus
 }

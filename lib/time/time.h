@@ -18,7 +18,7 @@ extern "C" {
 #include "lib/time/test32/time.h"
 #endif
 
-void Sleep(duration_t d);
+int Sleep(duration_t d);
 
 int TimeInit(void);
 

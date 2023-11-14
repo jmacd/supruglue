@@ -10,13 +10,13 @@
 extern "C" {
 #endif
 
-#define SUPRUGLUE_DEFINE_THINGS(name, type1, thing1, type2, thing2, size)                                              \
-  typedef struct _##name##_##thing1##_with_##thing2 name##_##thing1##_with_##thing2;                                   \
-  struct _##name##_##thing1##_with_##thing2 {                                                                          \
+#define SUPRUGLUE_DEFINE_THINGS(name, type1, thing1, type2, size)                                                      \
+  typedef struct _##name##_##type1##_with_##type2 name##_##type1##_with_##type2;                                       \
+  struct _##name##_##type1##_with_##type2 {                                                                            \
     type1 thing1;                                                                                                      \
-    type2 thing2[size];                                                                                                \
+    type2 space[size];                                                                                                 \
   };                                                                                                                   \
-  static name##_##thing1##_with_##thing2 name
+  static name##_##type1##_with_##type2 name
 
 #define _JOIN(thing, field) thing##field
 

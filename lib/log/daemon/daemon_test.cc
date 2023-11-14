@@ -21,23 +21,18 @@ void test_write_func(ThreadID tid, Args args) {
   }
 }
 
+SUPRUGLUE_DEFINE_THREAD(writer0, 500);
+SUPRUGLUE_DEFINE_THREAD(writer1, 500);
+SUPRUGLUE_DEFINE_THREAD(syslog, 500);
+
 TEST(Syslog, Simple) {
   auto tt = NewTestTransport();
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
 
-  Thread  writer0;
-  Thread  writer1;
-  Thread  syslog;
-  uint8_t stack0[500];
-  uint8_t stack1[500];
-  uint8_t stack2[500];
-
-  EXPECT_EQ(0,
-            Create(&writer0, test_write_func, Args{.ptr = "100"}, NewThreadConfig("writer0", stack0, sizeof(stack0))));
-  EXPECT_EQ(0,
-            Create(&writer1, test_write_func, Args{.ptr = "100"}, NewThreadConfig("writer1", stack1, sizeof(stack1))));
-  EXPECT_EQ(0, Create(&syslog, SyslogProcess, Args{.ptr = ""}, NewThreadConfig("syslog", stack2, sizeof(stack2))));
+  EXPECT_EQ(0, Create(&writer0.thread, test_write_func, Args{.ptr = "100"}, "writer0", sizeof(writer0.space)));
+  EXPECT_EQ(0, Create(&writer1.thread, test_write_func, Args{.ptr = "100"}, "writer1", sizeof(writer1.space)));
+  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(syslog.space)));
 
   std::unordered_set<std::string> res;
   std::unordered_set<std::string> expect;
@@ -88,13 +83,8 @@ TEST(Syslog, WithTransients) {
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
 
-  Thread  writer;
-  Thread  syslog;
-  uint8_t stack0[500];
-  uint8_t stack1[500];
-
-  EXPECT_EQ(0, Create(&writer, test_write_func, Args{.ptr = "1"}, NewThreadConfig("writer", stack0, sizeof(stack0))));
-  EXPECT_EQ(0, Create(&syslog, SyslogProcess, Args{.ptr = ""}, NewThreadConfig("syslog", stack1, sizeof(stack1))));
+  EXPECT_EQ(0, Create(&writer0.thread, test_write_func, Args{.ptr = "1"}, "writer0", sizeof(writer0.space)));
+  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(writer0.space)));
 
   std::thread client([tt] {
     // Some transients.

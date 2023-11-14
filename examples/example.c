@@ -139,11 +139,10 @@ SUPRUGLUE_DEFINE_THREAD(syslog, 256);
 SUPRUGLUE_DEFINE_THREAD(blue, 256);
 SUPRUGLUE_DEFINE_THREAD(yellow, 256);
 
-void main() {
+int main() {
   Args args1;
   Args args2;
   int  err = 0;
-
   SystemOnChipSetup();
 
   Init(NewSystemConfig());
@@ -153,11 +152,11 @@ void main() {
   args1.ptr = "1";
   args2.ptr = "0";
 
-  // TODO change the signature here.
-  err = Create(&writer.thread, test_write_func, args1, NewThreadConfig("writer", writer.stack, sizeof(blue.stack)));
-  err = Create(&syslog.thread, SyslogProcess, args2, NewThreadConfig("syslog", syslog.stack, sizeof(syslog.stack)));
-  err = Create(&blue.thread, toggle_blue, args2, NewThreadConfig("blue", blue.stack, sizeof(blue.stack)));
-  err = Create(&yellow.thread, toggle_yellow, args2, NewThreadConfig("yellow", yellow.stack, sizeof(yellow.stack)));
+  err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
+  err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
+  err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
+  err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
 
   err = Run();
+  return err;
 }

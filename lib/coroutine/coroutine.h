@@ -37,7 +37,7 @@ SystemConfig NewSystemConfig(void);
 
 int Init(SystemConfig cfg);
 
-int Create(Thread *thread, ThreadFunc *func, Args args, ThreadConfig cfg);
+int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t stack_size);
 
 int Run(void);
 
