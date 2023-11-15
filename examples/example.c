@@ -118,8 +118,8 @@ void toggle_yellow(ThreadID tid, Args args) {
   }
 }
 
-// SUPRUGLUE_DEFINE_THREAD(writer, 256);
-// SUPRUGLUE_DEFINE_THREAD(syslog, 256);
+SUPRUGLUE_DEFINE_THREAD(writer, 256);
+SUPRUGLUE_DEFINE_THREAD(syslog, 256);
 SUPRUGLUE_DEFINE_THREAD(blue, 256);
 SUPRUGLUE_DEFINE_THREAD(yellow, 256);
 
@@ -131,17 +131,20 @@ void main(void) {
 
   SystemOnChipSetup();
 
-  flash(4);
-
   Init(NewSystemConfig());
 
-  // err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
+  err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
+  if (err != 0) {
+    // @@@ this has failed b/c wrong event number... what would we do?
+    // (q: why compile-in such checks? is there a way to panic?)
+    flash(4);
+  }
 
   args1.ptr = "1";
   args2.ptr = "0";
 
-  // err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
-  // err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
+  err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
+  err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
   err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
   err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
 

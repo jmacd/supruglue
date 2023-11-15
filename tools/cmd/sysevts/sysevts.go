@@ -51,7 +51,7 @@ func main() {
 			sb.WriteString("#define ")
 			sb.WriteString(cppname)
 			sb.WriteString(" ((int8_t)")
-			sb.WriteString(fmt.Sprint(sysevt.Number))
+			sb.WriteString(fmt.Sprint(sysevt.Number()))
 			sb.WriteString(")\n")
 		}
 		return sb.String()

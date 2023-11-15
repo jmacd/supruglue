@@ -25,7 +25,10 @@ func (se SystemEvent) Validate() error {
 }
 
 func (se SystemEvent) Number() int8 {
-	num, _ := strconv.ParseInt(se.EventNumber, 10, 8)
+	num, err := strconv.ParseInt(se.EventNumber, 10, 8)
+	if err != nil {
+		panic(err)
+	}
 	return int8(num)
 }
 
