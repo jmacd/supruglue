@@ -31,3 +31,12 @@ genrule(
     cmd = "./$(location //tools/cmd/sysevts:sysevts) $(location //arch:sysevts) > $@",
     tools = ["//tools/cmd/sysevts"],
 )
+
+cc_test(
+    name = "test",
+    srcs = ["soc_test.cc"],
+    deps = [
+        ":soc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

@@ -20,12 +20,3 @@ cc_library(
         "//conditions:default": ["//lib/rpmsg/test32"],
     }),
 )
-
-cc_test(
-    name = "rpmsg_test",
-    srcs = ["rpmsg_test.cc"],
-    deps = [
-        "//lib/rpmsg",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
