@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "external/ti-pru-support/include/am335x/pru_cfg.h"
 #include "external/ti-pru-support/include/pru_virtio_ids.h"
@@ -117,43 +118,30 @@ void toggle_yellow(ThreadID tid, Args args) {
   }
 }
 
-void toggle_both(ThreadID tid, Args args) {
-  gpio_pin pin1 = GPIO_PIN(P9_25);
-  gpio_pin pin2 = GPIO_PIN(P9_23);
-
-  while (1) {
-    GPIO_SetPin(pin1, 1);
-    GPIO_SetPin(pin2, 1);
-    __delay_cycles(200000000);
-    Yield();
-
-    GPIO_SetPin(pin1, 0);
-    GPIO_SetPin(pin2, 0);
-    __delay_cycles(200000000);
-    Yield();
-  }
-}
-
-SUPRUGLUE_DEFINE_THREAD(writer, 256);
-SUPRUGLUE_DEFINE_THREAD(syslog, 256);
+// SUPRUGLUE_DEFINE_THREAD(writer, 256);
+// SUPRUGLUE_DEFINE_THREAD(syslog, 256);
 SUPRUGLUE_DEFINE_THREAD(blue, 256);
 SUPRUGLUE_DEFINE_THREAD(yellow, 256);
 
-int main() {
+void main(void) {
+
   Args args1;
   Args args2;
   int  err = 0;
+
   SystemOnChipSetup();
+
+  flash(4);
 
   Init(NewSystemConfig());
 
-  err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
+  // err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
 
   args1.ptr = "1";
   args2.ptr = "0";
 
-  err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
-  err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
+  // err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
+  // err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
   err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
   err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
 

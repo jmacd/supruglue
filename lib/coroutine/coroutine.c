@@ -19,6 +19,7 @@ SystemConfig NewSystemConfig(void) {
 
 int Init(SystemConfig cfg) {
   System *sys = &__system;
+  memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
@@ -26,6 +27,8 @@ int Init(SystemConfig cfg) {
 }
 
 int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t stack_size) {
+  memset(thread, 0, sizeof(*thread));
+  memset(thread->stack, 0, stack_size);
   thread->name = name;
   thread->stack_size = stack_size;
   thread->exec.call.func = func;
