@@ -97,7 +97,7 @@ TEST(Syslog, WithTransients) {
 
     EXPECT_EQ(0, HostRecv(tt, &entry, &blen));
     EXPECT_EQ(blen, sizeof(entry));
-    EXPECT_EQ("[writer] write 0", Format(&entry));
+    EXPECT_EQ("[writer0] write 0", Format(&entry));
   });
 
   EXPECT_EQ(0, ::Run());

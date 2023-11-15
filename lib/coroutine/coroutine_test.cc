@@ -17,14 +17,17 @@ using testing::HasSubstr;
 ThreadID test_run_vector[32];
 size_t   test_run_vector_size;
 
+// Note: the overflow test here depends on stack_size=500
+SUPRUGLUE_DECLARE_SIZED(test, Thread, thread, uint8_t, 500);
+
 typedef struct {
-  Thread    thread;
+  SUPRUGLUE_SIZED_TYPENAME(test, Thread, uint8_t) thread;
   uint32_t  index;
   uint32_t *regs;
 } TestThread1;
 
 typedef struct {
-  Thread         thread;
+  SUPRUGLUE_SIZED_TYPENAME(test, Thread, uint8_t) thread;
   vector<string> messages;
 } TestThread2;
 
@@ -80,9 +83,6 @@ TEST(CoroutineTest, TwoThreads) {
   threads[0].regs = regs;
   threads[1].regs = regs;
 
-  uint8_t stack0[1024];
-  uint8_t stack1[1024];
-
   auto test_func = [](ThreadID tid, Args args) {
     TestThread1 *tt = (TestThread1 *)tid;
     tt->regs[tt->index] = tt->index + 1;
@@ -90,8 +90,8 @@ TEST(CoroutineTest, TwoThreads) {
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
 
-  EXPECT_EQ(0, Create(&threads[0].thread, test_func, Args{.ptr = "1"}, "a", 1024)));
-  EXPECT_EQ(0, Create(&threads[1].thread, test_func, Args{.ptr = "2"}, "b", 1024)));
+  EXPECT_EQ(0, Create(&threads[0].thread.thread, test_func, Args{.ptr = "1"}, "a", sizeof(threads[0].thread.space)));
+  EXPECT_EQ(0, Create(&threads[1].thread.thread, test_func, Args{.ptr = "2"}, "b", sizeof(threads[1].thread.space)));
 
   EXPECT_EQ(0, ::Run());
   EXPECT_EQ(1, regs[0]);
@@ -99,19 +99,19 @@ TEST(CoroutineTest, TwoThreads) {
 }
 
 TEST(CoroutineTest, TwiceAlternating) {
-  Thread  threads[2];
-  uint8_t stack0[1024];
-  uint8_t stack1[1024];
+  TestThread1 threads[2];
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
 
-  EXPECT_EQ(0, Create(&threads[0], test_run_func, Args{.ptr = "2"}, NewThreadConfig("a", stack0, 1024)));
-  EXPECT_EQ(0, Create(&threads[1], test_run_func, Args{.ptr = "22"}, NewThreadConfig("b", stack1, 1024)));
+  EXPECT_EQ(0,
+            Create(&threads[0].thread.thread, test_run_func, Args{.ptr = "2"}, "a", sizeof(threads[0].thread.space)));
+  EXPECT_EQ(0,
+            Create(&threads[1].thread.thread, test_run_func, Args{.ptr = "22"}, "b", sizeof(threads[1].thread.space)));
 
   EXPECT_EQ(0, ::Run());
 
-  auto id0 = TID(&threads[0]);
-  auto id1 = TID(&threads[1]);
+  auto id0 = TID(&threads[0].thread.thread);
+  auto id1 = TID(&threads[1].thread.thread);
 
   vector<ThreadID> expect = {
       id0,
@@ -124,17 +124,16 @@ TEST(CoroutineTest, TwiceAlternating) {
 }
 
 TEST(CoroutineTest, Overflow) {
-  Thread  thread;
-  uint8_t stack0[500];
-  int     num = 1;
+  TestThread1 thread;
+  int         num = 1;
 
   for (; num < 20; num++) {
     EXPECT_EQ(0, Init(NewSystemConfig()));
 
     std::string arg = absl::StrFormat("%d", num);
 
-    EXPECT_EQ(0, Create(&thread, test_recursive_func, Args{.ptr = arg.c_str()},
-                        NewThreadConfig("abc", stack0, sizeof(stack0))));
+    EXPECT_EQ(0, Create(&thread.thread.thread, test_recursive_func, Args{.ptr = arg.c_str()}, "abc",
+                        sizeof(thread.thread.space)));
     EXPECT_EQ(0, ::Run());
 
     auto logs = test_logs_get();
@@ -150,14 +149,14 @@ TEST(CoroutineTest, Overflow) {
 }
 
 TEST(CoroutineTest, MultiOverflow) {
-  Thread  thread0;
-  Thread  thread1;
-  uint8_t stack0[500];
-  uint8_t stack1[500];
+  TestThread1 thread0;
+  TestThread1 thread1;
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
-  EXPECT_EQ(0, Create(&thread0, test_recursive_func, Args{.ptr = "20"}, NewThreadConfig("a", stack0, sizeof(stack0))));
-  EXPECT_EQ(0, Create(&thread1, test_recursive_func, Args{.ptr = "20"}, NewThreadConfig("b", stack1, sizeof(stack1))));
+  EXPECT_EQ(0,
+            Create(&thread0.thread.thread, test_recursive_func, Args{.ptr = "20"}, "a", sizeof(thread0.thread.space)));
+  EXPECT_EQ(0,
+            Create(&thread1.thread.thread, test_recursive_func, Args{.ptr = "20"}, "b", sizeof(thread1.thread.space)));
   EXPECT_EQ(0, ::Run());
 
   auto logs = test_logs_get();

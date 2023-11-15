@@ -81,7 +81,7 @@ static inline void YieldBlocked(void) {
   (*__system_yield)(JC_BLOCKED);
 }
 
-#define SUPRUGLUE_DEFINE_THREAD(nam, stack_size) SUPRUGLUE_DEFINE_THINGS(nam, Thread, thread, uint8_t, stack_size)
+#define SUPRUGLUE_DEFINE_THREAD(nam, stack_size) SUPRUGLUE_DEFINE_SIZED(nam, Thread, thread, uint8_t, stack_size)
 
 #ifdef __cplusplus
 }
