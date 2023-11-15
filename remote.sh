@@ -48,3 +48,5 @@ echo start > /sys/class/remoteproc/remoteproc1/state
 
 echo "State: ..."
 cat /sys/class/remoteproc/remoteproc1/state
+
+mv supructl ./bin

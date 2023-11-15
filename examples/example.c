@@ -137,7 +137,6 @@ void main(void) {
   if (err != 0) {
     // @@@ this has failed b/c wrong event number... what would we do?
     // (q: why compile-in such checks? is there a way to panic?)
-    flash(4);
   }
 
   args1.ptr = "1";

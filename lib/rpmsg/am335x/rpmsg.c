@@ -80,9 +80,13 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   }
 
   // Create the RPMsg channel between the PRU and the ARM.
-  while ((ret = pru_rpmsg_channel(RPMSG_NS_CREATE, &transport->channel, RPMSG_CHANNEL_NAME, transport->channel_port)) ==
-         PRU_RPMSG_NO_BUF_AVAILABLE) {
+  while ((ret = pru_rpmsg_channel(RPMSG_NS_CREATE, &transport->channel, RPMSG_CHANNEL_NAME, transport->channel_port)) !=
+         PRU_RPMSG_SUCCESS) {
+    flash(9);
   }
+
+  flash(4);
+  solid(2);
 
   return ret;
 }

@@ -12,4 +12,6 @@ build:clpru --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 build:clpru --platforms //tools/toolchain:real_pru
 build:clpru --copt='-DSUPRUGLUE_AM335X'
 
+build:arm --platforms @io_bazel_rules_go//go/toolchain:linux_arm
+
 test --test_output=all --test_arg=--verbose

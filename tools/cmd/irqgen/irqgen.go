@@ -75,8 +75,9 @@ struct pru_irq_rsc supruglue_incoming_irq_rsc = {
 #endif // %s
 `, os.Args[2], guard, guard, len(result.Incoming), func() string {
 		var sb strings.Builder
+		sb.WriteString("  {\n")
 		for _, irq := range result.Incoming {
-			sb.WriteString("  { ")
+			sb.WriteString("    { ")
 			sb.WriteString(irq.Event)
 			sb.WriteString(", ")
 			sb.WriteString(fmt.Sprint(irq.Channel))
@@ -84,6 +85,7 @@ struct pru_irq_rsc supruglue_incoming_irq_rsc = {
 			sb.WriteString(fmt.Sprint(irq.Host))
 			sb.WriteString("},\n")
 		}
+		sb.WriteString("  },\n")
 		return sb.String()
 	}(), guard)
 }
