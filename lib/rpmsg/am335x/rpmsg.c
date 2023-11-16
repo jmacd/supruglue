@@ -51,24 +51,22 @@ ClientTransport __transport;
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
               struct fw_rsc_vdev_vring *vring1) {
-  // Zero memory.
-  memset(transport, 0, sizeof(transport));
-
   // Ensure the virtio driver is ready.
   volatile uint8_t *status = &vdev->status;
   while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
   }
 
   // The system events and port are core-specific.
-  if (PRU_CORE_NUMBER() == 0) {
-    transport->channel_port = RPMSG_CHANNEL_PORT_0;
-    transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
-    transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
-  } else {
-    transport->channel_port = RPMSG_CHANNEL_PORT_1;
-    transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
-    transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
-  }
+  // if (PRU_CORE_NUMBER() == 0) {
+  // @@@ This is wrong!!!
+  transport->channel_port = RPMSG_CHANNEL_PORT_0;
+  transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
+  transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
+  // } else {
+  //   transport->channel_port = RPMSG_CHANNEL_PORT_1;
+  //   transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
+  //   transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
+  // }
 
   // Clear the incoming system event. TODO separate interrupt logic
   CT_INTC.SICR_bit.STS_CLR_IDX = transport->sysevt_arm_to_pru;
@@ -82,11 +80,7 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   // Create the RPMsg channel between the PRU and the ARM.
   while ((ret = pru_rpmsg_channel(RPMSG_NS_CREATE, &transport->channel, RPMSG_CHANNEL_NAME, transport->channel_port)) !=
          PRU_RPMSG_SUCCESS) {
-    flash(9);
   }
-
-  flash(4);
-  solid(2);
 
   return ret;
 }
@@ -103,14 +97,19 @@ int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
   // PRU_RPMSG_INVALID_HEAD;
   if (transport->rpmsg_peer_src_addr == 0) {
     // In case we have never received.
+
+    // TODO @@@ HOW IS THIS NOT TRIGGERED?
     return PRU_RPMSG_NO_PEER_ADDR;
   }
+
   return pru_rpmsg_send(&transport->channel, transport->channel_port, transport->rpmsg_peer_src_addr, (void *)data,
                         len);
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
   // TODO clear the interrupt (before) here.
+  // @@@ Note: Don't we have to receive once before we can send?  Why is peer_src_addr not set here?
+  // think we need to listen for the "kick" interrupt, then call receive.
   uint16_t my_dst_addr;
   return pru_rpmsg_receive(&transport->channel, &transport->rpmsg_peer_src_addr, &my_dst_addr, data, len);
 }

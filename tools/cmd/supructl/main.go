@@ -38,7 +38,6 @@ func (app *appState) run() error {
 		if err != nil {
 			log.Print(err)
 		}
-		log.Print("LOOK", string(dat))
 	}
 }
 
