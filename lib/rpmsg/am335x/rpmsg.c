@@ -5,6 +5,8 @@
 #include <stdint.h>
 
 #include "external/ti-pru-support/include/am335x/pru_intc.h"
+#include "lib/debug/debug.h"
+#include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg-defs.h"
 #include "lib/soc/soc.h"
 #include "lib/soc/sysevts.h"
@@ -51,6 +53,8 @@ ClientTransport __transport;
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
               struct fw_rsc_vdev_vring *vring1) {
+  memset(transport, 0, sizeof(*transport));
+
   // Ensure the virtio driver is ready.
   volatile uint8_t *status = &vdev->status;
   while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
@@ -68,9 +72,6 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   //   transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
   // }
 
-  // Clear the incoming system event. TODO separate interrupt logic
-  CT_INTC.SICR_bit.STS_CLR_IDX = transport->sysevt_arm_to_pru;
-
   int ret;
   ret = pru_rpmsg_init(&transport->channel, vring0, vring1, transport->sysevt_pru_to_arm, transport->sysevt_arm_to_pru);
   if (ret != PRU_RPMSG_SUCCESS) {
@@ -86,30 +87,29 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
-  // TODO: what kind of fallback?
-
-  // Transient cases
-  // PRU_RPMSG_NO_PEER_ADDR
-  // PRU_RPMSG_NO_BUF_AVAILABLE
-
-  // Permanent cases
-  // PRU_RPMSG_BUF_TOO_SMALL
-  // PRU_RPMSG_INVALID_HEAD;
   if (transport->rpmsg_peer_src_addr == 0) {
     // In case we have never received.
-
-    // TODO @@@ HOW IS THIS NOT TRIGGERED?
+    flash(7);
+    solid(1);
     return PRU_RPMSG_NO_PEER_ADDR;
   }
 
-  return pru_rpmsg_send(&transport->channel, transport->channel_port, transport->rpmsg_peer_src_addr, (void *)data,
-                        len);
+  flash(1);
+  solid(1);
+
+  int err = pru_rpmsg_send(&transport->channel, transport->rpmsg_peer_dst_addr, transport->rpmsg_peer_src_addr,
+                           (void *)data, len);
+  if (err == 0) {
+    flash(2);
+    solid(1);
+  } else {
+    flash(3);
+    solid(1);
+  }
+  return err;
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
-  // TODO clear the interrupt (before) here.
-  // @@@ Note: Don't we have to receive once before we can send?  Why is peer_src_addr not set here?
-  // think we need to listen for the "kick" interrupt, then call receive.
-  uint16_t my_dst_addr;
-  return pru_rpmsg_receive(&transport->channel, &transport->rpmsg_peer_src_addr, &my_dst_addr, data, len);
+  return pru_rpmsg_receive(&transport->channel, &transport->rpmsg_peer_src_addr, &transport->rpmsg_peer_dst_addr, data,
+                           len);
 }

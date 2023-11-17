@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-// Thread that reads log messages from other threads and conveys them
-// over rpmsg to the host.
+// Thread function that reads log messages from other threads via the
+// journal and conveys them over RPMsg to the host.
 
 void SyslogProcess(ThreadID thid, Args args);
 

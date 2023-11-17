@@ -22,22 +22,19 @@ func newAppState() (*appState, error) {
 		return nil, err
 	}
 
-	// if err := rpm.write([]byte("wakeup")); err != nil {
-	// 	return nil, err
-	// }
-
 	return &appState{
 		rpm: rpm,
 	}, nil
 }
 
 func (app *appState) run() error {
-	buf := make([]byte, 4096)
+	buf := make([]byte, 16)
 	for {
 		dat, err := app.rpm.read(buf)
 		if err != nil {
 			log.Print(err)
 		}
+		log.Print("Read:", string(dat))
 	}
 }
 
@@ -72,6 +69,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = app.rpm.write([]byte("hello"))
+	if err != nil {
+		panic(err)
+	}
+	log.Println("we said hello")
+
 	app.run()
 	// go app.run()
 	// select {}

@@ -26,6 +26,7 @@ struct _ClientTransport {
   // The peer address is initially 0, which case with no messages ever
   // received, we can't really send.
   uint16_t rpmsg_peer_src_addr;
+  uint16_t rpmsg_peer_dst_addr;
 
   // Equals the message source address.
   int16_t channel_port;

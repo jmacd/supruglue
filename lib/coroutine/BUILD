@@ -11,6 +11,7 @@ cc_library(
     ],
     deps = [
         "//lib/thread",
+        "//lib/intc",
         "//lib/log/journal",
     ],
 )

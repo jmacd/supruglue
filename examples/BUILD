@@ -17,6 +17,7 @@ cc_binary(
         "//lib/log/daemon",
         "//lib/gpio",
         "//lib/rpmsg",
+        "//lib/initproc",
         "//tools/toolchain/am335x",
     ],
 )

@@ -8,6 +8,7 @@
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
 #include "lib/gpio/gpio.h"
+#include "lib/initproc/initproc.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
@@ -83,9 +84,8 @@ struct my_resource_table resourceTable = {
 };
 
 void test_write_func(ThreadID tid, Args args) {
-  int32_t cnt = Atoi(args.ptr);
-  int32_t i;
-  for (i = 0; i < cnt; i++) {
+  int32_t i = 0;
+  for (;; i++) {
     PRULOG_2U(INFO, "write %u", i, 0); // Logs always yield
   }
 }
@@ -120,10 +120,11 @@ void toggle_yellow(ThreadID tid, Args args) {
 
 SUPRUGLUE_DEFINE_THREAD(writer, 256);
 SUPRUGLUE_DEFINE_THREAD(syslog, 256);
+SUPRUGLUE_DEFINE_THREAD(init, 256);
 SUPRUGLUE_DEFINE_THREAD(blue, 256);
 SUPRUGLUE_DEFINE_THREAD(yellow, 256);
 
-void main(void) {
+int main(void) {
 
   Args args1;
   Args args2;
@@ -142,8 +143,10 @@ void main(void) {
   args1.ptr = "1";
   args2.ptr = "0";
 
-  err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
+  err = Create(&init.thread, InitProcess, args1, "init", sizeof(init.space));
   err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
+
+  err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
   err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
   err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
 
