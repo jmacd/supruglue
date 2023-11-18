@@ -13,18 +13,18 @@ void SyslogProcess(ThreadID thid, Args args) {
 
     JournalRead(&__system.journal, &entry, JR_BLOCKING);
 
-    flash(7);
-
     int err;
     while ((err = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
       if (err == PRU_RPMSG_NO_PEER_ADDR) {
-
-        flash(4);
         // TODO block on init process?
         BlockOnHost0(&__controller);
         continue;
       }
-      // flash(3);
+
+      if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
+        flash(6);
+        solid(1);
+      }
 
       // TODO: otherwise, not clear what kind of fallback reporting
       // can be done when a permanent error is returned.

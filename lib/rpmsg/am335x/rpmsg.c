@@ -89,22 +89,22 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
   if (transport->rpmsg_peer_src_addr == 0) {
     // In case we have never received.
-    flash(7);
-    solid(1);
+    // flash(7);
+    // solid(1);
     return PRU_RPMSG_NO_PEER_ADDR;
   }
 
-  flash(1);
-  solid(1);
+  // flash(1);
+  // solid(1);
 
   int err = pru_rpmsg_send(&transport->channel, transport->rpmsg_peer_dst_addr, transport->rpmsg_peer_src_addr,
                            (void *)data, len);
   if (err == 0) {
-    flash(2);
-    solid(1);
+    // flash(2);
+    // solid(1);
   } else {
-    flash(3);
-    solid(1);
+    // flash(3);
+    // solid(1);
   }
   return err;
 }

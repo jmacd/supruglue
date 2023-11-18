@@ -145,10 +145,10 @@ int main(void) {
 
   err = Create(&init.thread, InitProcess, args1, "init", sizeof(init.space));
   err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
-
   err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
-  err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
-  err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
+
+  // err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
+  // err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
 
   err = Run();
   return err;
