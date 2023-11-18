@@ -7,7 +7,9 @@ go_library(
     importpath = "github.com/jmacd/supruglue/tools/cmd/supructl",
     visibility = ["//visibility:private"],
     deps = [
+        "//tools/internal/elfdata",
         "//tools/internal/rpmsghost",
+        "@com_github_spf13_cobra//:cobra",
     ],
 )
 
