@@ -1,81 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
+	"github.com/jmacd/supruglue/tools/internal/rpmsghost"
+	// "github.com/spf13/cobra"
 )
 
-const deviceName = "/dev/rpmsg_pru30"
-
-type RPMsgDevice struct {
-	file *os.File
-}
-
-type appState struct {
-	rpm *RPMsgDevice
-}
-
-func newAppState() (*appState, error) {
-	rpm, err := openRPMsgDevice()
-	if err != nil {
-		return nil, err
-	}
-
-	return &appState{
-		rpm: rpm,
-	}, nil
-}
-
-func (app *appState) run() error {
-	buf := make([]byte, 16)
-	for {
-		dat, err := app.rpm.read(buf)
-		if err != nil {
-			log.Print(err)
-		}
-		log.Print("Read:", string(dat))
-	}
-}
-
-func openRPMsgDevice() (*RPMsgDevice, error) {
-	file, err := os.OpenFile(deviceName, os.O_RDWR, 0666)
-	return &RPMsgDevice{
-		file: file,
-	}, err
-}
-
-func (r *RPMsgDevice) read(buf []byte) ([]byte, error) {
-	n, err := r.file.Read(buf)
-	if err != nil {
-		return nil, err
-	}
-	return buf[:n], nil
-}
-
-func (r *RPMsgDevice) write(data []byte) error {
-	n, err := r.file.Write(data)
-	if err != nil {
-		return nil
-	}
-	if n != len(data) {
-		return fmt.Errorf("short write: %d != %d", n, len(data))
-	}
-	return nil
-}
-
 func main() {
-	app, err := newAppState()
+	app, err := rpmsghost.New()
 	if err != nil {
 		panic(err)
 	}
-	err = app.rpm.write([]byte("hello"))
-	if err != nil {
-		panic(err)
-	}
-	log.Println("we said hello")
 
-	app.run()
-	// go app.run()
-	// select {}
+	go app.Run()
+
+	select {}
 }

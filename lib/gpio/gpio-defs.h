@@ -56,6 +56,17 @@ struct _gpio_pin {
 
 typedef struct _gpio_pin gpio_pin;
 
+// Declare a GPIO pin as in:
+//
+//   static gpio_pin p9_25 = GPIO_PIN_STRUCT(P9_25)
+//
+#define GPIO_PIN_STRUCT(pin)                                                                                           \
+  { GPIO_PIN_TO_REGISTER(pin), GPIO_PIN_TO_BIT_NUM(pin), }
+
+// Use a GPIO pin as an expression:
+//
+//   GPIO_SetPin(GPIO_PIN(P9_25), 1);
+//
 #define GPIO_PIN(pin)                                                                                                  \
   ({                                                                                                                   \
     gpio_pin __x;                                                                                                      \

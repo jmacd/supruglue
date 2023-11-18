@@ -8,12 +8,12 @@ cc_library(
     ],
     hdrs = [
         "journal.h",
-	],
+    ],
     deps = [
-	"//lib/list",
-	"//lib/thread",
-	"//lib/sync",
         "//lib/debug",
+        "//lib/list",
+        "//lib/sync",
+        "//lib/thread",
     ],
 )
 

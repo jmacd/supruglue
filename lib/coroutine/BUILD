@@ -10,9 +10,9 @@ cc_library(
         "coroutine.h",
     ],
     deps = [
-        "//lib/thread",
         "//lib/intc",
         "//lib/log/journal",
+        "//lib/thread",
     ],
 )
 

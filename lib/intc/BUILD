@@ -7,7 +7,7 @@ cc_library(
         "intc-defs.h",
     ],
     deps = [
-	"//lib/thread",
+        "//lib/thread",
     ],
 )
 

@@ -3,15 +3,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "test32",
-    hdrs = [
-        "time.h"
-    ],
     srcs = [
         "time.cc",
     ],
+    hdrs = [
+        "time.h",
+    ],
     deps = [
-            "//lib/time:defs",
-	    "//lib/thread",
+        "//lib/thread",
+        "//lib/time:defs",
     ],
 )
 

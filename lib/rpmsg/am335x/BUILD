@@ -10,11 +10,11 @@ cc_library(
         "rpmsg.h",
     ],
     deps = [
+        "//lib/debug",
+        "//lib/intc",
         "//lib/rpmsg:defs",
         "//lib/soc",
-        "//lib/debug",
         "//lib/thread",
-        "//lib/intc",
         "//tools/toolchain/am335x",
         "@ti-pru-support//lib/src/rpmsg_lib",
     ],

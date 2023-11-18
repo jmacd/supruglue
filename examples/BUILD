@@ -14,10 +14,10 @@ cc_binary(
     ],
     deps = [
         "//lib/coroutine",
-        "//lib/log/daemon",
         "//lib/gpio",
-        "//lib/rpmsg",
         "//lib/initproc",
+        "//lib/log/daemon",
+        "//lib/rpmsg",
         "//tools/toolchain/am335x",
     ],
 )

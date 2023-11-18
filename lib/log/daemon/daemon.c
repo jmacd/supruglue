@@ -22,12 +22,13 @@ void SyslogProcess(ThreadID thid, Args args) {
       }
 
       if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
-        flash(6);
-        solid(1);
+        BlockOnHost0(&__controller);
+        continue;
       }
 
       // TODO: otherwise, not clear what kind of fallback reporting
       // can be done when a permanent error is returned.
+      flash(4);
       Yield();
     }
 

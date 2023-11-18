@@ -10,8 +10,8 @@ cc_library(
         "thread.h",
     ],
     deps = [
-	"//lib/args",
-	"//lib/list",
+        "//lib/args",
+        "//lib/list",
         "//lib/soc",
     ],
 )

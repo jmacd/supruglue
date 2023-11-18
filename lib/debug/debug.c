@@ -6,17 +6,22 @@
 #include "lib/pinmap/pinmap.h"
 #include "lib/soc/soc.h"
 
+const gpio_pin _uled1 = GPIO_PIN_STRUCT(ULED1);
+const gpio_pin _uled2 = GPIO_PIN_STRUCT(ULED2);
+const gpio_pin _uled3 = GPIO_PIN_STRUCT(ULED3);
+const gpio_pin _uled4 = GPIO_PIN_STRUCT(ULED4);
+
 void uled1(int val) {
-  GPIO_SetPin(GPIO_PIN(ULED1), val);
+  GPIO_SetPin(_uled1, val);
 }
 void uled2(int val) {
-  GPIO_SetPin(GPIO_PIN(ULED2), val);
+  GPIO_SetPin(_uled2, val);
 }
 void uled3(int val) {
-  GPIO_SetPin(GPIO_PIN(ULED3), val);
+  GPIO_SetPin(_uled3, val);
 }
 void uled4(int val) {
-  GPIO_SetPin(GPIO_PIN(ULED4), val);
+  GPIO_SetPin(_uled4, val);
 }
 
 void blue(int val) {
@@ -39,6 +44,7 @@ void flash(int n) {
     SystemOnChipDelay(100000000);
     uled1(1);
     uled2(1);
+
     uled3(1);
     uled4(1);
     yellow(1);

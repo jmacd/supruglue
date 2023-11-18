@@ -3,11 +3,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "test32",
-    hdrs = [
-        "soc.h",
-    ],
     srcs = [
         "soc.cc",
+    ],
+    hdrs = [
+        "soc.h",
     ],
     deps = [
         "//lib/soc:defs",

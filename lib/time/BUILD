@@ -13,11 +13,11 @@ cc_library(
 
 cc_library(
     name = "time",
+    srcs = [
+        "time.c",
+    ],
     hdrs = [
         "time.h",
-    ],
-    srcs = [
-	"time.c",
     ],
     deps = [
         ":defs",

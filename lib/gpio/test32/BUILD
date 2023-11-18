@@ -3,11 +3,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "test32",
-    hdrs = [
-        "gpio.h"
-    ],
     srcs = [
         "gpio.cc",
+    ],
+    hdrs = [
+        "gpio.h",
     ],
     deps = [
         "//lib/gpio:defs",

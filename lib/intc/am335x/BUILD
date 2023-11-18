@@ -3,14 +3,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "am335x",
-    hdrs = [
-        "intc.h",
-    ],
     srcs = [
         "intc.c",
     ],
+    hdrs = [
+        "intc.h",
+    ],
     deps = [
-        "//lib/intc:defs",
         "//lib/debug",
+        "//lib/intc:defs",
     ],
 )

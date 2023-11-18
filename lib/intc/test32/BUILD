@@ -3,11 +3,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "test32",
-    hdrs = [
-        "intc.h"
-    ],
     srcs = [
         # "intc.cc",
+    ],
+    hdrs = [
+        "intc.h",
     ],
     deps = [
         "//lib/intc:defs",

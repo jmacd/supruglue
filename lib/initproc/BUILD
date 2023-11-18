@@ -10,9 +10,9 @@ cc_library(
         "initproc.h",
     ],
     deps = [
-        "//lib/thread",
         "//lib/debug",
-        "//lib/rpmsg",
         "//lib/intc",
+        "//lib/rpmsg",
+        "//lib/thread",
     ],
 )

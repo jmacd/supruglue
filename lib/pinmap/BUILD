@@ -9,7 +9,7 @@ cc_library(
     ],
     deps = [
         "//lib/soc",
-    ]
+    ],
 )
 
 genrule(
