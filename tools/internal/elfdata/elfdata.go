@@ -7,12 +7,12 @@ import (
 
 // Presently this indexes the .rodata section, which is where clpru
 // places string constants.
-type Strings struct {
+type ELF struct {
 	addr uint64
 	data []byte
 }
 
-func Open(fw string) (*Strings, error) {
+func Open(fw string) (*ELF, error) {
 	f, err := elf.Open(fw)
 	if err != nil {
 		return nil, err
@@ -27,13 +27,13 @@ func Open(fw string) (*Strings, error) {
 		return nil, fmt.Errorf("reading .rodata: %w", err)
 	}
 
-	return &Strings{
+	return &ELF{
 		addr: sect.Addr,
 		data: data,
 	}, nil
 }
 
-func (sd *Strings) CStringAt(addr uint64) (string, error) {
+func (sd *ELF) CStringAt(addr uint64) (string, error) {
 	if addr < sd.addr || (addr-sd.addr) >= uint64(len(sd.data)) {
 		return "", fmt.Errorf("address range [%d,%d)", sd.addr, sd.addr+uint64(len(sd.data)))
 	}

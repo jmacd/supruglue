@@ -36,17 +36,20 @@ configPins() {
 
 configPins
 
-echo "Stopping ..."
-echo stop > /sys/class/remoteproc/remoteproc1/state
-#echo stop > /sys/class/remoteproc/remoteproc2/state
+# echo "Stopping ..."
+# echo stop > /sys/class/remoteproc/remoteproc1/state
+# echo stop > /sys/class/remoteproc/remoteproc2/state
 
-mv example_pru0 /lib/firmware
-echo example_pru0 > /sys/class/remoteproc/remoteproc1/firmware
+# mv example_pru0 /lib/firmware
+# echo example_pru0 > /sys/class/remoteproc/remoteproc1/firmware
 
-echo "Starting ..."
-echo start > /sys/class/remoteproc/remoteproc1/state
+# echo "Starting ..."
+# echo start > /sys/class/remoteproc/remoteproc1/state
 
-echo "State: ..."
-cat /sys/class/remoteproc/remoteproc1/state
+# echo "State: ..."
+# cat /sys/class/remoteproc/remoteproc1/state
 
 mv supructl ./bin
+mv example_pru0 ./fw
+
+./bin/supructl start --firmware ./fw/example_pru0

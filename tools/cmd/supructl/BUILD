@@ -8,6 +8,8 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//tools/internal/elfdata",
+        "//tools/internal/firmware",
+        "//tools/internal/remoteproc",
         "//tools/internal/rpmsghost",
         "@com_github_spf13_cobra//:cobra",
     ],
