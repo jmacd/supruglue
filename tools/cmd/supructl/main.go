@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jmacd/supruglue/tools/internal/elfdata"
 	"github.com/jmacd/supruglue/tools/internal/firmware"
 	"github.com/jmacd/supruglue/tools/internal/remoteproc"
 	"github.com/jmacd/supruglue/tools/internal/rpmsghost"
@@ -26,7 +25,6 @@ var (
 
 func init() {
 	rootCmd.AddCommand(journalCmd)
-	rootCmd.AddCommand(stringsCmd)
 	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(stopCmd)
 }
@@ -34,51 +32,21 @@ func init() {
 var journalCmd = &cobra.Command{
 	Use:   "journal",
 	Short: "Print the Supruglue journal",
-	Run: func(cmd *cobra.Command, args []string) {
-		app, err := rpmsghost.New()
-		if err != nil {
-			panic(err)
-		}
-
-		app.Run()
-	},
-}
-
-// e.g.,
-// ./bazel-bin/tools/cmd/supructl/supructl_/supructl strings ./bazel-out/pru-fastbuild/bin/examples/example_pru0
-var stringsCmd = &cobra.Command{
-	Use:   "strings",
-	Short: "Print strings from a PRU firmware",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return fmt.Errorf("usage: strings <firmware>")
-		}
-		rodata, err := elfdata.Open(args[0])
-		if err != nil {
-			return fmt.Errorf("elf data: %w", err)
-		}
-
-		str, err := rodata.CStringAt(0x36b0)
-		if err != nil {
-			return fmt.Errorf("elf string: %w", err)
-		}
-		fmt.Println(str)
-		return nil
-	},
+	RunE:  runJournal,
 }
 
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start running PRU firmware",
 	Args:  cobra.NoArgs,
-	RunE:  runStartCommand,
+	RunE:  runStart,
 }
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop running PRU firmware",
 	Args:  cobra.NoArgs,
-	RunE:  runStopCommand,
+	RunE:  runStop,
 }
 
 func main() {
@@ -88,7 +56,7 @@ func main() {
 	}
 }
 
-func runStartCommand(cmd *cobra.Command, _ []string) error {
+func runStart(cmd *cobra.Command, _ []string) error {
 	fw, err := firmware.Open(*flagFirmware)
 	if err != nil {
 		return fmt.Errorf("firmware: %w", err)
@@ -112,10 +80,15 @@ func runStartCommand(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("start firmware: %w", err)
 	}
 
-	return nil
+	app, err := rpmsghost.New(fw)
+	if err != nil {
+		return fmt.Errorf("rpmsg host: %w", err)
+	}
+
+	return app.Run()
 }
 
-func runStopCommand(cmd *cobra.Command, _ []string) error {
+func runStop(cmd *cobra.Command, _ []string) error {
 	rp, err := remoteproc.Open(*flagRemoteProcDir, *flagFirmwareDir)
 	if err != nil {
 		return fmt.Errorf("remoteproc: %w", err)
@@ -125,4 +98,18 @@ func runStopCommand(cmd *cobra.Command, _ []string) error {
 	}
 
 	return nil
+}
+
+func runJournal(cmd *cobra.Command, args []string) error {
+	fw, err := firmware.Open(*flagFirmware)
+	if err != nil {
+		return fmt.Errorf("firmware: %w", err)
+	}
+	app, err := rpmsghost.New(fw)
+	if err != nil {
+		return fmt.Errorf("rpmsg host: %w", err)
+	}
+
+	app.Run()
+	select {}
 }

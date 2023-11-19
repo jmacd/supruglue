@@ -8,21 +8,21 @@ import (
 )
 
 type Firmware struct {
-	full   string
-	rodata *elfdata.ELF
+	full string
+	*elfdata.ELF
 }
 
 func Open(full string) (*Firmware, error) {
 	if full == "" {
 		return nil, fmt.Errorf("firmware name is empty")
 	}
-	rodata, err := elfdata.Open(full)
+	data, err := elfdata.Open(full)
 	if err != nil {
 		return nil, fmt.Errorf("elf data: %w", err)
 	}
 	fw := &Firmware{
-		full:   full,
-		rodata: rodata,
+		full: full,
+		ELF:  data,
 	}
 	return fw, nil
 }

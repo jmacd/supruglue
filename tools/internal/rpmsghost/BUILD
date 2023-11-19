@@ -5,4 +5,5 @@ go_library(
     srcs = ["rpmsghost.go"],
     importpath = "github.com/jmacd/supruglue/tools/internal/rpmsghost",
     visibility = ["//tools:__subpackages__"],
+    deps = ["//tools/internal/firmware"],
 )

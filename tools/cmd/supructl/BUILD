@@ -7,7 +7,6 @@ go_library(
     importpath = "github.com/jmacd/supruglue/tools/cmd/supructl",
     visibility = ["//visibility:private"],
     deps = [
-        "//tools/internal/elfdata",
         "//tools/internal/firmware",
         "//tools/internal/remoteproc",
         "//tools/internal/rpmsghost",
