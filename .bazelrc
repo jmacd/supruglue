@@ -1,4 +1,7 @@
-build --cxxopt='-std=c++14'
+build:host --cxxopt='-std=c++17'
+build:host --cxxopt='-Wall'
+build:host --copt='-Wall'
+build:host --copt='-DSUPRUGLUE_TEST32'
 
 # linker_files not working, can't sandbox the `ar` step
 build --spawn_strategy=standalone
@@ -6,8 +9,11 @@ build --spawn_strategy=standalone
 build:clpru --crosstool_top=//tools/toolchain:clpru_suite
 build:clpru --cpu=pru
 build:clpru --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
-build:clpru --platforms=//tools/toolchain:real_pru
+build:clpru --platforms //tools/toolchain:real_pru
+build:clpru --copt='-DSUPRUGLUE_AM335X'
+build:clpru --copt='--opt_level=4'
+build:clpru --copt='--opt_for_speed=0'
 
-build:testpru --crosstool_top=@bazel_tools//tools/cpp:toolchain
-build:testpru --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
-build:testpru --platforms=//tools/toolchain:fake_pru
+build:arm --platforms @io_bazel_rules_go//go/toolchain:linux_arm
+
+test --test_output=all --test_arg=--verbose

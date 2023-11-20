@@ -17,7 +17,7 @@ type Pin struct {
 	Mode5   string
 	Mode6   string
 	Mode7   string
-	GpioNum string
+	GpioNum string // parsed as string, int or empty
 	Name2   string
 }
 

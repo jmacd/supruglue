@@ -11,21 +11,13 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 3 {
-		log.Fatal("usage: %s <arch> <pins.csv>\n", os.Args[0])
+	if len(os.Args) != 2 {
+		log.Fatal("usage: %s <pins.csv>\n", os.Args[0])
 	}
 
-	hw := os.Args[1]
-	inp := os.Args[2]
+	inp := os.Args[1]
 
-	switch hw {
-	case "test32":
-	case "am335x":
-	default:
-		log.Fatal("unknown hardware: ", hw)
-	}
-
-	guard := strings.ToUpper("supruglue_" + hw + "_include_pinmap_h")
+	guard := strings.ToUpper("supruglue_include_pinmap_h")
 
 	pins, err := csv.ReadFile[arch.Pin](inp)
 	if err != nil {
@@ -40,7 +32,7 @@ func main() {
 #ifndef %s
 #define %s
 
-#include "supruglue/pinmap.h"
+#include "lib/pinmap/pinmap-defs.h"
 
 %s
 
@@ -69,15 +61,15 @@ func main() {
 
 			sb.WriteString("#define ")
 			sb.WriteString(cppname)
-			sb.WriteString(fmt.Sprint("_gpio_bank ", gbank, "\n"))
+			sb.WriteString(fmt.Sprint("_GPIO_BANK_NUM ", gbank, "\n"))
 
 			sb.WriteString("#define ")
 			sb.WriteString(cppname)
-			sb.WriteString(fmt.Sprint("_gpio_bit ", gbit, "\n"))
+			sb.WriteString(fmt.Sprint("_GPIO_BIT_NUM ", gbit, "\n"))
 
 			sb.WriteString("#define ")
 			sb.WriteString(cppname)
-			sb.WriteString(fmt.Sprint("_gpio_register(soc) GPIO_REGISTER", gbank, "(soc)\n"))
+			sb.WriteString(fmt.Sprint("_GPIO_BANK GPIO_BANK", gbank, "\n"))
 
 			if pruNum, has := pin.PRUHasGpioFastOutput(); has {
 				fbit, err := pin.PRUGpioFastOutputBit()

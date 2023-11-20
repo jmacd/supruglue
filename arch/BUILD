@@ -1,7 +1,16 @@
+# -*- Mode: Python -*-
+package(default_visibility = ["//visibility:public"])
+
 filegroup(
-    name = "arch",
-    srcs = glob([
-        "*.csv",
-    ]),
-    visibility = ["//visibility:public"],
+    name = "pins",
+    srcs = [
+        "bbb-am335x-pins.csv",
+    ],
+)
+
+filegroup(
+    name = "sysevts",
+    srcs = [
+        "ti-pruss-intr.csv",
+    ],
 )
