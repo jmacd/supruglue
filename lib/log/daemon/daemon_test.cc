@@ -74,6 +74,7 @@ TEST(Syslog, Simple) {
 
   // Make sure the logs we received were all expected
   for (auto arg : res) {
+    cerr << arg << endl;
     EXPECT_NE(expect.end(), expect.find(arg));
   }
 }

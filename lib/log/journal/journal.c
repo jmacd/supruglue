@@ -11,6 +11,9 @@ SUPRUGLUE_DEFINE_LIST(BlockList, Block, list);
 
 const char *const overflowMessage = "** OVERFLOW **: dropped %u records";
 
+// The ThreadID that shows for the overflow message
+#define OVERFLOW_THREAD_ID 0xd
+
 void JournalInit(Journal *jl) {
   memset(jl, 0, sizeof(*jl));
   LockInit(&jl->lock);
@@ -78,7 +81,7 @@ static Entry *getEntry(Journal *jl) {
   // Block is now the second-newest record, and its entry[0] is the
   // oldest entry after a new gap in the log.
   Entry *entry = &block->entries[0];
-  entry->tid = 0;
+  entry->tid = OVERFLOW_THREAD_ID;
   entry->msg = overflowMessage;
   entry->arg1 = loss;
   entry->arg2 = 0;

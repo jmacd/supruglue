@@ -16,7 +16,9 @@ void SyslogProcess(ThreadID thid, Args args) {
     int err;
     while ((err = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
       if (err == PRU_RPMSG_NO_PEER_ADDR) {
-        // TODO block on init process?
+        // TODO block on init process, instead, because it knows the
+        // destination first?  the host0 interrupt could be a kick, or
+        // it could be something else.
         BlockOnHost0(&__controller);
         continue;
       }

@@ -27,6 +27,7 @@ func init() {
 	rootCmd.AddCommand(journalCmd)
 	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(stopCmd)
+	rootCmd.AddCommand(rodataCmd)
 }
 
 var journalCmd = &cobra.Command{
@@ -47,6 +48,13 @@ var stopCmd = &cobra.Command{
 	Short: "Stop running PRU firmware",
 	Args:  cobra.NoArgs,
 	RunE:  runStop,
+}
+
+var rodataCmd = &cobra.Command{
+	Use:   "rodata",
+	Short: "Print the rodata section of the PRU firmware",
+	Args:  cobra.NoArgs,
+	RunE:  runRodata,
 }
 
 func main() {
@@ -112,4 +120,26 @@ func runJournal(cmd *cobra.Command, args []string) error {
 
 	app.Run()
 	select {}
+}
+
+func runRodata(cmd *cobra.Command, args []string) error {
+	fwPath := *flagFirmware
+	if fwPath == "" {
+		rp, err := remoteproc.Open(*flagRemoteProcDir, *flagFirmwareDir)
+		if err != nil {
+			return fmt.Errorf("remoteproc: %w", err)
+		}
+		fwPath, err = rp.FirmwarePath()
+		if err != nil {
+			return err
+		}
+	}
+	fmt.Println("firmware: ", fwPath)
+	fw, err := firmware.Open(fwPath)
+	if err != nil {
+		return err
+	}
+
+	fw.ELF.Show()
+	return nil
 }

@@ -121,6 +121,14 @@ func (rp *RemoteProc) Firmware() string {
 	return rp.readProp(fwareProp)
 }
 
+func (rp *RemoteProc) FirmwarePath() (string, error) {
+	fw := rp.Firmware()
+	if fw == "" {
+		return "", fmt.Errorf("no firmware is set")
+	}
+	return path.Join(rp.fwDir, fw), nil
+}
+
 func (rp *RemoteProc) SetFirmware(name string) error {
 	return rp.setProp(fwareProp, name)
 }

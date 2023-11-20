@@ -53,3 +53,4 @@ mv supructl ./bin
 mv example_pru0 ./fw
 
 ./bin/supructl start --firmware ./fw/example_pru0
+./bin/supructl rodata --firmware ./fw/example_pru0

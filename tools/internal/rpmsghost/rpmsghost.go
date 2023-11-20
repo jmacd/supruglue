@@ -59,11 +59,10 @@ func (host *Host) Run() error {
 		u3 := binary.LittleEndian.Uint32(dat[12:16])
 
 		msg, err := host.fw.ELF.CStringAt(uint64(u1))
-		if err != nil {
-			msg = fmt.Sprintf("<unknown msg %v>", err)
-		} else if msg == "" {
-			msg = "<empty>"
+		if err != nil || msg == "" {
+			msg = fmt.Sprintf("<unknown msg 0x%x>", u1)
 		} else {
+			// TODO Should let %d coerce uint->int
 			msg = strings.Replace(msg, "%u", "%d", -1)
 			print := fmt.Sprintf(msg, u2, u3)
 			if strings.Contains(print, "%!(EXTRA") {

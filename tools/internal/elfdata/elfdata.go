@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 	"strings"
+	"unicode"
 )
 
 // Presently this indexes the .rodata section, which is where clpru
@@ -44,19 +45,51 @@ func Open(fw string) (*ELF, error) {
 	}, nil
 }
 
-func (sd *ELF) CStringAt(addr uint64) (string, error) {
-	if addr < sd.addr || (addr-sd.addr) >= uint64(len(sd.rodata)) {
-		return "", fmt.Errorf("address range [%d,%d)", sd.addr, sd.addr+uint64(len(sd.rodata)))
+func (elf *ELF) Show() {
+	var str strings.Builder
+	appf := func(msg string, args ...any) {
+		str.WriteString(fmt.Sprintf(msg, args...))
+	}
+	// like `hexdump -C`
+	base := elf.addr &^ 0xf
+	limit := (elf.addr + uint64(len(elf.rodata)) + 0xf) &^ 0xf
+
+	for base < limit {
+		var line strings.Builder
+		appf("[%05x]  ", base)
+		for col := 0; col < 0x10; col++ {
+			if base >= elf.addr || (base-elf.addr) < uint64(len(elf.rodata)) {
+				b := elf.rodata[base-elf.addr]
+				appf("%02x ", b)
+				if unicode.IsPrint(rune(b)) {
+					line.WriteRune(rune(b))
+				} else {
+					line.WriteRune('☐')
+				}
+			} else {
+				appf("   ")
+				line.WriteRune(' ')
+			}
+			base++
+		}
+		appf(" |")
+		appf("%s", line.String())
+		appf("|\n")
+	}
+	fmt.Println(str.String())
+}
+
+func (elf *ELF) CStringAt(addr uint64) (string, error) {
+	if addr < elf.addr || (addr-elf.addr) >= uint64(len(elf.rodata)) {
+		return "", fmt.Errorf("address range [%d,%d)", elf.addr, elf.addr+uint64(len(elf.rodata)))
 	}
 
-	off := int(addr - sd.addr)
 	var b []byte
-
-	for idx := 0; idx < off; idx++ {
-		if sd.rodata[idx] == 0 {
+	for off := int(addr - elf.addr); off < len(elf.rodata); off++ {
+		if elf.rodata[off] == 0 {
 			break
 		}
-		b = append(b, sd.rodata[idx])
+		b = append(b, elf.rodata[off])
 	}
 	return string(b), nil
 }
