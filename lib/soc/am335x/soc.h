@@ -14,15 +14,6 @@ extern "C" {
 // Defined in delay.s.
 extern void SystemOnChipDelay(int cycles);
 
-// This macro assumes standard linker commands, i.e., normal
-// assignment of the PRU_DMEM_0_1 section to pru0 (0x0000...0x2000) and
-// assignment of the PRU_DMEM_1_0 section to pru1 (0x2000...0x4000).
-// TODO this should be compile-time.
-#define PRU_CORE_NUMBER() (((&__dummy) < (void *)0x2000) ? 0 : 1)
-
-// Dummy variable for PRU_CORE_NUMBER check.
-extern void *__dummy;
-
 #ifdef __cplusplus
 }
 #endif

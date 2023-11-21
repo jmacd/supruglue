@@ -12,6 +12,7 @@
 #include "lib/log/daemon/daemon.h"
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
+#include "lib/time/time.h"
 
 #define NUM_RESOURCES 1
 
@@ -133,6 +134,8 @@ int main(void) {
   SystemOnChipSetup();
 
   Init(NewSystemConfig());
+
+  ClockInit(&__clock);
 
   err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
   if (err != 0) {

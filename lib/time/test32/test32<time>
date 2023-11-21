@@ -1,8 +1,0 @@
-  /Users/josh.macdonald/src/supruglue/lib/time/test32:
-  total used in directory 32 available 336.9 GiB
-  drwxr-xr-x   7 josh.macdonald  staff  224 Nov 10 16:50 .
-  drwxr-xr-x  10 josh.macdonald  staff  320 Nov 10 17:32 ..
-  -rw-r--r--   1 josh.macdonald  staff  390 Nov 10 16:43 BUILD
-  -rw-r--r--   1 josh.macdonald  staff  132 Nov 10 16:50 time.cc
-  -rw-r--r--   1 josh.macdonald  staff  261 Nov 10 16:49 time.h
-  -rw-r--r--   1 josh.macdonald  staff    0 Nov 10 16:47 time_test.cc

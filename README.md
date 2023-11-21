@@ -53,10 +53,10 @@ As space becomes tight, more space-optimization will likely be needed.
 
 ### Quickstart
 
-To test the PRU build w/ TI's compiler:
+To build PRU firmware with TI's compiler for PRU-0:
 
 ```
-bazel build --config=clpru ...
+bazel build --config=pru0 ...
 ```
 
 To test using a host toolchain:
@@ -75,7 +75,7 @@ bazel build --config=arm ...
 The example will alternatingly flash two LEDs on pins `P9_23` and `P9_25`.
 
 ```
-bazel build --config=clpru //examples:example_pru0
+bazel build --config=pru0 //examples:example_pru0
 ```
 
 The firmware is located in `bazel-out/pru-fastbuild/bin/examples/example_pru0`

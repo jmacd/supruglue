@@ -6,10 +6,10 @@
 #include "lib/pinmap/pinmap.h"
 #include "lib/soc/soc.h"
 
-const gpio_pin _uled1 = GPIO_PIN_STRUCT(ULED1);
-const gpio_pin _uled2 = GPIO_PIN_STRUCT(ULED2);
-const gpio_pin _uled3 = GPIO_PIN_STRUCT(ULED3);
-const gpio_pin _uled4 = GPIO_PIN_STRUCT(ULED4);
+gpio_pin _uled1 = GPIO_PIN_STRUCT(ULED1);
+gpio_pin _uled2 = GPIO_PIN_STRUCT(ULED2);
+gpio_pin _uled3 = GPIO_PIN_STRUCT(ULED3);
+gpio_pin _uled4 = GPIO_PIN_STRUCT(ULED4);
 
 void uled1(int val) {
   GPIO_SetPin(_uled1, val);

@@ -4,9 +4,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "am335x",
     hdrs = [
-        "time.h",
+        "time-am335x.h",
+    ],
+    srcs = [
+        "time-am335x.c",
     ],
     deps = [
         "//lib/time:defs",
+        "//tools/toolchain/am335x",
     ],
 )

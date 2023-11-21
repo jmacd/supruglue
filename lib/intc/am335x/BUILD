@@ -12,5 +12,6 @@ cc_library(
     deps = [
         "//lib/debug",
         "//lib/intc:defs",
+        "//tools/toolchain/am335x",
     ],
 )

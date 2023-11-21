@@ -13,10 +13,10 @@
 extern "C" {
 #endif
 
-#define GPIO_BANK0 ((gpio_bank *)(&__soc->gpio_banks[0]))
-#define GPIO_BANK1 ((gpio_bank *)(&__soc->gpio_banks[1]))
-#define GPIO_BANK2 ((gpio_bank *)(&__soc->gpio_banks[2]))
-#define GPIO_BANK3 ((gpio_bank *)(&__soc->gpio_banks[3]))
+#define GPIO_BANK0 ((gpio_bank *)0)
+#define GPIO_BANK1 ((gpio_bank *)WORDSZ)
+#define GPIO_BANK2 ((gpio_bank *)(2 * WORDSZ))
+#define GPIO_BANK3 ((gpio_bank *)(3 * WORDSZ))
 
 #ifdef __cplusplus
 }

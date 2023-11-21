@@ -10,8 +10,6 @@ extern "C" {
 
 #include "lib/time/time-defs.h"
 
-#define PRU_MHZ 2e8 // @@@
-
 #ifdef __cplusplus
 }
 #endif

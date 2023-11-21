@@ -10,9 +10,7 @@
 extern "C" {
 #endif
 
-#define PRU_MHZ 2e8
-
-uint32_t RawCycleCounter(void);
+extern Clock __clock;
 
 #ifdef __cplusplus
 }

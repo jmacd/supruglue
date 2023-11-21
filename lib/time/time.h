@@ -13,14 +13,16 @@ extern "C" {
 #include "lib/time/time-defs.h"
 
 #if defined(SUPRUGLUE_AM335X)
-#include "lib/time/am335x/time.h"
+#include "lib/time/am335x/time-am335x.h"
 #elif defined(SUPRUGLUE_TEST32)
-#include "lib/time/test32/time.h"
+#include "lib/time/test32/time-test32.h"
 #endif
 
-int Sleep(duration_t d);
+int Sleep(Duration d);
 
-int TimeInit(void);
+int ClockInit(Clock *clock);
+
+void TimeAdd(Clock *clock, Duration dur);
 
 #ifdef __cplusplus
 }
