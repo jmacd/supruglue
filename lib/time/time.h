@@ -20,7 +20,7 @@ extern "C" {
 
 int Sleep(Duration d);
 
-int ClockInit(Clock *clock);
+int ClockInit();
 
 void TimeAdd(Clock *clock, Duration dur);
 

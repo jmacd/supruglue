@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "external/ti-pru-support/include/am335x/pru_iep.h"
-#include "lib/time/time.h"
+#include "lib/time/time-defs.h"
 
 Clock __clock;
 
@@ -22,7 +22,7 @@ void TimeInit(void) {
 // to read EIP_TIMER.
 
 void ReadClock(Clock *clock) {
-  uint32_t ts = CT_EIP.TMR_GLB_CNT.COUNT;
+  uint32_t ts = CT_IEP.TMR_CNT;
   if (ts < __clock.NANOS_bit.LOW) {
     __clock.NANOS_bit.HIGH++;
   }

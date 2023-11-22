@@ -10,6 +10,7 @@ cc_library(
         "time-am335x.c",
     ],
     deps = [
+        "//lib/thread",
         "//lib/time:defs",
         "//tools/toolchain/am335x",
     ],

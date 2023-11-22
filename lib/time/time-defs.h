@@ -29,8 +29,8 @@ struct _Clock {
 };
 
 struct _ScheduleItem {
-  Clock       when;
-  ThreadList *lptr;
+  Clock   when;
+  Thread *tptr;
 };
 
 struct _Schedule {
