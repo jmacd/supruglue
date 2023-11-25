@@ -11,9 +11,6 @@ SUPRUGLUE_DEFINE_LIST(BlockList, Block, list);
 
 const char *const overflowMessage = "** OVERFLOW **: dropped %u records";
 
-// The ThreadID that shows for the overflow message
-#define OVERFLOW_THREAD_ID 0xd
-
 void JournalInit(Journal *jl) {
   memset(jl, 0, sizeof(*jl));
   LockInit(&jl->lock);

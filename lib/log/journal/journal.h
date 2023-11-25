@@ -13,6 +13,9 @@
 extern "C" {
 #endif
 
+// The ThreadID that shows for the overflow message
+#define OVERFLOW_THREAD_ID 0xd
+
 extern const char *const overflowMessage;
 
 typedef struct _Journal Journal;

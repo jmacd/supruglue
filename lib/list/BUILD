@@ -5,6 +5,10 @@ cc_library(
     name = "list",
     hdrs = [
         "list.h",
+        "generic.h",
+    ],
+    srcs = [
+        "generic.c",
     ],
 )
 

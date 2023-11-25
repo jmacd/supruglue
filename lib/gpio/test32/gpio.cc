@@ -5,7 +5,12 @@
 
 #include "gpio.h"
 
-void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v) {
+static uint32_t __gpio_banks[4];
+
+void GPIO_SetRegister(gpio_bank *as_int, int r, uint32_t v) {
+  intptr_t   num = ((intptr_t)as_int) - 1;
+  gpio_bank *g = &__gpio_banks[num];
+
   switch (r) {
   case GPIOREG_CLEARDATAOUT:
     *g &= ~v;
@@ -24,7 +29,10 @@ void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v) {
   }
 }
 
-uint32_t GPIO_GetRegister(gpio_bank *g, int r) {
+uint32_t GPIO_GetRegister(gpio_bank *as_int, int r) {
+  intptr_t   num = ((intptr_t)as_int) - 1;
+  gpio_bank *g = &__gpio_banks[num];
+
   switch (r) {
   case GPIOREG_DATAOUT:
     return *g;

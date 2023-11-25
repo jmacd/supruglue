@@ -12,14 +12,6 @@
 extern "C" {
 #endif
 
-struct soc_test32 {
-  int32_t gpio_banks[GPIO_NUM_REGISTERS];
-};
-
-typedef struct soc_test32 soc_test32;
-
-extern soc_test32 *__soc;
-
 #ifdef __cplusplus
 }
 #endif

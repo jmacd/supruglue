@@ -23,7 +23,7 @@ void InitProcess(ThreadID thid, Args args) {
       // TODO: otherwise, not clear what kind of fallback reporting
       // can be done when a permanent error (PRU_RPMSG_INVALID_HEAD)
       // is returned.  Try again!
-      flash(4);
+      // flash(4);
       Yield();
     }
     Yield();
