@@ -18,19 +18,11 @@ extern "C" {
 #include "lib/time/test32/time-test32.h"
 #endif
 
-int Sleep(Duration d);
+void Sleep(uint32_t nanos);
 
 int ClockInit();
 
-void TimeAdd(Clock *clock, Duration dur);
-
-#define DURATION(nanos)                                                                                                \
-  ({                                                                                                                   \
-    Duration d = {                                                                                                     \
-        .NANOS = (nanos),                                                                                              \
-    };                                                                                                                 \
-    d;                                                                                                                 \
-  })
+void TimeAdd(Timestamp *clock, uint32_t nanos);
 
 #ifdef __cplusplus
 }

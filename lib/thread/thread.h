@@ -49,6 +49,7 @@ struct _Thread {
   const char *name;
   int32_t     stack_size;
   ThreadState state;
+  Timestamp   when;
 
   union {
     jmp_buf run_jump;

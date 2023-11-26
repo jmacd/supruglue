@@ -6,7 +6,7 @@
 #include "external/ti-pru-support/include/am335x/pru_iep.h"
 #include "lib/time/time-defs.h"
 
-Clock __clock;
+Timestamp __clock;
 
 void TimeInit(void) {
   __clock.NANOS_bit.HIGH = 0;
@@ -21,7 +21,7 @@ void TimeInit(void) {
 // Device-Specific PRU Read Latency Values Appendix A.1 says 12 cycles
 // to read EIP_TIMER.
 
-void ReadClock(Clock *clock) {
+void ReadClock(Timestamp *clock) {
   uint32_t ts = CT_IEP.TMR_CNT;
   if (ts < __clock.NANOS_bit.LOW) {
     __clock.NANOS_bit.HIGH++;

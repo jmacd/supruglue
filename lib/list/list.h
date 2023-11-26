@@ -54,8 +54,6 @@ extern "C" {
                                                                                                                        \
   static inline ETYPE *LTYPE##Back(LTYPE *list) { return (ETYPE *)AnyListBack(LTYPE##_AL(list), LTYPE##_LO()); }       \
                                                                                                                        \
-  static inline int LTYPE##End(LTYPE *list, ETYPE *item) { return AnyListEnd(LTYPE##_AL(list), item, LTYPE##_LO()); }  \
-                                                                                                                       \
   static inline void LTYPE##Remove(ETYPE *item) { AnyListRemove(item, LTYPE##_LO()); }                                 \
                                                                                                                        \
   static inline ETYPE *LTYPE##PopFront(LTYPE *list) {                                                                  \

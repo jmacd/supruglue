@@ -21,7 +21,6 @@ struct _AnyList {
 void     AnyListInit(AnyList *l);
 AnyList *AnyListAtOffset(void *item, ptrdiff_t offset);
 int      AnyListEmpty(AnyList *list);
-int      AnyListEnd(AnyList *list, void *item, ptrdiff_t offset);
 void     AnyListAdd(AnyList *prev, AnyList *next, AnyList *ins);
 void     AnyListDelete(AnyList *next, AnyList *prev);
 void     AnyListPushBack(AnyList *list, void *item, ptrdiff_t offset);

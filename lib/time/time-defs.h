@@ -11,39 +11,10 @@
 extern "C" {
 #endif
 
-typedef struct _Clock Clock;
-typedef struct _Clock Duration;
-
-typedef struct _Schedule     Schedule;
-typedef struct _ScheduleItem ScheduleItem;
-
-struct _Clock {
-  union {
-    volatile uint64_t NANOS;
-
-    volatile struct {
-      unsigned HIGH : 32;
-      unsigned LOW : 32;
-    } NANOS_bit;
-  };
-};
-
-struct _ScheduleItem {
-  Clock   when;
-  Thread *tptr;
-};
-
-struct _Schedule {
-  int32_t      size;
-  ScheduleItem queue[0];
-};
-
-#define SUPRUGLUE_DEFINE_SCHEDULE(name, size) SUPRUGLUE_DEFINE_SIZED(name, Schedule, pending, ScheduleItem, size)
-
 // Called by ClockInit().
 void TimeInit(void);
 
-void ReadClock(Clock *clock);
+void ReadClock(Timestamp *ts);
 
 #ifdef __cplusplus
 }

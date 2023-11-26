@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-extern Clock __clock;
+extern Timestamp __clock;
 
 #ifdef __cplusplus
 }

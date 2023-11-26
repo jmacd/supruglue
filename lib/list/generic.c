@@ -41,10 +41,6 @@ void *AnyListPrev(void *item, ptrdiff_t offset) {
   return AnyListBack(AnyListAtOffset(item, offset), offset);
 }
 
-int AnyListEnd(AnyList *list, void *item, ptrdiff_t offset) {
-  return list == AnyListAtOffset(item, offset);
-}
-
 void AnyListPushBack(AnyList *list, void *item, ptrdiff_t offset) {
   AnyListAdd(list->prev, list, AnyListAtOffset(item, offset));
 }

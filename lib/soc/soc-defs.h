@@ -40,6 +40,20 @@ void SystemOnChipTeardown(void);
 // maps into e.g., dynamic __delay_cycles
 void SystemOnChipDelay(int32_t cycles);
 
+// Timestamp is out of place. Where should it go?
+typedef struct _Timestamp Timestamp;
+
+struct _Timestamp {
+  union {
+    volatile uint64_t NANOS;
+
+    volatile struct {
+      unsigned HIGH : 32;
+      unsigned LOW : 32;
+    } NANOS_bit;
+  };
+};
+
 #ifdef __cplusplus
 }
 #endif
