@@ -19,6 +19,7 @@ cc_binary(
         "//lib/log/daemon",
         "//lib/rpmsg",
         "//lib/time/clock",
+        "//lib/ui1203",
         "//tools/toolchain/am335x",
     ],
 )
