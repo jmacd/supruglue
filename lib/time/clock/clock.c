@@ -7,6 +7,9 @@
 
 SUPRUGLUE_DEFINE_THREAD(clockproc, 256);
 
+// Note: I tested an implementation based on a heap, was about 500
+// bytes larger.
+
 ThreadList __asleep;
 
 void Sleep(uint32_t d) {

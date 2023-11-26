@@ -72,16 +72,3 @@ void clockProcess(ThreadID thid, Args args) {
     Yield();
   }
 }
-
-// ClockInit enables a handler to maintain the clock.
-int ClockInit(void) {
-  TimeInit();
-
-  Args args;
-  args.ptr = "";
-  return Create(&clockproc.thread, clockProcess, args, "clock", sizeof(clockproc.space));
-}
-
-void TimeAdd(Clock *clock, Duration dur) {
-  clock->NANOS += dur.NANOS;
-}
