@@ -24,6 +24,14 @@ int ClockInit();
 
 void TimeAdd(Clock *clock, Duration dur);
 
+#define DURATION(nanos)                                                                                                \
+  ({                                                                                                                   \
+    Duration d = {                                                                                                     \
+        .NANOS = (nanos),                                                                                              \
+    };                                                                                                                 \
+    d;                                                                                                                 \
+  })
+
 #ifdef __cplusplus
 }
 #endif
