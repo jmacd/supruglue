@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "external/ti-pru-support/include/am335x/pru_iep.h"
-#include "lib/time/time-defs.h"
+#include "lib/time/clock/clock-defs.h"
 
 Timestamp __clock;
 

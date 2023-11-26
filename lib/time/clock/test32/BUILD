@@ -4,22 +4,22 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test32",
     srcs = [
-        "time-test32.cc",
+        "clock-test32.cc",
     ],
     hdrs = [
-        "time-test32.h",
+        "clock-test32.h",
     ],
     deps = [
         "//lib/thread",
-        "//lib/time:defs",
+        "//lib/time/clock:defs",
     ],
 )
 
 cc_test(
-    name = "time_test",
-    srcs = ["time_test.cc"],
+    name = "clock_test",
+    srcs = ["clock_test.cc"],
     deps = [
-        "//lib/time",
+        "//lib/time/clock",
         "@com_google_googletest//:gtest_main",
     ],
 )

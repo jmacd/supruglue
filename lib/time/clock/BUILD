@@ -4,7 +4,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "defs",
     hdrs = [
-        "time-defs.h",
+        "clock-defs.h",
     ],
     deps = [
         "//lib/soc",
@@ -12,18 +12,18 @@ cc_library(
 )
 
 cc_library(
-    name = "time",
+    name = "clock",
     srcs = [
-        "time.c",
+        "clock.c",
     ],
     hdrs = [
-        "time.h",
+        "clock.h",
     ],
     deps = [
         ":defs",
         "//lib/coroutine",
     ] + select({
-        "//tools/toolchain:am335x": ["//lib/time/am335x"],
-        "//conditions:default": ["//lib/time/test32"],
+        "//tools/toolchain:am335x": ["//lib/time/clock/am335x"],
+        "//conditions:default": ["//lib/time/clock/test32"],
     }),
 )

@@ -12,7 +12,7 @@
 #include "lib/log/daemon/daemon.h"
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
-#include "lib/time/time.h"
+#include "lib/time/clock/clock.h"
 
 #define NUM_RESOURCES 1
 

@@ -1,7 +1,7 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "lib/time/time.h"
+#include "lib/time/clock/clock.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/thread/thread.h"
 

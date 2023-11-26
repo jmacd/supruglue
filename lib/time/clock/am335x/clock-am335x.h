@@ -4,7 +4,7 @@
 #ifndef LIB_TIME_AM335X_TIME_H
 #define LIB_TIME_AM335X_TIME_H
 
-#include "lib/time/time-defs.h"
+#include "lib/time/clock/clock-defs.h"
 
 #ifdef __cplusplus
 extern "C" {
