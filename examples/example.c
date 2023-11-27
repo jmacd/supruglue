@@ -96,11 +96,13 @@ void toggle_blue(ThreadID tid, Args args) {
 
   while (1) {
     GPIO_SetPin(pin, 1);
-    Sleep(1000000000);
+    // Sleep(1000000000);
+    __delay_cycles(1000000000);
     Yield();
 
     GPIO_SetPin(pin, 0);
-    Sleep(100000000);
+    // Sleep(100000000);
+    __delay_cycles(1000000000);
     Yield();
   }
 }
@@ -110,11 +112,14 @@ void toggle_yellow(ThreadID tid, Args args) {
 
   while (1) {
     GPIO_SetPin(pin, 1);
-    Sleep(200000000);
+    // Sleep(200000000);
+    __delay_cycles(1000000000);
+
     Yield();
 
     GPIO_SetPin(pin, 0);
-    Sleep(200000000);
+    // Sleep(200000000);
+    __delay_cycles(1000000000);
     Yield();
   }
 }

@@ -20,7 +20,7 @@ extern "C" {
 
 void Sleep(uint32_t nanos);
 
-int ClockInit();
+int ClockInit(void);
 
 void TimeAdd(Timestamp *clock, uint32_t nanos);
 
