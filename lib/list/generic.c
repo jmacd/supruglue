@@ -9,6 +9,10 @@ void AnyListInit(AnyList *l) {
 }
 
 void AnyListDelete(AnyList *next, AnyList *prev) {
+  // @@@ TODO the following
+  next->prev->next = NULL;
+  next->prev->prev = NULL;
+
   next->prev = prev;
   prev->next = next;
 }

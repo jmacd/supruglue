@@ -1,6 +1,7 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+#include "absl/log/log.h"
 #include "absl/strings/str_format.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/log/daemon/daemon.h"
@@ -15,8 +16,10 @@
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
+    LOG(INFO) << "HERE";
     PRULOG_2U(INFO, "write %u", i, 0); // Logs always yield
     Sleep(1000000000);
+    LOG(INFO) << "NOTHERE";
   }
 }
 
@@ -41,34 +44,24 @@ TEST(ClockTest, SleepWake) {
   }
 
   int howmany = 0;
-  int overflowed = 0;
-  int overflows = 0;
 
-  std::thread client([tt, &res, &howmany, &overflows, &overflowed] {
-    // read until we receive the correct number, counting skips
+  std::thread client([tt, &res, &howmany] {
+    // read until we receive the correct number, w/o overflow
     for (int got = 0; got < 200;) {
       Entry    entry;
       uint16_t blen = sizeof(entry);
       EXPECT_EQ(0, HostRecv(tt, &entry, &blen));
       EXPECT_EQ(blen, sizeof(entry));
       howmany++;
-      if (entry.msg == overflowMessage) {
-        overflows++;
-        overflowed += entry.arg1;
-        got += entry.arg1;
-      } else {
-        res.insert(Format(&entry));
-        got += 1;
-      }
+      EXPECT_NE(overflowMessage, entry.msg);
+      res.insert(Format(&entry));
+      got += 1;
     }
   });
 
   EXPECT_EQ(0, ::Run());
 
   client.join();
-
-  // The number of overflows and overflowed counts are logical.
-  EXPECT_EQ(overflowed + howmany - 200, overflows);
 
   // Make sure the logs we received were all expected
   for (auto arg : res) {

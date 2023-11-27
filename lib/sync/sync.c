@@ -4,7 +4,6 @@
 #include "sync.h"
 
 void LockInit(LockWord *word) {
-  // word->value = 0;
   ThreadListInit(&word->waiters);
 }
 
