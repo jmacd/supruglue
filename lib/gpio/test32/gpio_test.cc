@@ -13,7 +13,7 @@ protected:
   }
 
   void TearDown() override {
-    SystemOnChipTeardown();
+    SystemOnChipShutdown();
   }
 };
 

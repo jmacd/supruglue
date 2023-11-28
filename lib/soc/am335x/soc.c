@@ -10,6 +10,3 @@ void SystemOnChipSetup(void) {
   // Allow OCP master port access by the PRU.
   CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 }
-
-void SystemOnChipTeardown(void) {
-}

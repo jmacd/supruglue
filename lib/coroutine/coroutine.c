@@ -22,6 +22,7 @@ int Init(SystemConfig cfg) {
   System *sys = &__system;
   memset(sys, 0, sizeof(*sys));
   sys->cfg = cfg;
+  SystemOnChipSetup();
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
   ControllerInit(&__controller);
@@ -40,7 +41,7 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
 }
 
 int __run(void) {
-  while (!ThreadListEmpty(&__system_runnable)) {
+  while (!SystemOnChipIsShutdown() && !ThreadListEmpty(&__system_runnable)) {
     ServiceInterrupts(&__controller);
 
     Thread *volatile run = ThreadListPopFront(&__system_runnable);

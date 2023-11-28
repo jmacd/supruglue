@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+void SystemOnChipShutdown(void);
+
 #ifdef __cplusplus
 }
 #endif

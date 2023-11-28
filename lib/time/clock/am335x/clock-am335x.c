@@ -13,8 +13,8 @@ void TimeInit(void) {
   __clock.NANOS_bit.LOW = 0;
 
   // The hardware reset state is for DEFAULT_INC is 5, which makes the
-  // EIP counter on this device a nanosecond counter, i.e., (1000 / PRU_MHZ).
-  // CT_EIP.TMR_GLB_CFG_bit.DEFAULT_INC = 5;
+  // IEP counter on this device a nanosecond counter, i.e., (1000 / PRU_MHZ).
+  // CT_IEP.TMR_GLB_CFG_bit.DEFAULT_INC = 5;
   CT_IEP.TMR_GLB_CFG_bit.CNT_EN = 1;
 }
 

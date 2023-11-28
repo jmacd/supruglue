@@ -14,6 +14,10 @@ extern "C" {
 // Defined in delay.s.
 extern void SystemOnChipDelay(int cycles);
 
+inline int SystemOnChipIsShutdown(void) {
+  return 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

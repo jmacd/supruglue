@@ -20,11 +20,8 @@ void Sleep(uint32_t d) {
   ReadClock(&self->when);
   TimeAdd(&self->when, d);
 
-  printf("go to sleep %qd\n", self->when.NANOS);
   ThreadListPushBack(&__asleep, self);
-
   YieldBlocked();
-  printf("wakeup\n");
 }
 
 void clockProcess(ThreadID thid, Args args) {
@@ -33,29 +30,19 @@ void clockProcess(ThreadID thid, Args args) {
     ReadClock(&clk);
 
     ThreadList *p = __asleep.next;
-    int         c = 0;
-    while (p != &__asleep) {
-      p = p->next;
-      c++;
-    }
-
-    printf("checksleep run: %d %p\n", c, &__asleep);
-
-    p = __asleep.next;
     while (p != &__asleep) {
       Thread *th = ThreadListEntry(p);
 
-      printf("with %qd >= %qd (%d)\n", clk.NANOS, th->when.NANOS, clk.NANOS > th->when.NANOS);
-      if (clk.NANOS >= th->when.NANOS) {
-        ThreadListDelete(p->next, p->prev);
+      int runnable = clk.NANOS >= th->when.NANOS;
+      if (runnable) {
+        ThreadListRemove(th);
+      }
+      p = p->next;
+      if (runnable) {
         ThreadListPushBack(&__system_runnable, th);
       }
-      printf("n/p %p %p\n", p->next, p->prev);
-      printf("th %p\n", &th->list);
-      p = p->next;
     }
 
-    printf("checksleep yield\n");
     Yield();
   }
 }

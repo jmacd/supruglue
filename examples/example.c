@@ -84,47 +84,32 @@ struct my_resource_table resourceTable = {
     },
 };
 
-void test_write_func(ThreadID tid, Args args) {
-  int32_t i = 0;
-  for (;; i++) {
-    PRULOG_2U(INFO, "write %u", i, 0); // Logs always yield
-  }
-}
+#define BLUE_PERIOD 400000000
+#define YELLOW_PERIOD 200000000
 
 void toggle_blue(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(P9_25);
-
+  gpio_pin pin = GPIO_PIN(P9_23);
+  PRULOG_2U(INFO, "starting blue %uns", BLUE_PERIOD, 0);
   while (1) {
     GPIO_SetPin(pin, 1);
-    // Sleep(1000000000);
-    __delay_cycles(1000000000);
-    Yield();
-
+    Sleep(BLUE_PERIOD);
     GPIO_SetPin(pin, 0);
-    // Sleep(100000000);
-    __delay_cycles(1000000000);
-    Yield();
+    Sleep(BLUE_PERIOD);
   }
 }
 
 void toggle_yellow(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(P9_23);
-
+  gpio_pin pin = GPIO_PIN(P9_25);
+  PRULOG_2U(INFO, "starting yellow %uns", YELLOW_PERIOD, 0);
   while (1) {
     GPIO_SetPin(pin, 1);
-    // Sleep(200000000);
-    __delay_cycles(1000000000);
-
-    Yield();
+    Sleep(YELLOW_PERIOD);
 
     GPIO_SetPin(pin, 0);
-    // Sleep(200000000);
-    __delay_cycles(1000000000);
-    Yield();
+    Sleep(YELLOW_PERIOD);
   }
 }
 
-SUPRUGLUE_DEFINE_THREAD(writer, 256);
 SUPRUGLUE_DEFINE_THREAD(syslog, 256);
 SUPRUGLUE_DEFINE_THREAD(init, 256);
 SUPRUGLUE_DEFINE_THREAD(blue, 256);
@@ -135,8 +120,6 @@ int main(void) {
   Args args1;
   Args args2;
   int  err = 0;
-
-  SystemOnChipSetup();
 
   Init(NewSystemConfig());
 
@@ -153,7 +136,6 @@ int main(void) {
 
   err = Create(&init.thread, InitProcess, args1, "init", sizeof(init.space));
   err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
-  err = Create(&writer.thread, test_write_func, args1, "writer", sizeof(writer.space));
 
   err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
   err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));

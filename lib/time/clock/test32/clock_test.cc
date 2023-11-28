@@ -16,10 +16,8 @@
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
-    LOG(INFO) << "HERE";
-    PRULOG_2U(INFO, "write %u", i, 0); // Logs always yield
-    Sleep(1000000000);
-    LOG(INFO) << "NOTHERE";
+    PRULOG_2U(INFO_BLOCK, "write %u", i, 0); // Logs always yield
+    Sleep(10);
   }
 }
 
@@ -30,6 +28,8 @@ TEST(ClockTest, SleepWake) {
   auto tt = NewTestTransport();
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
+
+  EXPECT_EQ(0, SystemOnChipIsShutdown());
 
   ClockInit();
 
@@ -47,7 +47,7 @@ TEST(ClockTest, SleepWake) {
 
   std::thread client([tt, &res, &howmany] {
     // read until we receive the correct number, w/o overflow
-    for (int got = 0; got < 200;) {
+    for (int got = 0; got < 100;) {
       Entry    entry;
       uint16_t blen = sizeof(entry);
       EXPECT_EQ(0, HostRecv(tt, &entry, &blen));
@@ -57,6 +57,7 @@ TEST(ClockTest, SleepWake) {
       res.insert(Format(&entry));
       got += 1;
     }
+    SystemOnChipShutdown();
   });
 
   EXPECT_EQ(0, ::Run());
