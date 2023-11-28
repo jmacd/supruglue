@@ -30,7 +30,7 @@ void SyslogProcess(ThreadID thid, Args args) {
 
       // TODO: otherwise, not clear what kind of fallback reporting
       // can be done when a permanent error is returned.
-      flash(4);
+      // flash(4);
       Yield();
     }
 

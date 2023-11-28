@@ -1,3 +1,4 @@
+
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
@@ -37,10 +38,10 @@ void ServiceInterrupts(InterruptController *controller) {
     CT_INTC.SECR0 |= (1 << SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
   } else {
 
-    if (CT_INTC.HIPIR0 & (1 << 31)) {
-      // @@@???
-    } else {
-    }
+    // if (CT_INTC.HIPIR0 & (1 << 31)) {
+    //   // @@@???
+    // } else {
+    // }
   }
 
   // Unblock all and prioritize to run immediately.

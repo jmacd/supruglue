@@ -8,9 +8,7 @@
 extern "C" {
 #endif
 
-#include "lib/time/time-defs.h"
-
-#define PRU_MHZ 2e8 // @@@
+#include "lib/time/clock/clock-defs.h"
 
 #ifdef __cplusplus
 }

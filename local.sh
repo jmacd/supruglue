@@ -6,7 +6,7 @@ SUPRUCTL=bazel-bin/tools/cmd/supructl/supructl_/supructl
 
 BONE=${BONE:-beaglebone.local}
 
-bazel build --config=clpru //examples:example_pru0 || exit 1
+bazel build --config=pru0 //examples:example_pru0 || exit 1
 bazel build --config=arm //tools/cmd/supructl || exit 1
 
 echo "Copying"

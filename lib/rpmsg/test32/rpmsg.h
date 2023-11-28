@@ -19,6 +19,7 @@ extern "C" {
 #include "lib/rpmsg/rpmsg-defs.h"
 
 #define PRU_RPMSG_NO_BUF_AVAILABLE -7
+#define PRU_RPMSG_NO_PEER_ADDR -8
 
 typedef struct _TestTransport TestTransport;
 

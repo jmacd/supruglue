@@ -39,8 +39,12 @@ func New(fw *firmware.Firmware) (*Host, error) {
 	}, nil
 }
 
+const logEntrySize = 24
+
 func (host *Host) Run() error {
-	buf := make([]byte, 16)
+	buf := make([]byte, logEntrySize)
+
+	// TODO: clock correction, or similar
 
 	for {
 		dat, err := host.rpm.Read(buf)
@@ -49,31 +53,35 @@ func (host *Host) Run() error {
 			continue
 		}
 		// Interpret 4 32-bit words
-		if len(dat) != 16 {
-			log.Print(fmt.Errorf("data should be 16 bytes", len(dat)))
+		if len(dat) != cap(buf) {
+			log.Print(fmt.Errorf("data should be %d bytes, was %d", logEntrySize, len(dat)))
 			continue
 		}
 		u0 := binary.LittleEndian.Uint32(dat[0:4])
 		u1 := binary.LittleEndian.Uint32(dat[4:8])
 		u2 := binary.LittleEndian.Uint32(dat[8:12])
 		u3 := binary.LittleEndian.Uint32(dat[12:16])
+		u4 := binary.LittleEndian.Uint32(dat[16:20])
+		u5 := binary.LittleEndian.Uint32(dat[20:24])
 
-		msg, err := host.fw.ELF.CStringAt(uint64(u1))
+		msg, err := host.fw.ELF.CStringAt(uint64(u3))
 		if err != nil || msg == "" {
-			msg = fmt.Sprintf("<unknown msg 0x%x>", u1)
+			msg = fmt.Sprintf("<unknown msg 0x%x>", u3)
 		} else {
 			// TODO Should let %d coerce uint->int
 			msg = strings.Replace(msg, "%u", "%d", -1)
-			print := fmt.Sprintf(msg, u2, u3)
+			print := fmt.Sprintf(msg, u4, u5)
 			if strings.Contains(print, "%!(EXTRA") {
-				print = fmt.Sprintf(msg, u2)
+				print = fmt.Sprintf(msg, u4)
 			}
 			if !strings.Contains(print, "%!(EXTRA") {
 				msg = print
 			}
 		}
+		elapsed := time.Duration(uint64(u2)<<32 | uint64(u1))
+		ts := elapsed.String()
 
-		log.Printf("[%05x] %s\n", u0, msg)
+		fmt.Printf("%s [%05x] %s\n", ts, u0, msg)
 	}
 }
 

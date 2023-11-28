@@ -4,15 +4,13 @@
 #ifndef LIB_TIME_AM335X_TIME_H
 #define LIB_TIME_AM335X_TIME_H
 
-#include "lib/time/time-defs.h"
+#include "lib/time/clock/clock-defs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define PRU_MHZ 2e8
-
-uint32_t RawCycleCounter(void);
+extern Timestamp __clock;
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@ typedef struct _InterruptController InterruptController;
 
 extern InterruptController __controller;
 
-void InitController(InterruptController *controller);
+void ControllerInit(InterruptController *controller);
 
 void ServiceInterrupts(InterruptController *controller);
 

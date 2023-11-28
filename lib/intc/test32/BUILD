@@ -4,7 +4,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test32",
     srcs = [
-        # "intc.cc",
+        "intc.cc",
     ],
     hdrs = [
         "intc.h",

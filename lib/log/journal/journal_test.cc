@@ -26,7 +26,7 @@ void testRead(Journal *jl, int32_t i) {
 void testReadOverflow(Journal *jl, int32_t i) {
   Entry entry;
   EXPECT_EQ(0, JournalRead(jl, &entry, JR_NONE));
-  EXPECT_EQ(0, entry.tid);
+  EXPECT_EQ(OVERFLOW_THREAD_ID, entry.tid);
   EXPECT_STREQ(overflowMessage, entry.msg);
   EXPECT_EQ(i, entry.arg1);
   EXPECT_EQ(0, entry.arg2);

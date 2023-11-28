@@ -61,16 +61,15 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   }
 
   // The system events and port are core-specific.
-  // if (PRU_CORE_NUMBER() == 0) {
-  // @@@ This is wrong!!!
+#if SUPRUGLUE_PRU_NUM == 0
   transport->channel_port = RPMSG_CHANNEL_PORT_0;
   transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
   transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
-  // } else {
-  //   transport->channel_port = RPMSG_CHANNEL_PORT_1;
-  //   transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
-  //   transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
-  // }
+#else
+  transport->channel_port = RPMSG_CHANNEL_PORT_1;
+  transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
+  transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
+#endif
 
   int ret;
   ret = pru_rpmsg_init(&transport->channel, vring0, vring1, transport->sysevt_pru_to_arm, transport->sysevt_arm_to_pru);

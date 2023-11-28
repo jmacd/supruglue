@@ -13,6 +13,9 @@
 extern "C" {
 #endif
 
+// The ThreadID that shows for the overflow message
+#define OVERFLOW_THREAD_ID 0xd
+
 extern const char *const overflowMessage;
 
 typedef struct _Journal Journal;
@@ -32,17 +35,19 @@ enum _JournalReadFlags {
 enum _JournalWriteFlags {
   JW_NONE = 0,
   JW_YIELD = 0x1,
+  JW_INFO_BLOCK = 0x10,         // INFO will Block
   JW_INFO = 0x10 | JW_YIELD,    // INFO will Yield
+  JW_WARNING_BLOCK = 0x20,      // WARNING will Block
   JW_WARNING = 0x20 | JW_YIELD, // WARNING will Yield
-  JW_FATAL = 0x40,              // FATAL will not Yield
+  JW_FATAL = 0x40,              // FATAL will Block
 };
 
 typedef enum _JournalReadFlags  JournalReadFlags;
 typedef enum _JournalWriteFlags JournalWriteFlags;
 
 struct _Entry {
-  // TODO: timestamp
   ThreadID    tid;
+  Timestamp   time;
   const char *msg;
   int32_t     arg1;
   int32_t     arg2;

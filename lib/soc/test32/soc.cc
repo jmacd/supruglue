@@ -2,18 +2,25 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/soc/test32/soc.h"
+#include "absl/synchronization/mutex.h"
 
-soc_test32 *__soc;
+absl::Mutex __system_lock;
+int         __system_enabled;
 
 void SystemOnChipSetup() {
-  __soc = (soc_test32 *)calloc(1, sizeof(soc_test32));
-}
-
-void SystemOnChipTeardown() {
-  free(__soc);
-  __soc = NULL;
+  absl::MutexLock lock(&__system_lock);
+  __system_enabled = 1;
 }
 
 void SystemOnChipDelay(int32_t cycles) {
-  // TODO noop?
+}
+
+int SystemOnChipIsShutdown(void) {
+  absl::MutexLock lock(&__system_lock);
+  return !__system_enabled;
+}
+
+void SystemOnChipShutdown(void) {
+  absl::MutexLock lock(&__system_lock);
+  __system_enabled = 0;
 }
