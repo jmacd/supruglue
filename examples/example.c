@@ -84,8 +84,8 @@ struct my_resource_table resourceTable = {
     },
 };
 
-#define BLUE_PERIOD 400000000
-#define YELLOW_PERIOD 200000000
+#define BLUE_PERIOD 4000000000
+#define YELLOW_PERIOD 2000000000
 
 void toggle_blue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_23);

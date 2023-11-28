@@ -19,7 +19,7 @@ void TimeInit(void) {
 }
 
 // Device-Specific PRU Read Latency Values Appendix A.1 says 12 cycles
-// to read EIP_TIMER.
+// to read IEP_TIMER.
 
 void ReadClock(Timestamp *clock) {
   uint32_t ts = CT_IEP.TMR_CNT;
