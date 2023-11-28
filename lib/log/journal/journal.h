@@ -46,8 +46,8 @@ typedef enum _JournalReadFlags  JournalReadFlags;
 typedef enum _JournalWriteFlags JournalWriteFlags;
 
 struct _Entry {
-  // TODO: timestamp
   ThreadID    tid;
+  Timestamp   time;
   const char *msg;
   int32_t     arg1;
   int32_t     arg2;

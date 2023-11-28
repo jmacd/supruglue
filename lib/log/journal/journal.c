@@ -4,6 +4,7 @@
 #include "lib/log/journal/journal.h"
 #include "lib/debug/debug.h"
 #include "lib/sync/sync.h"
+#include "lib/time/clock/clock.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -95,6 +96,7 @@ void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int3
   entry->msg = msg;
   entry->arg1 = arg1;
   entry->arg2 = arg2;
+  ReadClock(&entry->time);
 
   SemaUp(&jl->lock);
 

@@ -21,9 +21,22 @@ cc_library(
     ],
     deps = [
         ":defs",
-        "//lib/coroutine",
     ] + select({
         "//tools/toolchain:am335x": ["//lib/time/clock/am335x"],
         "//conditions:default": ["//lib/time/clock/test32"],
     }),
+)
+
+cc_library(
+    name = "process",
+    srcs = [
+        "process.c",
+    ],
+    hdrs = [
+        "process.h",
+    ],
+    deps = [
+        ":clock",
+        "//lib/coroutine",
+    ],
 )

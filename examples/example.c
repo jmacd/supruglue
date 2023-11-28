@@ -13,6 +13,7 @@
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/time/clock/clock.h"
+#include "lib/time/clock/process.h"
 
 #define NUM_RESOURCES 1
 
@@ -84,15 +85,20 @@ struct my_resource_table resourceTable = {
     },
 };
 
-#define BLUE_PERIOD 4000000000
-#define YELLOW_PERIOD 2000000000
+#define BLUE_PERIOD 2000000000U
+#define YELLOW_PERIOD 1000000000U
 
 void toggle_blue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_23);
-  PRULOG_2U(INFO, "starting blue %uns", BLUE_PERIOD, 0);
+  PRULOG_2U(INFO, "starting blue half-cycle %uns", BLUE_PERIOD, 0);
   while (1) {
+    PRULOG_2U(INFO, "blue on", 0, 0);
+
     GPIO_SetPin(pin, 1);
     Sleep(BLUE_PERIOD);
+
+    PRULOG_2U(INFO, "blue off", 0, 0);
+
     GPIO_SetPin(pin, 0);
     Sleep(BLUE_PERIOD);
   }
@@ -100,11 +106,14 @@ void toggle_blue(ThreadID tid, Args args) {
 
 void toggle_yellow(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_25);
-  PRULOG_2U(INFO, "starting yellow %uns", YELLOW_PERIOD, 0);
+  PRULOG_2U(INFO, "starting yellow half-cycle %uns", YELLOW_PERIOD, 0);
   while (1) {
+    PRULOG_2U(INFO, "yellow on", 0, 0);
+
     GPIO_SetPin(pin, 1);
     Sleep(YELLOW_PERIOD);
 
+    PRULOG_2U(INFO, "yellow off", 0, 0);
     GPIO_SetPin(pin, 0);
     Sleep(YELLOW_PERIOD);
   }

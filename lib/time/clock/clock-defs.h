@@ -14,7 +14,11 @@ extern "C" {
 // Called by ClockInit().
 void TimeInit(void);
 
+// Read the clock.
 void ReadClock(Timestamp *ts);
+
+// Sleepers, used by clock process.
+extern ThreadList __asleep;
 
 #ifdef __cplusplus
 }
