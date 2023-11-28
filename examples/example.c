@@ -140,7 +140,7 @@ int main(void) {
 
   Init(NewSystemConfig());
 
-  ClockInit(&__clock);
+  ClockInit();
 
   err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
   if (err != 0) {

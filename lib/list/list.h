@@ -4,7 +4,6 @@
 #ifndef LIB_LIST_LIST_H
 #define LIB_LIST_LIST_H
 
-#include "generic.h"
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -26,51 +25,75 @@ extern "C" {
   struct _##LTYPE {                                                                                                    \
     LTYPE *next;                                                                                                       \
     LTYPE *prev;                                                                                                       \
-  }
+  };                                                                                                                   \
+                                                                                                                       \
+  size_t LTYPE##Length(LTYPE *l);
 
 #define SUPRUGLUE_DEFINE_LIST_INLINE(LTYPE, ETYPE, LNAME)                                                              \
                                                                                                                        \
-  static inline AnyList *LTYPE##_AL(LTYPE *list) { return (AnyList *)list; }                                           \
-                                                                                                                       \
-  static inline ptrdiff_t LTYPE##_LO() { return (ptrdiff_t) & ((ETYPE *)0)->LNAME; }                                   \
-                                                                                                                       \
-  static inline void LTYPE##Init(LTYPE *list) { AnyListInit(LTYPE##_AL(list)); }                                       \
-                                                                                                                       \
-  static inline void LTYPE##Delete(LTYPE *next, LTYPE *prev) { AnyListDelete(LTYPE##_AL(next), LTYPE##_AL(prev)); }    \
-                                                                                                                       \
-  static inline void LTYPE##Add(LTYPE *prev, LTYPE *next, LTYPE *insert) {                                             \
-    AnyListAdd(LTYPE##_AL(prev), LTYPE##_AL(next), LTYPE##_AL(insert));                                                \
+  static inline void LTYPE##Init(LTYPE *l) {                                                                           \
+    l->next = l;                                                                                                       \
+    l->prev = l;                                                                                                       \
   }                                                                                                                    \
                                                                                                                        \
-  static inline ETYPE *LTYPE##Entry(LTYPE *list) { return (ETYPE *)AnyListEntry(LTYPE##_AL(list), LTYPE##_LO()); }     \
-                                                                                                                       \
-  static inline int LTYPE##Empty(LTYPE *list) { return AnyListEmpty(LTYPE##_AL(list)); }                               \
-                                                                                                                       \
-  static inline ETYPE *LTYPE##Next(ETYPE *item) { return (ETYPE *)AnyListNext(item, LTYPE##_LO()); }                   \
-                                                                                                                       \
-  static inline ETYPE *LTYPE##Prev(ETYPE *item) { return (ETYPE *)AnyListPrev(item, LTYPE##_LO()); }                   \
-                                                                                                                       \
-  static inline ETYPE *LTYPE##Front(LTYPE *list) { return (ETYPE *)AnyListFront(LTYPE##_AL(list), LTYPE##_LO()); }     \
-                                                                                                                       \
-  static inline ETYPE *LTYPE##Back(LTYPE *list) { return (ETYPE *)AnyListBack(LTYPE##_AL(list), LTYPE##_LO()); }       \
-                                                                                                                       \
-  static inline void LTYPE##Remove(ETYPE *item) { AnyListRemove(item, LTYPE##_LO()); }                                 \
-                                                                                                                       \
-  static inline ETYPE *LTYPE##PopFront(LTYPE *list) {                                                                  \
-    return (ETYPE *)AnyListPopFront(LTYPE##_AL(list), LTYPE##_LO());                                                   \
+  static inline void LTYPE##Delete(LTYPE *next, LTYPE *prev) {                                                         \
+    next->prev = prev;                                                                                                 \
+    prev->next = next;                                                                                                 \
   }                                                                                                                    \
                                                                                                                        \
-  static inline ETYPE *LTYPE##PopBack(LTYPE *list) { return (ETYPE *)AnyListPopBack(LTYPE##_AL(list), LTYPE##_LO()); } \
-                                                                                                                       \
-  static inline void LTYPE##PushBack(LTYPE *list, ETYPE *item) {                                                       \
-    AnyListPushBack(LTYPE##_AL(list), item, LTYPE##_LO());                                                             \
+  static inline void LTYPE##Add(LTYPE *prev, LTYPE *next, LTYPE *ins) {                                                \
+    next->prev = ins;                                                                                                  \
+    prev->next = ins;                                                                                                  \
+    ins->next = next;                                                                                                  \
+    ins->prev = prev;                                                                                                  \
   }                                                                                                                    \
                                                                                                                        \
-  static inline void LTYPE##PushFront(LTYPE *list, ETYPE *item) {                                                      \
-    AnyListPushFront(LTYPE##_AL(list), item, LTYPE##_LO());                                                            \
-  }
+  static inline ptrdiff_t LTYPE##LinkOffset() { return (ptrdiff_t) & ((ETYPE *)0)->LNAME; }                            \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##Entry(LTYPE *l) { return (ETYPE *)((uint8_t *)l - LTYPE##LinkOffset()); }                \
+                                                                                                                       \
+  static inline int LTYPE##Empty(LTYPE *l) { return l == l->next; }                                                    \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##Next(ETYPE *f) { return LTYPE##Entry(f->LNAME.next); }                                   \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##Prev(ETYPE *f) { return LTYPE##Entry(f->LNAME.prev); }                                   \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##Front(LTYPE *f) { return LTYPE##Entry(f->next); }                                        \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##Back(LTYPE *f) { return LTYPE##Entry(f->prev); }                                         \
+                                                                                                                       \
+  static inline int LTYPE##End(LTYPE *f, ETYPE *i) { return f == &i->LNAME; }                                          \
+                                                                                                                       \
+  static inline void LTYPE##PushBack(LTYPE *l, ETYPE *i) { LTYPE##Add(l->prev, l, &i->LNAME); }                        \
+                                                                                                                       \
+  static inline void LTYPE##Remove(ETYPE *f) { LTYPE##Delete(f->LNAME.next, f->LNAME.prev); }                          \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##PopFront(LTYPE *l) {                                                                     \
+    LTYPE *i = l->next;                                                                                                \
+    LTYPE##Delete(i->next, l);                                                                                         \
+    return LTYPE##Entry(i);                                                                                            \
+  }                                                                                                                    \
+                                                                                                                       \
+  static inline ETYPE *LTYPE##PopBack(LTYPE *l) {                                                                      \
+    LTYPE *i = l->prev;                                                                                                \
+    LTYPE##Delete(l, i->prev);                                                                                         \
+    return LTYPE##Entry(i);                                                                                            \
+  }                                                                                                                    \
+                                                                                                                       \
+  static inline void LTYPE##PushFront(LTYPE *l, ETYPE *i) { LTYPE##Add(l, l->next, &i->LNAME); }
 
-#define SUPRUGLUE_DEFINE_LIST(LTYPE, ETYPE, LNAME)
+#define SUPRUGLUE_DEFINE_LIST(LTYPE, ETYPE, LNAME)                                                                     \
+                                                                                                                       \
+  size_t LTYPE##Length(LTYPE *l) {                                                                                     \
+    LTYPE *p;                                                                                                          \
+    size_t c = 0;                                                                                                      \
+                                                                                                                       \
+    for (p = l->next; p != l; p = p->next) {                                                                           \
+      c += 1;                                                                                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+    return c;                                                                                                          \
+  }
 
 #ifdef __cplusplus
 }
