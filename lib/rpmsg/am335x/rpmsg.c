@@ -65,10 +65,12 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   transport->channel_port = RPMSG_CHANNEL_PORT_0;
   transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
   transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
-#else
+#elif SUPRUGLUE_PRU_NUM == 1
   transport->channel_port = RPMSG_CHANNEL_PORT_1;
   transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
   transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
+#else
+#pragma "PRU number is not set"
 #endif
 
   int ret;
