@@ -1,3 +1,30 @@
+
+4.4.2.5 INTC Basic Programming Model
+Follow these steps to configure the interrupt controller.
+1. Set polarity and type of system event through the System Event Polarity Registers (SIPR1 and SPIR2)
+and the System Event Type Registers (SITR1 and SITR2). Polarity of all system events is always high.
+Type of all system events is always pulse.
+2. Map system event to INTC channel through Channel Map registers.
+3. Map channel to host interrupt through Host Interrupt Map registers. Recommend channel “x” be
+mapped to host interrupt “x”.
+4. Clear system event by writing 1s to SECR registers.
+5. Enable host interrupt by writing index value to HIER register.
+6. Enable interrupt nesting if desired.
+7. Globally enable all interrupts through GER register.
+
+ePWM
+15.2.2.2 Proper Interrupt Initialization Procedure
+When the ePWM peripheral clock is enabled it may be possible that interrupt flags may be set due to
+spurious events due to the ePWM registers not being properly initialized. The proper procedure for
+initializing the ePWM peripheral is:
+1. Disable global interrupts (CPU INTM flag)
+2. Disable ePWM interrupts
+3. Initialize peripheral registers
+4. Clear any spurious ePWM flags
+5. Enable ePWM interrupts
+6. Enable global interrupts
+
+
 Cheetsheet on PRU INTC registers
 
 0h REVID

@@ -19,7 +19,7 @@ cc_binary(
         "//lib/log/daemon",
         "//lib/rpmsg",
         "//lib/time/clock:process",
-        #"//lib/ui1203",
+        #"//lib/time/period",
         "//tools/toolchain/am335x",
     ],
 )
@@ -36,11 +36,12 @@ genrule(
     name = "irqgen",
     srcs = [
         "//tools/toolchain/am335x:pru0_irq",
+        "//lib/time/period:epwm0_01",
         "//arch:sysevts",
     ],
     outs = [
         "rsc.c",
     ],
-    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //tools/toolchain/am335x:pru0_irq) > $@",
+    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //tools/toolchain/am335x:pru0_irq) $(location //lib/time/period:epwm0_01) > $@",
     tools = ["//tools/cmd/irqgen"],
 )
