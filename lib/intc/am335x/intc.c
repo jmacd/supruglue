@@ -27,24 +27,21 @@ void ControllerInit(InterruptController *controller) {
   CT_INTC.SECR1 = 0xffffffff;
 
   // Use EISR (indexed) or ESR (32bit) to enable system events
-  // CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PRU_TO_EDMA; // sysevt 18 / channel 9
+  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
+  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_EPWM_INTR1_INTR_PEND;
 
   // CT_INTC.CMR4_bit.CH_MAP_18 = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
   // CT_INTC.HMR2_bit.HINT_MAP_9 = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
   // CT_INTC.HIEISR_bit.HINT_EN_SET_IDX = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
-
-  // // Clear the system event mapped to the input interrupts.
-  // CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_ARM_TO_PRU;
-  // CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EDMA_TO_PRU;
-  // CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EDMA_CTRL_ERROR_TO_PRU;
-  // CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EDMA_CHAN_ERROR_TO_PRU;
 
   // // Enable the EDMA (Transfer controller, Channel controller) clocks.
   // // TODO: Necessary? Probably the kernel does this.
   // CM_PER_BASE[CM_PER_TPTC0_CLKCTRL] = CM_PER_CLK_ENABLED;
   // CM_PER_BASE[CM_PER_TPCC_CLKCTRL] = CM_PER_CLK_ENABLED;
 
+  // Unset the raw events
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
+  CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM_INTR1_INTR_PEND;
 
   CT_INTC.GER_bit.EN_HINT_ANY = 1;
 }
