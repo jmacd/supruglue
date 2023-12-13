@@ -34,11 +34,6 @@ void ControllerInit(InterruptController *controller) {
   // CT_INTC.HMR2_bit.HINT_MAP_9 = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
   // CT_INTC.HIEISR_bit.HINT_EN_SET_IDX = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
 
-  // // Enable the EDMA (Transfer controller, Channel controller) clocks.
-  // // TODO: Necessary? Probably the kernel does this.
-  // CM_PER_BASE[CM_PER_TPTC0_CLKCTRL] = CM_PER_CLK_ENABLED;
-  // CM_PER_BASE[CM_PER_TPCC_CLKCTRL] = CM_PER_CLK_ENABLED;
-
   // Unset the raw events
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM_INTR1_INTR_PEND;

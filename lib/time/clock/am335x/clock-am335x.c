@@ -12,9 +12,17 @@ void TimeInit(void) {
   __clock.NANOS_bit.HIGH = 0;
   __clock.NANOS_bit.LOW = 0;
 
-  // The hardware reset state is for DEFAULT_INC is 5, which makes the
-  // IEP counter on this device a nanosecond counter, i.e., (1000 / PRU_MHZ).
-  // CT_IEP.TMR_GLB_CFG_bit.DEFAULT_INC = 5;
+  CT_IEP.TMR_GLB_CFG_bit.CNT_EN = 0;
+  CT_IEP.TMR_GLB_CFG_bit.DEFAULT_INC = 5; // Count nanoseconds
+  CT_IEP.TMR_GLB_STS_bit.CNT_OVF = 0x1;   // W1ToClr
+  CT_IEP.TMR_COMPEN_bit.COMPEN_CNT = 0;
+  CT_IEP.TMR_CNT = 0; // Says W1ToClr, but is 32 bits?
+
+  CT_IEP.TMR_CMP0 = 10000000;                   // 1/100 second
+  CT_IEP.TMR_CMP_STS_bit.CMP_HIT = 0xFF;        // Write1toClear x 8
+  CT_IEP.TMR_CMP_CFG_bit.CMP_EN = 0x1;          // CMP[0] enabled
+  CT_IEP.TMR_CMP_CFG_bit.CMP0_RST_CNT_EN = 0x1; // CMP[0] will reset
+
   CT_IEP.TMR_GLB_CFG_bit.CNT_EN = 1;
 }
 

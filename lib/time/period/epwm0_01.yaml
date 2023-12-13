@@ -1,5 +1,0 @@
-incoming:
-- event: SYSEVT_EPWM_INTR1_INTR_PEND
-  channel: 1
-  host: 0
-  desc: From eHRPWM0 to PRU channel 1 on host 0

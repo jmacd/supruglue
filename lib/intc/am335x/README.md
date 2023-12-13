@@ -24,6 +24,19 @@ initializing the ePWM peripheral is:
 5. Enable ePWM interrupts
 6. Enable global interrupts
 
+IEP
+4.4.3.2.2 Basic Programming Model
+Follow these basic steps to configure the IEP Timer.
+1. Initialize timer to known state (default values)
+a. Disable counter (GLB_CFG.CNT_ENABLE)
+b. Reset Count Register (CNT) by writing 0xFFFFFFFF to clear
+c. Clear overflow status register (GLB_STS.CNT_OVF)
+d. Clear compare status (CMP_STS)
+2. Set compare values (CMP0-CMPx)
+3. Enable compare event (CMP_CFG.CMP_EN)
+4. Set increment value (GLB_CFG.DEFAULT_INC)
+5. Set compensation value (COMPEN.COMPEN_CNT)
+6. Enable counter (GLB_CFG.CNT_ENABLE)
 
 Cheetsheet on PRU INTC registers
 
