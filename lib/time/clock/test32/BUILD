@@ -19,7 +19,7 @@ cc_test(
     name = "clock_test",
     srcs = ["clock_test.cc"],
     deps = [
-        "//lib/time/clock",
+        "//lib/time/clock:process",
         "//lib/log/fmt",
         "//lib/log/daemon",
         "//lib/rpmsg/test32",

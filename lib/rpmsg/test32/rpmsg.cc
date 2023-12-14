@@ -31,8 +31,8 @@ int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
     return -1;
   }
   // TODO: should test that *len can hold r.size()?
-  memcpy(data, r.value().c_str(), r.value().size());
-  *len = r.value().size();
+  memcpy(data, r->c_str(), r->size());
+  *len = r->size();
   return 0;
 }
 
@@ -42,8 +42,8 @@ int HostRecv(TestTransport *transport, void *data, uint16_t *len) {
     return -1;
   }
   // TODO: should test that *len can hold r.size()?
-  memcpy(data, r.value().c_str(), r.value().size());
-  *len = r.value().size();
+  memcpy(data, r->c_str(), r->size());
+  *len = r->size();
   return 0;
 }
 

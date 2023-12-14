@@ -8,6 +8,7 @@
 #include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/time/clock/clock.h"
+#include "lib/time/clock/process.h"
 #include "gtest/gtest.h"
 
 #include <thread>

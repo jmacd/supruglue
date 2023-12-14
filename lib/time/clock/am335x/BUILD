@@ -15,3 +15,10 @@ cc_library(
         "//tools/toolchain/am335x",
     ],
 )
+
+filegroup(
+    name = "iep_tim_cap_cmp_pend",
+    srcs = [
+        "iep_tim_cap_cmp_pend.yaml",
+    ],
+)
