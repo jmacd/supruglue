@@ -8,7 +8,7 @@ build:host --copt='-DSUPRUGLUE_TEST32'
 #build:host --apple_platform_type=macos
 
 # linker_files not working, can't sandbox the `ar` step
-#build --spawn_strategy=standalone
+build --spawn_strategy=standalone
 
 build:pru0 --crosstool_top=//tools/toolchain:clpru_suite
 build:pru0 --cpu=pru

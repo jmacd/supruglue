@@ -23,13 +23,13 @@ cc_binary(
     ],
 )
 
-cc_binary(
-    name = "local",
-    srcs = ["local.c"],
-    deps = [
-        "//lib/coroutine",
-    ],
-)
+# cc_binary(
+#     name = "local",
+#     srcs = ["local.c"],
+#     deps = [
+#         "//lib/coroutine",
+#     ],
+# )
 
 genrule(
     name = "irqgen",
