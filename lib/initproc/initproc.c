@@ -5,6 +5,7 @@
 #include "lib/debug/debug.h"
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg.h"
+#include "lib/soc/sysevts.h"
 
 void InitProcess(ThreadID thid, Args args) {
   for (;;) {
@@ -16,7 +17,7 @@ void InitProcess(ThreadID thid, Args args) {
       if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
         // flash(5);
         // solid(1);
-        BlockOnHost0(&__controller);
+        BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
         continue;
       }
 

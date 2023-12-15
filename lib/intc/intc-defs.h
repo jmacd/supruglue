@@ -16,8 +16,10 @@ void ControllerInit(InterruptController *controller);
 
 void ServiceInterrupts(InterruptController *controller);
 
-// TODO: This is a placeholder.
-void BlockOnHost0(InterruptController *controller);
+// @@@ Still sorta a placeholder
+void BlockOnSystemEvent(InterruptController *controller, uint8_t evt);
+
+void ClearSystemEvent(uint8_t evt);
 
 #ifdef __cplusplus
 }

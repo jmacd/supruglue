@@ -140,6 +140,8 @@ int main(void) {
     // (q: why compile-in such checks? is there a way to panic?)
   }
 
+  TimeStart();
+
   args1.ptr = "1";
   args2.ptr = "0";
 

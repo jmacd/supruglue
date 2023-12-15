@@ -11,6 +11,9 @@ using std::chrono::nanoseconds;
 void TimeInit(void) {
 }
 
+void TimeStart(void) {
+}
+
 void ReadClock(Timestamp *ts) {
   auto now = high_resolution_clock::now();
 

@@ -12,8 +12,10 @@ extern "C" {
 #endif
 
 struct _InterruptController {
-  // TODO mostly placeholder
-  ThreadList blocked;
+  // Shrug this should use generated code so that only the enabled
+  // interrupts occupy space, and the lookup is O(1).  For now waste
+  // some space.
+  ThreadList waiting[64];
 };
 
 #ifdef __cplusplus

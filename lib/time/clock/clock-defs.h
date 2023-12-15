@@ -14,6 +14,8 @@ extern "C" {
 // Called by ClockInit().
 void TimeInit(void);
 
+void TimeStart(void);
+
 // Read the clock.
 void ReadClock(Timestamp *ts);
 

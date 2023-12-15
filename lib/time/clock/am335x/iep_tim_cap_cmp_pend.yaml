@@ -1,5 +1,5 @@
 incoming:
 - event: SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND
-  channel: 1
+  channel: 0
   host: 0
-  desc: From EIP to PRU channel 1 on host 0
+  desc: From EIP to PRU channel 0 on host 0

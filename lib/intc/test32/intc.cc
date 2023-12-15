@@ -11,5 +11,8 @@ void ControllerInit(InterruptController *controller) {
 void ServiceInterrupts(InterruptController *controller) {
 }
 
-void BlockOnHost0(InterruptController *controller) {
+void BlockOnSystemEvent(InterruptController *controller, uint8_t evt) {
+}
+
+void ClearSystemEvent(uint8_t evt) {
 }

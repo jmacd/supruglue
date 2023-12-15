@@ -6,6 +6,7 @@
 #include "lib/debug/debug.h"
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg.h"
+#include "lib/soc/sysevts.h"
 
 void SyslogProcess(ThreadID thid, Args args) {
   for (;;) {
@@ -16,15 +17,12 @@ void SyslogProcess(ThreadID thid, Args args) {
     int err;
     while ((err = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
       if (err == PRU_RPMSG_NO_PEER_ADDR) {
-        // TODO block on init process, instead, because it knows the
-        // destination first?  the host0 interrupt could be a kick, or
-        // it could be something else.
-        BlockOnHost0(&__controller);
+        BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
         continue;
       }
 
       if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
-        BlockOnHost0(&__controller);
+        BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
         continue;
       }
 

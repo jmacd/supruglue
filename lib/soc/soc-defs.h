@@ -41,20 +41,8 @@ int  SystemOnChipIsShutdown(void);
 void SystemOnChipDelay(int32_t cycles);
 
 // Timestamp is out of place. Where should it go?
-typedef struct _Timestamp Timestamp;
-
-struct _Timestamp {
-  union {
-    volatile uint64_t NANOS;
-
-    // Note that the order of LOW, HIGH was discovered through
-    // trial-and-error.  TODO: on-PRU test runner.
-    volatile struct {
-      unsigned LOW : 32;
-      unsigned HIGH : 32;
-    } NANOS_bit;
-  };
-};
+// Counts 5ns cycles.
+typedef uint64_t Timestamp;
 
 #ifdef __cplusplus
 }

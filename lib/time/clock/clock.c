@@ -22,5 +22,5 @@ void Sleep(uint32_t d) {
 }
 
 void TimeAdd(Timestamp *clock, uint32_t dur) {
-  clock->NANOS += dur;
+  *clock += dur / 5;
 }
