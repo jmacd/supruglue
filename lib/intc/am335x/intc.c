@@ -13,18 +13,14 @@
 #define PRU_HOST1_INTERRUPT 0x80000000
 #define PRU_HOST_ANY_INTERRUPT 0xc0000000
 
-// TODO generate something from irqgen's yaml input?  For now (for
-// RPMsg to succeed), assume host interrupt 0 is all we need.
-
 volatile register uint32_t __R31;
 
 InterruptController __controller;
 
-void ControllerInit(InterruptController *controller) {
+void ControllerInit(void) {
   uint8_t evt;
-  for (evt = 0; evt < 64; evt++) {
-    ThreadListInit(&controller->waiting[evt]);
-    // TODO Hmm maybe only need one thread? not one list per event?
+  for (evt = 0; evt < NUM_SYSEVTS; evt++) {
+    __controller.handler[evt] = NULL;
   }
 
   // Disable interrupts until configured.
@@ -63,30 +59,20 @@ void ControllerInit(InterruptController *controller) {
   CT_INTC.GER_bit.EN_HINT_ANY = 1;
 }
 
-void ServiceInterrupts(InterruptController *controller) {
-  if ((__R31 & PRU_HOST0_INTERRUPT) == 0) {
-    return;
-  }
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
+  __controller.handler[evt] = handler;
+}
 
-  uint8_t evt = CT_INTC.HIPIR0;
+void ServiceInterrupts(void) {
+  while ((__R31 & PRU_HOST0_INTERRUPT) != 0) {
 
-  // TODO this has to move later after the condition is cleared
-  if (evt >= 16 & evt < 32) {
-    // software interrupts immediately cleared HACK @@@
+    uint8_t evt = CT_INTC.HIPIR0;
+
+    // Unblock all and prioritize to run immediately.
+    if (__controller.handler[evt] != NULL) {
+      (__controller.handler[evt])();
+    }
+
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;
   }
-
-  // Unblock all and prioritize to run immediately.
-  while (!ThreadListEmpty(&controller->waiting[evt])) {
-    ThreadListPushBack(&__system_runnable, ThreadListPopFront(&controller->waiting[evt]));
-  }
-}
-
-void BlockOnSystemEvent(InterruptController *controller, uint8_t evt) {
-  ThreadListPushBack(&controller->waiting[evt], __system_current);
-  YieldBlocked();
-}
-
-void ClearSystemEvent(uint8_t evt) {
-  CT_INTC.SICR_bit.STS_CLR_IDX = evt;
 }

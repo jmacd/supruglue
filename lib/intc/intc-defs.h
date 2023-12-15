@@ -10,16 +10,13 @@ extern "C" {
 
 typedef struct _InterruptController InterruptController;
 
+typedef void(InterruptHandler)(void);
+
 extern InterruptController __controller;
 
-void ControllerInit(InterruptController *controller);
-
-void ServiceInterrupts(InterruptController *controller);
-
-// @@@ Still sorta a placeholder
-void BlockOnSystemEvent(InterruptController *controller, uint8_t evt);
-
-void ClearSystemEvent(uint8_t evt);
+void ControllerInit(void);
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler);
+void ServiceInterrupts(void);
 
 #ifdef __cplusplus
 }

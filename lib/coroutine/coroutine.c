@@ -25,7 +25,7 @@ int Init(SystemConfig cfg) {
   SystemOnChipSetup();
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
-  ControllerInit(&__controller);
+  ControllerInit();
   return 0;
 }
 
@@ -42,7 +42,7 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
 
 int __run(void) {
   while (!SystemOnChipIsShutdown() && !ThreadListEmpty(&__system_runnable)) {
-    ServiceInterrupts(&__controller);
+    ServiceInterrupts();
 
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 

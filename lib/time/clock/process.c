@@ -6,27 +6,22 @@
 #include "lib/coroutine/coroutine.h"
 #include "lib/intc/intc.h"
 #include "lib/soc/sysevts.h"
+#include "lib/sync/sync.h"
 
 SUPRUGLUE_DEFINE_THREAD(clockproc, 256);
 
 void clockProcess(ThreadID thid, Args args) {
-  while (1) {
-    BlockOnSystemEvent(&__controller, SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND);
-
-    // TODO why this won't quite work is we need to clear the timer
-    // compare status (and probably delay 2 cycles, see pru_cape
-    // examples) before clearing the interrupt condition
+  for (;;) {
+    SemaDown(&__clock_lock);
 
     Timestamp clk;
-    ReadClock(&clk); // This has clears the timer compare status
-
-    ClearSystemEvent(SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND);
+    ReadClock(&clk);
 
     ThreadList *p = __asleep.next;
     while (p != &__asleep) {
       Thread *th = ThreadListEntry(p);
 
-      int runnable = clk >= th->when;
+      int runnable = clk.CYCLES >= th->when.CYCLES;
       if (runnable) {
         ThreadListRemove(th);
       }
@@ -41,7 +36,7 @@ void clockProcess(ThreadID thid, Args args) {
 // ClockInit enables a handler to maintain the clock.
 int ClockInit(void) {
   TimeInit();
-
+  LockInit(&__clock_lock);
   ThreadListInit(&__asleep);
 
   Args args;

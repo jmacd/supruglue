@@ -31,18 +31,31 @@ extern "C" {
 
 #define SIZEOF_WORDS(x) NUM_WORDS(sizeof(x))
 
+#define NUM_SYSEVTS ARCH_NUM_SYSEVTS
+
 #define GPIO_NUM_REGISTERS 4
 
 // test helpers, reset functions, etc
 void SystemOnChipSetup(void);
 int  SystemOnChipIsShutdown(void);
 
-// maps into e.g., dynamic __delay_cycles
+// like a dynamic __delay_cycles
 void SystemOnChipDelay(int32_t cycles);
 
-// Timestamp is out of place. Where should it go?
 // Counts 5ns cycles.
-typedef uint64_t Timestamp;
+typedef struct _Timestamp Timestamp;
+
+struct _Timestamp {
+  union {
+    uint64_t CYCLES;
+
+    struct {
+      unsigned LOW : 16;
+      unsigned MIDDLE : 16;
+      unsigned HIGH : 32;
+    } CYCLES_bit;
+  };
+};
 
 #ifdef __cplusplus
 }

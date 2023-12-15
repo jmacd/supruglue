@@ -6,9 +6,7 @@
 
 #include <stdio.h>
 
-// Note: I tested an implementation based on a heap, was about 500
-// bytes larger.
-
+LockWord   __clock_lock;
 ThreadList __asleep;
 
 void Sleep(uint32_t d) {
@@ -22,5 +20,5 @@ void Sleep(uint32_t d) {
 }
 
 void TimeAdd(Timestamp *clock, uint32_t dur) {
-  *clock += dur / 5;
+  clock->CYCLES += dur / 5;
 }

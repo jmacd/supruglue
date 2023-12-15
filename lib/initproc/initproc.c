@@ -7,6 +7,9 @@
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/soc/sysevts.h"
 
+// EH? Unclear purpose.  Is it important to call ClientRecv?  Or does
+// knowing the ARM process is ready to talk matter?
+
 void InitProcess(ThreadID thid, Args args) {
   for (;;) {
     int      err;
@@ -17,8 +20,7 @@ void InitProcess(ThreadID thid, Args args) {
       if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
         // flash(5);
         // solid(1);
-        BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
-        continue;
+        // BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
       }
 
       // TODO: otherwise, not clear what kind of fallback reporting

@@ -12,6 +12,8 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+// TODO: verify channels and interrupts are unique
+
 func main() {
 	if len(os.Args) < 3 {
 		log.Fatal("usage: %s <sysevts.csv> <irqconfig.yaml> ...\n", os.Args[0])

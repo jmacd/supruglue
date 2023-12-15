@@ -16,7 +16,7 @@ struct _LockWord;
 typedef struct _LockWord LockWord;
 
 struct _LockWord {
-  // int32_t value;
+  // This code supports primitive sleep/wake, rename methods?
   ThreadList waiters;
 };
 
