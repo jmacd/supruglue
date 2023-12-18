@@ -14,6 +14,7 @@ cc_library(
         "//lib/intc",
         "//lib/rpmsg:defs",
         "//lib/soc",
+        "//lib/sync",
         "//lib/thread",
         "//tools/toolchain/am335x",
         "@ti-pru-support//lib/src/rpmsg_lib",

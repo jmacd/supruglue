@@ -17,13 +17,17 @@ void SyslogProcess(ThreadID thid, Args args) {
     int err;
     while ((err = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
       if (err == PRU_RPMSG_NO_PEER_ADDR) {
-        BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
-        continue;
+        // BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
+        // flash(3);
+        // Sleep(100000);
+        // continue;
       }
 
       if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
-        BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
-        continue;
+        // BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
+        // flash(1);
+        // Sleep(100000);
+        // continue;
       }
 
       // TODO: otherwise, not clear what kind of fallback reporting
@@ -31,6 +35,8 @@ void SyslogProcess(ThreadID thid, Args args) {
       // flash(4);
       Yield();
     }
+
+    flash(4);
 
     Yield();
   }

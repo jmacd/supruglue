@@ -19,14 +19,13 @@ void InitProcess(ThreadID thid, Args args) {
     while ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
       if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
         // flash(5);
-        // solid(1);
-        // BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
+        //  solid(1);
+        //  BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
+        // Sleep(1000000);
       }
 
-      // TODO: otherwise, not clear what kind of fallback reporting
-      // can be done when a permanent error (PRU_RPMSG_INVALID_HEAD)
-      // is returned.  Try again!
-      // flash(4);
+      // Sleep(1000000);
+      //  flash(2);
       Yield();
     }
     Yield();

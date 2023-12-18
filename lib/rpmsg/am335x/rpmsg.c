@@ -29,6 +29,11 @@ ClientTransport __transport;
 #define RPMSG_CHANNEL_PORT_0 30
 #define RPMSG_CHANNEL_PORT_1 31
 
+void RpmsgKick(void) {
+  // Note: this can wake > 1
+  SemaUp(&__transport.kick_lock);
+}
+
 // These two system events are wired to the PRU automatically by the
 // pru_rpmsg driver.
 //
@@ -53,28 +58,35 @@ ClientTransport __transport;
 // in section 4.4.2.2 PRU-ICSS System Events, table 4.22.
 int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rsc_vdev_vring *vring0,
               struct fw_rsc_vdev_vring *vring1) {
+  uint8_t sysevt_pru_to_arm;
+  uint8_t sysevt_arm_to_pru;
   memset(transport, 0, sizeof(*transport));
+
+  LockInit(&transport->peer_lock);
+  LockInit(&transport->kick_lock);
 
   // Ensure the virtio driver is ready.
   volatile uint8_t *status = &vdev->status;
   while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
   }
 
+  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick);
+
   // The system events and port are core-specific.
 #if SUPRUGLUE_PRU_NUM == 0
   transport->channel_port = RPMSG_CHANNEL_PORT_0;
-  transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
-  transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
+  sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
+  sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
 #elif SUPRUGLUE_PRU_NUM == 1
   transport->channel_port = RPMSG_CHANNEL_PORT_1;
-  transport->sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
-  transport->sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
+  sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
+  sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
 #else
 #pragma "PRU number is not set"
 #endif
 
   int ret;
-  ret = pru_rpmsg_init(&transport->channel, vring0, vring1, transport->sysevt_pru_to_arm, transport->sysevt_arm_to_pru);
+  ret = pru_rpmsg_init(&transport->channel, vring0, vring1, sysevt_pru_to_arm, sysevt_arm_to_pru);
   if (ret != PRU_RPMSG_SUCCESS) {
     return ret;
   }
@@ -88,22 +100,22 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
-  if (transport->rpmsg_peer_src_addr == 0) {
+  if (transport->peer_src_addr == 0) {
     // In case we have never received.
     // flash(7);
     // solid(1);
-    return PRU_RPMSG_NO_PEER_ADDR;
+    SemaDown(&transport->peer_lock);
   }
 
   // flash(1);
   // solid(1);
 
-  int err = pru_rpmsg_send(&transport->channel, transport->rpmsg_peer_dst_addr, transport->rpmsg_peer_src_addr,
-                           (void *)data, len);
+  int err = pru_rpmsg_send(&transport->channel, transport->peer_dst_addr, transport->peer_src_addr, (void *)data, len);
   if (err == 0) {
     // flash(2);
     // solid(1);
   } else {
+    SemaDown(&transport->kick_lock);
     // flash(3);
     // solid(1);
   }
@@ -111,6 +123,15 @@ int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
-  return pru_rpmsg_receive(&transport->channel, &transport->rpmsg_peer_src_addr, &transport->rpmsg_peer_dst_addr, data,
-                           len);
+  int was_unset = transport->peer_src_addr == 0;
+
+  int err = pru_rpmsg_receive(&transport->channel, &transport->peer_src_addr, &transport->peer_dst_addr, data, len);
+  if (err != 0) {
+    SemaDown(&transport->kick_lock);
+    return err;
+  }
+  if (was_unset != 0 && transport->peer_src_addr != 0) {
+    SemaUp(&transport->peer_lock);
+  }
+  return 0;
 }

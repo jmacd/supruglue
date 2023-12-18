@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//lib/thread",
         "//lib/sync",
+        "//lib/intc",
         "//lib/time/clock:defs",
         "//tools/toolchain/am335x",
     ],
