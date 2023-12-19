@@ -64,15 +64,43 @@ void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
 }
 
 void ServiceInterrupts(void) {
-  while ((__R31 & PRU_HOST0_INTERRUPT) != 0) {
+  // solid(2);
+  // flash(2);
+  // solid(2);
 
+  while ((__R31 & PRU_HOST0_INTERRUPT) != 0) {
     uint8_t evt = CT_INTC.HIPIR0;
+    // solid(2);
+    // flash(evt);
+    // solid(2);
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {
       (__controller.handler[evt])();
+    } else {
+      // solid(2);
+      // flash(evt);
+      // solid(2);
     }
+    // __delay_cycles(10);
+
+    // if (CT_INTC.SRSR0 & (1 << evt)) {
+    //   solid(2);
+    //   flash(2);
+    //   solid(2);
+    // }
 
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;
+
+    // __delay_cycles(200);
+
+    // if (CT_INTC.SRSR0 & (1 << evt)) {
+    //   solid(2);
+    //   flash(10);
+    //   solid(2);
+    // }
   }
+  // solid(2);
+  // flash(2);
+  // solid(2);
 }

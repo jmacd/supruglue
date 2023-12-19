@@ -45,6 +45,7 @@ func (host *Host) Run() error {
 	buf := make([]byte, logEntrySize)
 
 	// TODO: clock correction, or similar
+	fmt.Println("rpmsg: channel opened")
 
 	for {
 		dat, err := host.rpm.Read(buf)

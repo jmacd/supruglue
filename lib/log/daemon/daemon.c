@@ -36,7 +36,7 @@ void SyslogProcess(ThreadID thid, Args args) {
       Yield();
     }
 
-    flash(4);
+    // flash(4);
 
     Yield();
   }
