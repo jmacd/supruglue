@@ -14,13 +14,11 @@ SUPRUGLUE_DEFINE_THREAD(clockproc, 256);
 
 void clockProcess(ThreadID thid, Args args) {
   for (;;) {
-    printf("PROCESS DOWN\n");
     // solid(2);
     // flash(5);
     // solid(2);
     SemaDown(&__clock_lock);
 
-    printf("PROCESS UP! %zu\n", ThreadListLength(&__asleep));
     // solid(2);
     // flash(3); // + ThreadListLength(&__asleep));
     // solid(2);

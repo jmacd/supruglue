@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//lib/thread",
         "//lib/intc",
-        "//lib/time/clock:defs",
+        "//lib/time:defs",
+        "@com_google_absl//absl/log",
     ],
 )

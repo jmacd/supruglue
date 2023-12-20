@@ -12,8 +12,8 @@
 #include "lib/log/daemon/daemon.h"
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
-#include "lib/time/clock/clock.h"
-#include "lib/time/clock/process.h"
+#include "lib/time/clock.h"
+#include "lib/time/process.h"
 
 #define NUM_RESOURCES 1
 

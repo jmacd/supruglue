@@ -7,8 +7,8 @@
 #include "lib/log/daemon/daemon.h"
 #include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/rpmsg.h"
-#include "lib/time/clock/clock.h"
-#include "lib/time/clock/process.h"
+#include "lib/time/clock.h"
+#include "lib/time/process.h"
 #include "gtest/gtest.h"
 
 #include <thread>
@@ -49,7 +49,6 @@ TEST(ClockTest, SleepWake) {
   std::thread client([tt, &res, &howmany] {
     // read until we receive the correct number, w/o overflow
     for (int got = 0; got < 100;) {
-      LOG(INFO) << "GOT: " << got;
       Entry    entry;
       uint16_t blen = sizeof(entry);
       EXPECT_EQ(0, HostRecv(tt, &entry, &blen));

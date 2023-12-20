@@ -13,7 +13,7 @@ cc_library(
         "//lib/thread",
         "//lib/sync",
         "//lib/intc",
-        "//lib/time/clock:defs",
+        "//lib/time:defs",
         "//tools/toolchain/am335x",
     ],
 )

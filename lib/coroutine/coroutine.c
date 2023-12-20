@@ -41,8 +41,12 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
 }
 
 int __run(void) {
-  while (!SystemOnChipIsShutdown() && !ThreadListEmpty(&__system_runnable)) {
+  while (!SystemOnChipIsShutdown()) {
     ServiceInterrupts();
+
+    if (ThreadListEmpty(&__system_runnable)) {
+      continue;
+    }
 
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
@@ -67,7 +71,6 @@ int __run(void) {
       run->state = TS_FINISHED;
       break;
     default:
-      // assert(0);
       break;
     }
     switch (run->state) {

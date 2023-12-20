@@ -46,7 +46,6 @@ void ControllerInit(void) {
 }
 
 void ServiceInterrupts(void) {
-  LOG(INFO) << "SERVICE";
   __controller.test->Service();
 }
 
@@ -55,6 +54,5 @@ void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
 }
 
 void RaiseInterrupt(uint8_t evt) {
-  LOG(INFO) << "RAISE";
   __controller.test->Raise(evt);
 }

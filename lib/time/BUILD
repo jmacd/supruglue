@@ -13,7 +13,7 @@ cc_library(
 )
 
 cc_library(
-    name = "clock",
+    name = "time",
     srcs = [
         "clock.c",
     ],
@@ -23,8 +23,8 @@ cc_library(
     deps = [
         ":defs",
     ] + select({
-        "//tools/toolchain:am335x": ["//lib/time/clock/am335x"],
-        "//conditions:default": ["//lib/time/clock/test32"],
+        "//tools/toolchain:am335x": ["//lib/time/am335x"],
+        "//conditions:default": ["//lib/time/test32"],
     }),
 )
 
@@ -37,7 +37,7 @@ cc_library(
         "process.h",
     ],
     deps = [
-        ":clock",
+        ":time",
         "//lib/coroutine",
     ],
 )
@@ -46,7 +46,7 @@ cc_test(
     name = "test",
     srcs = ["clock_test.cc"],
     deps = [
-        "//lib/time/clock:process",
+        "//lib/time:process",
         "//lib/log/fmt",
         "//lib/log/daemon",
         "//lib/rpmsg/test32",

@@ -1,8 +1,9 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+#include "absl/log/log.h"
 #include "lib/intc/intc.h"
-#include "lib/time/clock/clock-defs.h"
+#include "lib/time/clock-defs.h"
 #include <chrono>
 #include <thread>
 #include <unistd.h>

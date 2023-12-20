@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#include "lib/time/clock/clock-defs.h"
+#include "lib/time/clock-defs.h"
 
 #ifdef __cplusplus
 }

@@ -7,7 +7,7 @@
 
 #include "lib/intc/intc.h"
 #include "lib/soc/sysevts.h"
-#include "lib/time/clock/clock-defs.h"
+#include "lib/time/clock-defs.h"
 
 // Device-Specific PRU Read Latency Values Appendix A.1 says 12 cycles
 // to read IEP_TIMER.
