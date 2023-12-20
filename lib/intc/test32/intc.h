@@ -5,15 +5,20 @@
 #define LIB_INTC_TEST32_INTC_H
 
 #include "lib/intc/intc-defs.h"
+#include "lib/soc/soc.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct _TestInterruptController TestInterruptController;
+
 struct _InterruptController {
-  int32_t unused;
+  TestInterruptController *test;
 };
+
+void RaiseInterrupt(uint8_t evt);
 
 #ifdef __cplusplus
 }

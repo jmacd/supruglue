@@ -78,9 +78,22 @@ extern "C" {
     return LTYPE##Entry(i);                                                                                            \
   }                                                                                                                    \
                                                                                                                        \
-  static inline void LTYPE##PushFront(LTYPE *l, ETYPE *i) { LTYPE##Add(l, l->next, &i->LNAME); }
+  static inline void LTYPE##PushFront(LTYPE *l, ETYPE *i) { LTYPE##Add(l, l->next, &i->LNAME); }                       \
+                                                                                                                       \
+  size_t LTYPE##Length(LTYPE *l);
 
-#define SUPRUGLUE_DEFINE_LIST(LTYPE, ETYPE, LNAME)
+#define SUPRUGLUE_DEFINE_LIST(LTYPE, ETYPE, LNAME)                                                                     \
+                                                                                                                       \
+  size_t LTYPE##Length(LTYPE *l) {                                                                                     \
+    LTYPE *p;                                                                                                          \
+    size_t c = 0;                                                                                                      \
+                                                                                                                       \
+    for (p = l->next; p != l; p = p->next) {                                                                           \
+      c += 1;                                                                                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+    return c;                                                                                                          \
+  }
 
 #ifdef __cplusplus
 }

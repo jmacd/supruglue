@@ -13,6 +13,7 @@
 // to read IEP_TIMER.
 
 // This is power-of-two to simplify the logic.
+// #define RESOLUTION (1 << 30)
 #define RESOLUTION (1 << 16)
 
 Timestamp __clock;

@@ -4,6 +4,8 @@
 #ifndef LIB_INTC_INTC_DEFS_H
 #define LIB_INTC_INTC_DEFS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

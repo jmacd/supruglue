@@ -15,8 +15,12 @@ void Sleep(uint32_t d) {
   ReadClock(&self->when);
   TimeAdd(&self->when, d);
 
+  printf("SLEEPING\n");
+
   ThreadListPushBack(&__asleep, self);
   YieldBlocked();
+
+  printf("WAKING\n");
 }
 
 void TimeAdd(Timestamp *clock, uint32_t dur) {

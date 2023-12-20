@@ -95,14 +95,14 @@ void toggle_blue(ThreadID tid, Args args) {
     PRULOG_2U(INFO, "blue on", 0, 0);
 
     GPIO_SetPin(pin, 1);
-    // Sleep(BLUE_PERIOD);
-    __delay_cycles(BLUE_PERIOD / 5);
+    Sleep(BLUE_PERIOD);
+    //__delay_cycles(BLUE_PERIOD / 5);
 
     PRULOG_2U(INFO, "blue off", 0, 0);
 
     GPIO_SetPin(pin, 0);
-    // Sleep(BLUE_PERIOD);
-    __delay_cycles(BLUE_PERIOD / 5);
+    Sleep(BLUE_PERIOD);
+    //__delay_cycles(BLUE_PERIOD / 5);
   }
 }
 
@@ -113,13 +113,13 @@ void toggle_yellow(ThreadID tid, Args args) {
     PRULOG_2U(INFO, "yellow on", 0, 0);
 
     GPIO_SetPin(pin, 1);
-    // Sleep(YELLOW_PERIOD);
-    __delay_cycles(YELLOW_PERIOD / 5);
+    Sleep(YELLOW_PERIOD);
+    //__delay_cycles(YELLOW_PERIOD / 5);
 
     PRULOG_2U(INFO, "yellow off", 0, 0);
     GPIO_SetPin(pin, 0);
-    // Sleep(YELLOW_PERIOD);
-    __delay_cycles(YELLOW_PERIOD / 5);
+    Sleep(YELLOW_PERIOD);
+    //__delay_cycles(YELLOW_PERIOD / 5);
   }
 }
 

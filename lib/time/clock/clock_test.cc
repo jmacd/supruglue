@@ -49,6 +49,7 @@ TEST(ClockTest, SleepWake) {
   std::thread client([tt, &res, &howmany] {
     // read until we receive the correct number, w/o overflow
     for (int got = 0; got < 100;) {
+      LOG(INFO) << "GOT: " << got;
       Entry    entry;
       uint16_t blen = sizeof(entry);
       EXPECT_EQ(0, HostRecv(tt, &entry, &blen));

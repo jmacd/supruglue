@@ -1,20 +1,28 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "process.h"
+#include <stdio.h>
+
 #include "clock.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/intc/intc.h"
 #include "lib/soc/sysevts.h"
 #include "lib/sync/sync.h"
+#include "process.h"
 
 SUPRUGLUE_DEFINE_THREAD(clockproc, 256);
 
 void clockProcess(ThreadID thid, Args args) {
   for (;;) {
-    SemaDown(&__clock_lock);
+    printf("PROCESS DOWN\n");
     // solid(2);
-    // flash(2);
+    // flash(5);
+    // solid(2);
+    SemaDown(&__clock_lock);
+
+    printf("PROCESS UP! %zu\n", ThreadListLength(&__asleep));
+    // solid(2);
+    // flash(3); // + ThreadListLength(&__asleep));
     // solid(2);
 
     Timestamp clk;
@@ -22,6 +30,9 @@ void clockProcess(ThreadID thid, Args args) {
 
     ThreadList *p = __asleep.next;
     while (p != &__asleep) {
+      // solid(2);
+      // flash(2);
+      // solid(2);
       Thread *th = ThreadListEntry(p);
 
       int runnable = clk.CYCLES >= th->when.CYCLES;
@@ -30,9 +41,12 @@ void clockProcess(ThreadID thid, Args args) {
       }
       p = p->next;
       if (runnable) {
-        ThreadListPushBack(&__system_runnable, th);
+        ThreadListPushFront(&__system_runnable, th);
       }
     }
+    // solid(2);
+    // flash(1);
+    // solid(2);
   }
 }
 

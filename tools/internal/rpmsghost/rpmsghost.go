@@ -45,7 +45,7 @@ func (host *Host) Run() error {
 	buf := make([]byte, logEntrySize)
 
 	// TODO: clock correction, or similar
-	fmt.Println("rpmsg: channel opened")
+	fmt.Println("rpmsg: channel open")
 
 	for {
 		dat, err := host.rpm.Read(buf)
@@ -79,7 +79,7 @@ func (host *Host) Run() error {
 				msg = print
 			}
 		}
-		elapsed := time.Duration(uint64(u2)<<32 | uint64(u1))
+		elapsed := 5 * time.Duration(uint64(u2)<<32|uint64(u1))
 		ts := elapsed.String()
 
 		fmt.Printf("%s [%05x] %s\n", ts, u0, msg)
