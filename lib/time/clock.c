@@ -20,5 +20,8 @@ void Sleep(uint32_t d) {
 }
 
 void TimeAdd(Timestamp *clock, uint32_t dur) {
-  clock->CYCLES += dur / 5;
+  // TODO! Need to avoid division by 5 here because PRU doesn't
+  // have an instruction for that and it's 280 bytes of text.
+  // dur /= 5;
+  clock->CYCLES += dur;
 }

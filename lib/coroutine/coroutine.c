@@ -42,6 +42,8 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
 
 int __run(void) {
   while (!SystemOnChipIsShutdown()) {
+    // TODO: use a blocking call when there are no runnables.  Requires assembly
+    // to use the block-on-R31 instruction.
     ServiceInterrupts();
 
     if (ThreadListEmpty(&__system_runnable)) {
