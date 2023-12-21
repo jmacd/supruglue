@@ -10,17 +10,17 @@
 extern "C" {
 #endif
 
-#include "lib/time/clock/clock-defs.h"
+#include "lib/time/clock-defs.h"
 
 #if defined(SUPRUGLUE_AM335X)
-#include "lib/time/clock/am335x/clock-am335x.h"
+#include "lib/time/am335x/clock-am335x.h"
 #elif defined(SUPRUGLUE_TEST32)
-#include "lib/time/clock/test32/clock-test32.h"
+#include "lib/time/test32/clock-test32.h"
 #endif
 
 void Sleep(uint32_t nanos);
 
-void TimeAdd(Timestamp *clock, uint32_t nanos);
+void TimeAddCycles(Timestamp *clock, uint32_t cycles);
 
 #ifdef __cplusplus
 }

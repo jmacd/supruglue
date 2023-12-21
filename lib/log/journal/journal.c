@@ -4,7 +4,7 @@
 #include "lib/log/journal/journal.h"
 #include "lib/debug/debug.h"
 #include "lib/sync/sync.h"
-#include "lib/time/clock/clock.h"
+#include "lib/time/clock.h"
 #include <stdio.h>
 #include <string.h>
 

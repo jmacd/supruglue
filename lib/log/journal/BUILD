@@ -14,7 +14,7 @@ cc_library(
         "//lib/list",
         "//lib/sync",
         "//lib/thread",
-        "//lib/time/clock",
+        "//lib/time",
     ],
 )
 

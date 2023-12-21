@@ -12,41 +12,51 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+// TODO: verify channels and interrupts are unique
+
 func main() {
-	if len(os.Args) != 3 {
-		log.Fatal("usage: %s <sysevts.csv> <irqconfig.yaml>\n", os.Args[0])
+	if len(os.Args) < 3 {
+		log.Fatal("usage: %s <sysevts.csv> <irqconfig.yaml> ...\n", os.Args[0])
 	}
 	sevts, err := csv.ReadFile[arch.SystemEvent](os.Args[1])
+	if err != nil {
+		log.Fatalf("unmarshal sysevts.csv: %v\n", err)
+	}
 	sysevtMap := arch.SystemEventMap(sevts)
 
-	obj := map[string]interface{}{}
+	var combined arch.IRQs
 
-	data, err := os.ReadFile(os.Args[2])
-	if err != nil {
-		log.Fatalf("read yaml #%v\n", err)
-	}
-	err = yaml.Unmarshal(data, obj)
-	if err != nil {
-		log.Fatalf("unmarshal yaml: %v\n", err)
-	}
-	var result arch.IRQs
-	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		ErrorUnused: true,
-		Result:      &result,
-	})
-	if err != nil {
-		log.Fatalf("decode yaml #%v\n", err)
-	}
-	err = dec.Decode(obj)
-	if err != nil {
-		log.Fatalf("decode yaml #%v\n", err)
-	}
+	for _, arg := range os.Args[2:] {
+		obj := map[string]interface{}{}
 
-	for i := range result.Incoming {
-		_, ok := sysevtMap[result.Incoming[i].Event]
-		if !ok {
-			log.Fatalf("cannot find system event %s\n", result.Incoming[i].Event)
+		data, err := os.ReadFile(arg)
+		if err != nil {
+			log.Fatalf("read yaml #%v\n", err)
 		}
+		err = yaml.Unmarshal(data, obj)
+		if err != nil {
+			log.Fatalf("unmarshal yaml: %v\n", err)
+		}
+		var result arch.IRQs
+		dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+			ErrorUnused: true,
+			Result:      &result,
+		})
+		if err != nil {
+			log.Fatalf("decode yaml #%v\n", err)
+		}
+		err = dec.Decode(obj)
+		if err != nil {
+			log.Fatalf("decode yaml #%v\n", err)
+		}
+
+		for i := range result.Incoming {
+			_, ok := sysevtMap[result.Incoming[i].Event]
+			if !ok {
+				log.Fatalf("cannot find system event %s\n", result.Incoming[i].Event)
+			}
+		}
+		combined.Incoming = append(combined.Incoming, result.Incoming...)
 	}
 
 	guard := strings.ToUpper("supruglue_include_irqgen_h")
@@ -73,10 +83,10 @@ struct pru_irq_rsc supruglue_incoming_irq_rsc = {
 %s};
 
 #endif // %s
-`, os.Args[2], guard, guard, len(result.Incoming), func() string {
+`, os.Args[2], guard, guard, len(combined.Incoming), func() string {
 		var sb strings.Builder
 		sb.WriteString("  {\n")
-		for _, irq := range result.Incoming {
+		for _, irq := range combined.Incoming {
 			sb.WriteString("    { ")
 			sb.WriteString(irq.Event)
 			sb.WriteString(", ")

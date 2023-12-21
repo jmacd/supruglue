@@ -18,6 +18,8 @@ inline int SystemOnChipIsShutdown(void) {
   return 0;
 }
 
+#define ARCH_NUM_SYSEVTS 64
+
 #ifdef __cplusplus
 }
 #endif

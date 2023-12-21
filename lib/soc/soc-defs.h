@@ -31,28 +31,29 @@ extern "C" {
 
 #define SIZEOF_WORDS(x) NUM_WORDS(sizeof(x))
 
+#define NUM_SYSEVTS ARCH_NUM_SYSEVTS
+
 #define GPIO_NUM_REGISTERS 4
 
 // test helpers, reset functions, etc
 void SystemOnChipSetup(void);
 int  SystemOnChipIsShutdown(void);
 
-// maps into e.g., dynamic __delay_cycles
+// like a dynamic __delay_cycles
 void SystemOnChipDelay(int32_t cycles);
 
-// Timestamp is out of place. Where should it go?
+// Counts 5ns cycles.
 typedef struct _Timestamp Timestamp;
 
 struct _Timestamp {
   union {
-    volatile uint64_t NANOS;
+    uint64_t CYCLES;
 
-    // Note that the order of LOW, HIGH was discovered through
-    // trial-and-error.  TODO: on-PRU test runner.
-    volatile struct {
-      unsigned LOW : 32;
+    struct {
+      unsigned LOW : 16;
+      unsigned MIDDLE : 16;
       unsigned HIGH : 32;
-    } NANOS_bit;
+    } CYCLES_bit;
   };
 };
 

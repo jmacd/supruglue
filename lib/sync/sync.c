@@ -13,10 +13,8 @@ void SemaDown(LockWord *word) {
 }
 
 void SemaUp(LockWord *word) {
-  if (ThreadListEmpty(&word->waiters)) {
-    return;
+  while (!ThreadListEmpty(&word->waiters)) {
+    Thread *wake = ThreadListPopFront(&word->waiters);
+    ThreadListPushFront(&__system_runnable, wake);
   }
-  Thread *wake = ThreadListPopFront(&word->waiters);
-  // This is a scheduler decision.
-  ThreadListPushFront(&__system_runnable, wake);
 }

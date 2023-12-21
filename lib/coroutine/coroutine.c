@@ -25,7 +25,7 @@ int Init(SystemConfig cfg) {
   SystemOnChipSetup();
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
-  ControllerInit(&__controller);
+  ControllerInit();
   return 0;
 }
 
@@ -41,8 +41,14 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
 }
 
 int __run(void) {
-  while (!SystemOnChipIsShutdown() && !ThreadListEmpty(&__system_runnable)) {
-    ServiceInterrupts(&__controller);
+  while (!SystemOnChipIsShutdown()) {
+    // TODO: use a blocking call when there are no runnables.  Requires assembly
+    // to use the block-on-R31 instruction.
+    ServiceInterrupts();
+
+    if (ThreadListEmpty(&__system_runnable)) {
+      continue;
+    }
 
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
@@ -67,7 +73,6 @@ int __run(void) {
       run->state = TS_FINISHED;
       break;
     default:
-      // assert(0);
       break;
     }
     switch (run->state) {

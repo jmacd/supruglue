@@ -4,20 +4,21 @@
 #ifndef LIB_INTC_INTC_DEFS_H
 #define LIB_INTC_INTC_DEFS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct _InterruptController InterruptController;
 
+typedef void(InterruptHandler)(void);
+
 extern InterruptController __controller;
 
-void ControllerInit(InterruptController *controller);
-
-void ServiceInterrupts(InterruptController *controller);
-
-// TODO: This is a placeholder.
-void BlockOnHost0(InterruptController *controller);
+void ControllerInit(void);
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler);
+void ServiceInterrupts(void);
 
 #ifdef __cplusplus
 }

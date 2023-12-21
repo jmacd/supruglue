@@ -7,6 +7,7 @@
 #include "external/ti-pru-support/include/pru_rpmsg.h"
 #include "external/ti-pru-support/include/rsc_types.h"
 #include "lib/rpmsg/rpmsg-defs.h"
+#include "lib/sync/sync.h"
 
 #define PRU_RPMSG_NO_PEER_ADDR (-5)
 
@@ -17,16 +18,13 @@ extern "C" {
 struct _ClientTransport {
   struct pru_rpmsg_transport channel;
 
-  // This event needs to be cleared when messages are received.
-  int8_t sysevt_arm_to_pru;
-
-  // Note: maybe unused
-  int16_t sysevt_pru_to_arm;
+  LockWord peer_lock;
+  LockWord kick_lock;
 
   // The peer address is initially 0, which case with no messages ever
   // received, we can't really send.
-  uint16_t rpmsg_peer_src_addr;
-  uint16_t rpmsg_peer_dst_addr;
+  uint16_t peer_src_addr;
+  uint16_t peer_dst_addr;
 
   // Equals the message source address.
   int16_t channel_port;

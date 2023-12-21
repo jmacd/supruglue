@@ -14,11 +14,11 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "test",
-#     srcs = ["sync_test.cc"],
-#     deps = [
-#         ":sync",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "test",
+    srcs = ["sync_test.cc"],
+    deps = [
+        ":sync",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

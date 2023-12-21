@@ -18,29 +18,29 @@ cc_binary(
         "//lib/initproc",
         "//lib/log/daemon",
         "//lib/rpmsg",
-        "//lib/time/clock:process",
-        #"//lib/ui1203",
+        "//lib/time:process",
         "//tools/toolchain/am335x",
     ],
 )
 
-cc_binary(
-    name = "local",
-    srcs = ["local.c"],
-    deps = [
-        "//lib/coroutine",
-    ],
-)
+# cc_binary(
+#     name = "local",
+#     srcs = ["local.c"],
+#     deps = [
+#         "//lib/coroutine",
+#     ],
+# )
 
 genrule(
     name = "irqgen",
     srcs = [
         "//tools/toolchain/am335x:pru0_irq",
+        "//lib/time/am335x:iep_tim_cap_cmp_pend",
         "//arch:sysevts",
     ],
     outs = [
         "rsc.c",
     ],
-    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //tools/toolchain/am335x:pru0_irq) > $@",
+    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //tools/toolchain/am335x:pru0_irq) $(location //lib/time/am335x:iep_tim_cap_cmp_pend) > $@",
     tools = ["//tools/cmd/irqgen"],
 )

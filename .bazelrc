@@ -3,6 +3,10 @@ build:host --cxxopt='-Wall'
 build:host --copt='-Wall'
 build:host --copt='-DSUPRUGLUE_TEST32'
 
+# Things I tried to get bazel 7.0.0 to work
+#build:host --cpu=darwin_x86_64
+#build:host --apple_platform_type=macos
+
 # linker_files not working, can't sandbox the `ar` step
 build --spawn_strategy=standalone
 
@@ -11,6 +15,7 @@ build:pru0 --cpu=pru
 build:pru0 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 build:pru0 --platforms //tools/toolchain:real_pru
 build:pru0 --copt='-DSUPRUGLUE_AM335X'
+build:pru1 --copt='-DSUPRUGLUE_PRU_NUM=0'
 build:pru0 --copt='--opt_level=4'
 build:pru0 --copt='--opt_for_speed=0'
 
@@ -19,7 +24,7 @@ build:pru1 --cpu=pru
 build:pru1 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 build:pru1 --platforms //tools/toolchain:real_pru
 build:pru1 --copt='-DSUPRUGLUE_AM335X'
-build:pru1 --copt='-DSUPRUGLUE_PRU_NUM'
+build:pru1 --copt='-DSUPRUGLUE_PRU_NUM=1'
 build:pru1 --copt='--opt_level=4'
 build:pru1 --copt='--opt_for_speed=0'
 

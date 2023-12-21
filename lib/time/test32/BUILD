@@ -11,19 +11,8 @@ cc_library(
     ],
     deps = [
         "//lib/thread",
-        "//lib/time/clock:defs",
-    ],
-)
-
-cc_test(
-    name = "clock_test",
-    srcs = ["clock_test.cc"],
-    deps = [
-        "//lib/time/clock",
-        "//lib/log/fmt",
-        "//lib/log/daemon",
-        "//lib/rpmsg/test32",
+        "//lib/intc",
+        "//lib/time:defs",
         "@com_google_absl//absl/log",
-        "@com_google_googletest//:gtest_main",
     ],
 )

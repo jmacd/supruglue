@@ -11,7 +11,16 @@ cc_library(
     ],
     deps = [
         "//lib/thread",
-        "//lib/time/clock:defs",
+        "//lib/sync",
+        "//lib/intc",
+        "//lib/time:defs",
         "//tools/toolchain/am335x",
+    ],
+)
+
+filegroup(
+    name = "iep_tim_cap_cmp_pend",
+    srcs = [
+        "iep_tim_cap_cmp_pend.yaml",
     ],
 )

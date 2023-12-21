@@ -14,6 +14,8 @@ extern "C" {
 
 void SystemOnChipShutdown(void);
 
+#define ARCH_NUM_SYSEVTS 64
+
 #ifdef __cplusplus
 }
 #endif
