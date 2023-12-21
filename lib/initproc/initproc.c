@@ -16,18 +16,10 @@ void InitProcess(ThreadID thid, Args args) {
     char     buf[32];
     uint16_t sz = sizeof(buf);
 
-    while ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
-      if (err == PRU_RPMSG_NO_BUF_AVAILABLE) {
-        // flash(5);
-        //  solid(1);
-        //  BlockOnSystemEvent(&__controller, SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ);
-        // Sleep(1000000);
-      }
-
-      // Sleep(1000000);
-      //  flash(2);
-      Yield();
+    if ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
+      Sleep(1000000);
     }
+
     Yield();
   }
 }

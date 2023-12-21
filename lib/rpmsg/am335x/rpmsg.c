@@ -102,22 +102,12 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
   if (transport->peer_src_addr == 0) {
     // In case we have never received.
-    // flash(7);
-    // solid(1);
     SemaDown(&transport->peer_lock);
   }
 
-  // flash(1);
-  // solid(1);
-
   int err = pru_rpmsg_send(&transport->channel, transport->peer_dst_addr, transport->peer_src_addr, (void *)data, len);
-  if (err == 0) {
-    // flash(2);
-    // solid(1);
-  } else {
+  if (err != 0) {
     SemaDown(&transport->kick_lock);
-    // flash(3);
-    // solid(1);
   }
   return err;
 }

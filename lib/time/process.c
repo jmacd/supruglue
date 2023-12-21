@@ -14,23 +14,13 @@ SUPRUGLUE_DEFINE_THREAD(clockproc, 256);
 
 void clockProcess(ThreadID thid, Args args) {
   for (;;) {
-    // solid(2);
-    // flash(5);
-    // solid(2);
     SemaDown(&__clock_lock);
-
-    // solid(2);
-    // flash(3); // + ThreadListLength(&__asleep));
-    // solid(2);
 
     Timestamp clk;
     ReadClock(&clk);
 
     ThreadList *p = __asleep.next;
     while (p != &__asleep) {
-      // solid(2);
-      // flash(2);
-      // solid(2);
       Thread *th = ThreadListEntry(p);
 
       int runnable = clk.CYCLES >= th->when.CYCLES;
@@ -42,9 +32,6 @@ void clockProcess(ThreadID thid, Args args) {
         ThreadListPushFront(&__system_runnable, th);
       }
     }
-    // solid(2);
-    // flash(1);
-    // solid(2);
   }
 }
 
