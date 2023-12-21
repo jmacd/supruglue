@@ -85,8 +85,9 @@ struct my_resource_table resourceTable = {
     },
 };
 
-#define BLUE_PERIOD 2000000000U
-#define YELLOW_PERIOD 1000000000U
+// Note: the argument is cycles / 5 because 5 ns cycle
+#define BLUE_PERIOD (2000000000U / 5)
+#define YELLOW_PERIOD (1000000000U / 5)
 
 void toggle_blue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_23);
@@ -96,13 +97,11 @@ void toggle_blue(ThreadID tid, Args args) {
 
     GPIO_SetPin(pin, 1);
     Sleep(BLUE_PERIOD);
-    //__delay_cycles(BLUE_PERIOD / 5);
 
     PRULOG_2U(INFO, "blue off", 0, 0);
 
     GPIO_SetPin(pin, 0);
     Sleep(BLUE_PERIOD);
-    //__delay_cycles(BLUE_PERIOD / 5);
   }
 }
 
@@ -114,12 +113,11 @@ void toggle_yellow(ThreadID tid, Args args) {
 
     GPIO_SetPin(pin, 1);
     Sleep(YELLOW_PERIOD);
-    //__delay_cycles(YELLOW_PERIOD / 5);
 
     PRULOG_2U(INFO, "yellow off", 0, 0);
+
     GPIO_SetPin(pin, 0);
     Sleep(YELLOW_PERIOD);
-    //__delay_cycles(YELLOW_PERIOD / 5);
   }
 }
 

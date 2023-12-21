@@ -20,7 +20,7 @@ extern "C" {
 
 void Sleep(uint32_t nanos);
 
-void TimeAdd(Timestamp *clock, uint32_t nanos);
+void TimeAddCycles(Timestamp *clock, uint32_t cycles);
 
 #ifdef __cplusplus
 }

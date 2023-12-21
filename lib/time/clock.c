@@ -9,19 +9,16 @@
 LockWord   __clock_lock;
 ThreadList __asleep;
 
-void Sleep(uint32_t d) {
+void Sleep(uint32_t cycles) {
   Thread *self = __system_current;
 
   ReadClock(&self->when);
-  TimeAdd(&self->when, d);
+  TimeAddCycles(&self->when, cycles);
 
   ThreadListPushBack(&__asleep, self);
   YieldBlocked();
 }
 
-void TimeAdd(Timestamp *clock, uint32_t dur) {
-  // TODO! Need to avoid division by 5 here because PRU doesn't
-  // have an instruction for that and it's 280 bytes of text.
-  // dur /= 5;
-  clock->CYCLES += dur;
+void TimeAddCycles(Timestamp *clock, uint32_t cycles) {
+  clock->CYCLES += cycles;
 }
