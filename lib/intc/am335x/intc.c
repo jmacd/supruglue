@@ -30,17 +30,6 @@ void ControllerInit(void) {
   CT_INTC.SECR0 = 0xffffffff;
   CT_INTC.SECR1 = 0xffffffff;
 
-  // @@@ Note the following few lines can be replaced by setting the irq_map. TODO?
-
-  // // Clear channel map register 1 (system events 4-7)
-  // CT_INTC.CMR1 = 0x00000000;
-
-  // // Set event 7 to channel 0
-  // CT_INTC.CMR1_bit.CH_MAP_7 = 0;
-
-  // // Map channel 1 to host 0
-  // CT_INTC.HMR0_bit.HINT_MAP_1 = 0;
-
   // Use EISR (indexed) or ESR (32bit) to enable system events.
   //
   // Note: fewer instructions, maybe, if we assemble a bit map and
@@ -64,43 +53,14 @@ void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
 }
 
 void ServiceInterrupts(void) {
-  // solid(2);
-  // flash(2);
-  // solid(2);
-
   while ((__R31 & PRU_HOST0_INTERRUPT) != 0) {
     uint8_t evt = CT_INTC.HIPIR0;
-    // solid(2);
-    // flash(evt);
-    // solid(2);
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {
       (__controller.handler[evt])();
-    } else {
-      // solid(2);
-      // flash(evt);
-      // solid(2);
     }
-    // __delay_cycles(10);
-
-    // if (CT_INTC.SRSR0 & (1 << evt)) {
-    //   solid(2);
-    //   flash(2);
-    //   solid(2);
-    // }
 
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;
-
-    // __delay_cycles(200);
-
-    // if (CT_INTC.SRSR0 & (1 << evt)) {
-    //   solid(2);
-    //   flash(10);
-    //   solid(2);
-    // }
   }
-  // solid(2);
-  // flash(2);
-  // solid(2);
 }
