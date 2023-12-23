@@ -9,16 +9,15 @@
 LockWord   __clock_lock;
 ThreadList __asleep;
 
-void Sleep(uint32_t cycles) {
+void SleepUntil(Timestamp *when, uint32_t cycles) {
   Thread *self = __system_current;
 
-  ReadClock(&self->when);
-  TimeAddCycles(&self->when, cycles);
+  TimeAddCycles(when, cycles);
+  self->when = *when;
 
   ThreadListPushBack(&__asleep, self);
   YieldBlocked();
-}
 
-void TimeAddCycles(Timestamp *clock, uint32_t cycles) {
-  clock->CYCLES += cycles;
+  // Note: the clock process could set the wakeup time as self->when
+  // and the difference could be use to detect falling behind, maybe.
 }
