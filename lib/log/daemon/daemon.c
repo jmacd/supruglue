@@ -7,6 +7,7 @@
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/soc/sysevts.h"
+#include "lib/time/clock.h"
 
 void SyslogProcess(ThreadID thid, Args args) {
   for (;;) {

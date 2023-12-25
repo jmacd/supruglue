@@ -6,6 +6,7 @@
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/soc/sysevts.h"
+#include "lib/time/clock.h"
 
 // EH? Unclear purpose.  Is it important to call ClientRecv?  Or does
 // knowing the ARM process is ready to talk matter?

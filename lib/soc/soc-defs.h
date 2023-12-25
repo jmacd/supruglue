@@ -41,6 +41,7 @@ int  SystemOnChipIsShutdown(void);
 
 // like a dynamic __delay_cycles
 void SystemOnChipDelay(int32_t cycles);
+void SystemOnChipSleep(void);
 
 // Counts 5ns cycles.
 typedef struct _Timestamp Timestamp;

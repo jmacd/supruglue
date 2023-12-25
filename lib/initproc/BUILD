@@ -13,6 +13,6 @@ cc_library(
         "//lib/debug",
         "//lib/intc",
         "//lib/rpmsg",
-        "//lib/thread",
+        "//lib/time",
     ],
 )

@@ -11,8 +11,16 @@
 extern "C" {
 #endif
 
+// Interrupt inputs set bits 30 and 31 in register R31.
+#define PRU_HOST0_INTERRUPT 0x40000000
+#define PRU_HOST1_INTERRUPT 0x80000000
+#define PRU_HOST_ANY_INTERRUPT 0xc0000000
+
 // Defined in delay.s.
 extern void SystemOnChipDelay(int cycles);
+
+// Defined in sleep.s.
+extern void SystemOnChipSleep(void);
 
 inline int SystemOnChipIsShutdown(void) {
   return 0;

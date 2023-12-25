@@ -15,6 +15,9 @@ void SystemOnChipSetup() {
 void SystemOnChipDelay(int32_t cycles) {
 }
 
+void SystemOnChipSleep(void) {
+}
+
 int SystemOnChipIsShutdown(void) {
   absl::MutexLock lock(&__system_lock);
   return !__system_enabled;

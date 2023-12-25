@@ -8,11 +8,6 @@
 #include "lib/intc/am335x/intc.h"
 #include "lib/soc/sysevts.h"
 
-// Interrupt inputs set bits 30 and 31 in register R31.
-#define PRU_HOST0_INTERRUPT 0x40000000
-#define PRU_HOST1_INTERRUPT 0x80000000
-#define PRU_HOST_ANY_INTERRUPT 0xc0000000
-
 volatile register uint32_t __R31;
 
 InterruptController __controller;

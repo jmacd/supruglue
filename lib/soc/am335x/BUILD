@@ -5,6 +5,7 @@ cc_library(
     name = "am335x",
     srcs = [
         "delay.s",
+        "sleep.s",
         "soc.c",
     ],
     hdrs = [
