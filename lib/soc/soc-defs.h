@@ -55,6 +55,11 @@ struct _Timestamp {
       unsigned MIDDLE : 16;
       unsigned HIGH : 32;
     } CYCLES_bit;
+
+    struct {
+      unsigned LOW32 : 32;
+      unsigned HIGH32 : 32;
+    } CYCLES_32bit;
   };
 };
 

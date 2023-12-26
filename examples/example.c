@@ -9,6 +9,7 @@
 #include "lib/debug/debug.h"
 #include "lib/gpio/gpio.h"
 #include "lib/initproc/initproc.h"
+#include "lib/intc/service.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"

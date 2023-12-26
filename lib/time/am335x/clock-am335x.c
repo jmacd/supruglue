@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include "external/ti-pru-support/include/am335x/pru_ctrl.h"
 #include "external/ti-pru-support/include/am335x/pru_iep.h"
 
 #include "lib/intc/intc.h"
@@ -52,7 +53,29 @@ void TimeInit(void) {
 }
 
 void TimeStart(void) {
+#if SUPRUGLUE_PRU_NUM == 0
+  PRU0_CTRL.CTRL_bit.CTR_EN = 1;
+#elif SUPRUGLUE_PRU_NUM == 1
+  PRU1_CTRL.CTRL_bit.CTR_EN = 1;
+#endif
+
   CT_IEP.TMR_GLB_CFG_bit.CNT_EN = 1;
+}
+
+void TimedSwitch(void) {
+  uint32_t run;
+  uint32_t stall;
+#if SUPRUGLUE_PRU_NUM == 0
+  run = PRU0_CTRL.CYCLE;
+  stall = PRU0_CTRL.STALL;
+  PRU0_CTRL.CYCLE = 0xffffffff;
+#elif SUPRUGLUE_PRU_NUM == 1
+  run = PRU1_CTRL.CYCLE;
+  stall = PRU1_CTRL.STALL;
+  PRU1_CTRL.CYCLE = 0xffffffff;
+#endif
+  __system_current->usage.run.CYCLES += run;
+  __system_current->usage.stall.CYCLES += stall;
 }
 
 void ReadClock(Timestamp *clock) {

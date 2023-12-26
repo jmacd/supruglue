@@ -39,17 +39,15 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
   return 0;
 }
 
-CPUCounter *running;
-
 int __run(void) {
-
   while (!SystemOnChipIsShutdown()) {
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
     __system.run_stack_pos = (void *)&run;
-    __system_current = run;
 
-    // TimeSwitch();
+    TimedSwitch();
+
+    __system_current = run;
 
     // Control flow:
     // 1. setjmp() returns JC_SETJUMP
@@ -98,17 +96,16 @@ void yieldInternal(JumpCode jc) {
 
   memcpy(__system_current->stack, yield_stack, size);
 
-  switch (setjmp(__system_current->exec.run_jump)) {
-  case JC_SETJUMP:
+  // Set return point.
+  if (setjmp(__system_current->exec.run_jump) == JC_SETJUMP) {
+    // Return control.
     longjmp(__system.return_jump, jc);
-  case JC_RESUME:
-    break;
-  default:
-    // assert(0);
-    break;
   }
+  // Resume control.
 
-  //  size and yield_stack are not volatile, recompute:
+  // size and yield_stack are not volatile, but they have to be
+  // recomputed for other reasons.  TODO: not clear why--is the stack
+  // copy off in size?
   yield_stack = (void *)&unused;
   size = (size_t)__system.run_stack_pos - (size_t)yield_stack;
 
@@ -118,6 +115,8 @@ void yieldInternal(JumpCode jc) {
 int Run(void) {
   __system_yield = &yieldInternal;
 
+  // set current for TimedSwitch() to avoid extra branches
+  __system_current = ThreadListFront(&__system_runnable);
   TimeStart();
 
   int err = __run();
