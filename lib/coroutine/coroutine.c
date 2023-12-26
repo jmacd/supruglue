@@ -8,7 +8,7 @@
 
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
-#include "lib/intc/intc.h"
+#include "lib/time/clock.h"
 
 System __system;
 
@@ -25,7 +25,6 @@ int Init(SystemConfig cfg) {
   SystemOnChipSetup();
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
-  ControllerInit();
   return 0;
 }
 
@@ -40,23 +39,26 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
   return 0;
 }
 
-int __run(void) {
-  while (!SystemOnChipIsShutdown()) {
-    ServiceInterrupts();
-    if (ThreadListEmpty(&__system_runnable)) {
-      SystemOnChipSleep();
-      continue;
-    }
+CPUCounter *running;
 
+int __run(void) {
+
+  while (!SystemOnChipIsShutdown()) {
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
-    __system_current = run;
     __system.run_stack_pos = (void *)&run;
+    __system_current = run;
 
+    TimeSwitch();
+
+    // Control flow:
+    // 1. setjmp() returns JC_SETJUMP
+    // 2. switch (run->state) starts, resumes, or exits a thread
+    // 3. return here for non-JC_SETJUMP codes
     switch (setjmp(__system.return_jump)) {
     case JC_SETJUMP:
-      //  The return jump was prepared, break to the second switch with
-      //  the current runnable thread.
+      //  The return jump was prepared, break to the second switch
+      //  with the current runnable thread.
       break;
     case JC_SUSPEND:
       //  Running thread yielded.
@@ -86,7 +88,7 @@ int __run(void) {
       break;
       // Function call returned
     case TS_FINISHED:
-      //  Error cases exit here.
+      //  Error cases (e.g., stack overflow) exit here.
       break;
     }
   }
@@ -125,6 +127,9 @@ void yieldInternal(JumpCode jc) {
 
 int Run(void) {
   __system_yield = &yieldInternal;
+
+  TimeStart();
+
   int err = __run();
   __system_yield = NULL;
   __system_current = NULL;

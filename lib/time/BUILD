@@ -50,6 +50,7 @@ cc_test(
         "//lib/log/fmt",
         "//lib/log/daemon",
         "//lib/rpmsg/test32",
+        "//lib/intc:service",
         "@com_google_absl//absl/log",
         "@com_google_googletest//:gtest_main",
     ],

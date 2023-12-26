@@ -4,6 +4,7 @@
 #include "absl/log/log.h"
 #include "absl/strings/str_format.h"
 #include "lib/coroutine/coroutine.h"
+#include "lib/intc/service.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/rpmsg.h"
@@ -29,6 +30,7 @@ TEST(ClockTest, SleepWake) {
   auto tt = NewTestTransport();
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
+  EXPECT_EQ(0, InterruptServiceInit());
 
   EXPECT_EQ(0, SystemOnChipIsShutdown());
 

@@ -18,6 +18,8 @@ extern "C" {
 #include "lib/time/test32/clock-test32.h"
 #endif
 
+void Sleep(uint32_t cycles);
+void TimeAddCycles(Timestamp *clock, uint32_t cycles);
 void SleepUntil(Timestamp *when, uint32_t cycles);
 
 inline void Sleep(uint32_t cycles) {

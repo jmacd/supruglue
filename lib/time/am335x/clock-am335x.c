@@ -9,9 +9,6 @@
 #include "lib/soc/sysevts.h"
 #include "lib/time/clock-defs.h"
 
-// Device-Specific PRU Read Latency Values Appendix A.1 says 12 cycles
-// to read IEP_TIMER.
-
 // This is power-of-two to simplify the logic.
 // #define RESOLUTION (1 << 30)
 #define RESOLUTION (1 << 16)
@@ -19,6 +16,8 @@
 Timestamp __clock;
 
 void UpdateClock(void) {
+  // Device-Specific PRU Read Latency Values Appendix A.1 indicates
+  // 12 cycles to read IEP_TIMER.
   uint32_t ts = CT_IEP.TMR_CNT;
 
   if (ts < __clock.CYCLES_bit.LOW) {

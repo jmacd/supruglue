@@ -41,7 +41,7 @@ int  SystemOnChipIsShutdown(void);
 
 // like a dynamic __delay_cycles
 void SystemOnChipDelay(int32_t cycles);
-void SystemOnChipSleep(void);
+void SystemOnChipSuspend(void);
 
 // Counts 5ns cycles.
 typedef struct _Timestamp Timestamp;
@@ -56,6 +56,14 @@ struct _Timestamp {
       unsigned HIGH : 32;
     } CYCLES_bit;
   };
+};
+
+// Pair of usage/stall cycle count
+typedef struct _CPUCounter CPUCounter;
+
+struct _CPUCounter {
+  Timestamp run;
+  Timestamp stall;
 };
 
 #ifdef __cplusplus

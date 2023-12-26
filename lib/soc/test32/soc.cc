@@ -15,7 +15,7 @@ void SystemOnChipSetup() {
 void SystemOnChipDelay(int32_t cycles) {
 }
 
-void SystemOnChipSleep(void) {
+void SystemOnChipSuspend(void) {
 }
 
 int SystemOnChipIsShutdown(void) {

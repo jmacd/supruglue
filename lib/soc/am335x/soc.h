@@ -20,7 +20,7 @@ extern "C" {
 extern void SystemOnChipDelay(int cycles);
 
 // Defined in sleep.s.
-extern void SystemOnChipSleep(void);
+extern void SystemOnChipSuspend(void);
 
 inline int SystemOnChipIsShutdown(void) {
   return 0;

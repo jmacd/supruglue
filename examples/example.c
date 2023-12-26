@@ -140,6 +140,7 @@ int main(void) {
 
   Init(NewSystemConfig());
 
+  InterruptServiceInit();
   ClockInit();
 
   err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
@@ -147,8 +148,6 @@ int main(void) {
     // @@@ this has failed b/c wrong event number... what would we do?
     // (q: why compile-in such checks? is there a way to panic?)
   }
-
-  TimeStart();
 
   args1.ptr = "1";
   args2.ptr = "0";
