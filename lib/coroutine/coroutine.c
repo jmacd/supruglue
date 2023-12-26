@@ -49,17 +49,13 @@ int __run(void) {
     __system.run_stack_pos = (void *)&run;
     __system_current = run;
 
-    TimeSwitch();
+    // TimeSwitch();
 
     // Control flow:
     // 1. setjmp() returns JC_SETJUMP
     // 2. switch (run->state) starts, resumes, or exits a thread
     // 3. return here for non-JC_SETJUMP codes
     switch (setjmp(__system.return_jump)) {
-    case JC_SETJUMP:
-      //  The return jump was prepared, break to the second switch
-      //  with the current runnable thread.
-      break;
     case JC_SUSPEND:
       //  Running thread yielded.
       ThreadListPushBack(&__system_runnable, run);
@@ -70,26 +66,20 @@ int __run(void) {
     case JC_OVERFLOW:
     case JC_INTERNAL:
       // Running thread had an error.
-      run->state = TS_FINISHED;
-      break;
-    default:
-      break;
-    }
-    switch (run->state) {
-    case TS_STARTING:
-      //  Run a new thread.
-      run->state = TS_RUNNING;
-      run->exec.call.func(TID(run), run->exec.call.args);
-      run->state = TS_FINISHED;
-      break;
-    case TS_RUNNING:
-      //  Re-enter the yield call.
-      longjmp(run->exec.run_jump, JC_RESUME);
-      break;
-      // Function call returned
-    case TS_FINISHED:
-      //  Error cases (e.g., stack overflow) exit here.
-      break;
+      continue;
+    default: // e.g., JC_SETJUMP
+      switch (run->state) {
+      case TS_STARTING:
+        //  Run a new thread.
+        run->state = TS_RUNNING;
+        run->exec.call.func(TID(run), run->exec.call.args);
+        continue;
+      case TS_RUNNING:
+        // Re-enter the yield call.
+        longjmp(run->exec.run_jump, JC_RESUME);
+        // Function call returned
+        continue;
+      }
     }
   }
   return 0;
