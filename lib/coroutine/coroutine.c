@@ -90,7 +90,7 @@ void yieldInternal(JumpCode jc) {
 
   // Check for thread-stack overflow.
   if (size > __system_current->stack_size) {
-    PRULOG_2U(FATAL, "stack overflow: %u exceeds %u", size, __system_current->stack_size);
+    PRULOG_2u32(FATAL, "stack overflow: %u exceeds %u", size, __system_current->stack_size);
     longjmp(__system.return_jump, JC_OVERFLOW);
   }
 

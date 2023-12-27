@@ -39,7 +39,7 @@ func New(fw *firmware.Firmware) (*Host, error) {
 	}, nil
 }
 
-const logEntrySize = 24
+const logEntrySize = 36
 
 func (host *Host) Run() error {
 	buf := make([]byte, logEntrySize)
@@ -54,42 +54,52 @@ func (host *Host) Run() error {
 			continue
 		}
 
-		typeid := binary.LittleEndian.Uint32(dat[0:4])
-		dat = dat[4:]
-		switch typeid {
-		case 1: // TODO hard-coded for log entry type
-
-			// Interpret 4 32-bit words
-			if len(dat) != cap(buf) {
-				log.Print(fmt.Errorf("data should be %d bytes, was %d", logEntrySize, len(dat)))
-				continue
-			}
-			u0 := binary.LittleEndian.Uint32(dat[0:4])
-			u1 := binary.LittleEndian.Uint32(dat[4:8])
-			u2 := binary.LittleEndian.Uint32(dat[8:12])
-			u3 := binary.LittleEndian.Uint32(dat[12:16])
-			u4 := binary.LittleEndian.Uint32(dat[16:20])
-			u5 := binary.LittleEndian.Uint32(dat[20:24])
-
-			msg, err := host.fw.ELF.CStringAt(uint64(u3))
-			if err != nil || msg == "" {
-				msg = fmt.Sprintf("<unknown msg 0x%x>", u3)
-			} else {
-				// TODO Should let %d coerce uint->int
-				msg = strings.Replace(msg, "%u", "%d", -1)
-				print := fmt.Sprintf(msg, u4, u5)
-				if strings.Contains(print, "%!(EXTRA") {
-					print = fmt.Sprintf(msg, u4)
-				}
-				if !strings.Contains(print, "%!(EXTRA") {
-					msg = print
-				}
-			}
-			elapsed := 5 * time.Duration(uint64(u2)<<32|uint64(u1))
-			ts := elapsed.String()
-
-			fmt.Printf("%s [%05x] %s\n", ts, u0, msg)
+		// Interpret 4 32-bit words
+		if len(dat) != cap(buf) {
+			log.Print(fmt.Errorf("data should be %d bytes, was %d", logEntrySize, len(dat)))
+			continue
 		}
+		tid := binary.LittleEndian.Uint32(dat[0:4])
+		flags := binary.LittleEndian.Uint32(dat[4:8])
+		tslow := binary.LittleEndian.Uint32(dat[8:12])
+		tshigh := binary.LittleEndian.Uint32(dat[12:16])
+		msgptr := binary.LittleEndian.Uint32(dat[16:20])
+
+		var a, b uint64
+
+		switch {
+		case flags&0x1000 != 0:
+			a = uint64(binary.LittleEndian.Uint32(dat[20:24]))
+		case flags&0x2000 != 0:
+			a = uint64(binary.LittleEndian.Uint32(dat[20:24])) << 32
+			a |= uint64(binary.LittleEndian.Uint32(dat[24:28]))
+		}
+		switch {
+		case flags&0x4000 != 0:
+			b = uint64(binary.LittleEndian.Uint32(dat[28:32]))
+		case flags&0x8000 != 0:
+			b = uint64(binary.LittleEndian.Uint32(dat[28:32])) << 32
+			b |= uint64(binary.LittleEndian.Uint32(dat[32:36]))
+		}
+
+		msg, err := host.fw.ELF.CStringAt(uint64(msgptr))
+		if err != nil || msg == "" {
+			msg = fmt.Sprintf("<unknown msg 0x%x>", msg)
+		} else {
+			// TODO Should let %d coerce uint->int; use the flags
+			msg = strings.Replace(msg, "%u", "%d", -1)
+			print := fmt.Sprintf(msg, a, b)
+			if strings.Contains(print, "%!(EXTRA") {
+				print = fmt.Sprintf(msg, a)
+			}
+			if !strings.Contains(print, "%!(EXTRA") {
+				msg = print
+			}
+		}
+		elapsed := 5 * time.Duration(uint64(tshigh)<<32|uint64(tslow))
+		ts := elapsed.String()
+
+		fmt.Printf("%s [%05x] %s\n", ts, tid, msg)
 	}
 }
 

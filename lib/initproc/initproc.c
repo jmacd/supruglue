@@ -21,7 +21,7 @@ void InitProcess(ThreadID thid, Args args) {
 
     if ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
       Sleep(100000000);
-      continue
+      continue;
     }
 
     // Send periodic metrics.

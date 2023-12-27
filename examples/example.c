@@ -92,17 +92,17 @@ struct my_resource_table resourceTable = {
 
 void toggle_blue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_23);
-  PRULOG_2U(INFO, "starting blue half-cycle %uns", BLUE_PERIOD, 0);
+  PRULOG_1u32(INFO, "starting blue half-cycle %uns", BLUE_PERIOD);
 
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
-    PRULOG_2U(INFO, "blue on", 0, 0);
+    PRULOG_0(INFO, "blue on");
 
     GPIO_SetPin(pin, 1);
     SleepUntil(&clock, BLUE_PERIOD);
 
-    PRULOG_2U(INFO, "blue off", 0, 0);
+    PRULOG_0(INFO, "blue off");
 
     GPIO_SetPin(pin, 0);
     SleepUntil(&clock, BLUE_PERIOD);
@@ -111,17 +111,17 @@ void toggle_blue(ThreadID tid, Args args) {
 
 void toggle_yellow(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_25);
-  PRULOG_2U(INFO, "starting yellow half-cycle %uns", YELLOW_PERIOD, 0);
+  PRULOG_1u32(INFO, "starting yellow half-cycle %uns", YELLOW_PERIOD);
 
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
-    PRULOG_2U(INFO, "yellow on", 0, 0);
+    PRULOG_0(INFO, "yellow on");
 
     GPIO_SetPin(pin, 1);
     SleepUntil(&clock, YELLOW_PERIOD);
 
-    PRULOG_2U(INFO, "yellow off", 0, 0);
+    PRULOG_0(INFO, "yellow off");
 
     GPIO_SetPin(pin, 0);
     SleepUntil(&clock, YELLOW_PERIOD);

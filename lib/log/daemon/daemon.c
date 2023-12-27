@@ -11,13 +11,12 @@
 
 void SyslogProcess(ThreadID thid, Args args) {
   for (;;) {
-    TypedEntry tentry;
-    tentry.typeid = 1;
+    Entry entry;
 
-    JournalRead(&__system.journal, &tentry.entry, JR_BLOCKING);
+    JournalRead(&__system.journal, &entry, JR_BLOCKING);
 
     int err;
-    while ((err = ClientSend(&__transport, &tentry, sizeof(tentry))) != 0) {
+    while ((err = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
       // TODO: Flash user LEDs?
       Sleep(1000000);
     }
