@@ -28,6 +28,7 @@ struct _System {
   SystemConfig cfg;
   jmp_buf      return_jump;
   void        *run_stack_pos;
+  Thread      *allthreads;
   Journal      journal;
 };
 

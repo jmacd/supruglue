@@ -14,5 +14,7 @@ cc_library(
         "//lib/intc",
         "//lib/rpmsg",
         "//lib/time",
+        "//lib/coroutine",
+        "//lib/log/journal",
     ],
 )

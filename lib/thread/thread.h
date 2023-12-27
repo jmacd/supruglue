@@ -64,6 +64,8 @@ struct _Thread {
     } call;
   } exec;
 
+  Thread *allthreads;
+
   uint8_t stack[0];
 };
 

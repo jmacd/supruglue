@@ -35,6 +35,8 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
   thread->exec.call.func = func;
   thread->exec.call.args = args;
   thread->state = TS_STARTING;
+  thread->allthreads = __system.allthreads;
+  __system.allthreads = thread;
   ThreadListPushBack(&__system_runnable, thread);
   return 0;
 }

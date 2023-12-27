@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "initproc.h"
+#include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg.h"
@@ -24,15 +25,12 @@ void InitProcess(ThreadID thid, Args args) {
       continue;
     }
 
-    // Send periodic metrics.
-    // @@@ Need a list of all threads?
-    // form rpmsg typeid 2
-    // for {
-    //   sleep...
-    //   3 words per thread:
-    //     TID
-    //     RUN
-    //     STALL
-    // }
+    Sleep(2000000000);
+
+    Thread *th;
+    for (th = __system.allthreads; th != NULL; th = th->allthreads) {
+      // @@@ important constant, make static and load via ELF
+      PRULOG_2u64(INFO, "thread ran %u stalled %u", th->usage.run.CYCLES, th->usage.stall.CYCLES);
+    }
   }
 }
