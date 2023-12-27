@@ -5,6 +5,7 @@
 #define LIB_SYSLOG_PROC_H
 
 #include "lib/args/args.h"
+#include "lib/log/journal/journal.h"
 #include "lib/thread/thread.h"
 
 #ifdef __cplusplus
@@ -15,6 +16,13 @@ extern "C" {
 // journal and conveys them over RPMsg to the host.
 
 void SyslogProcess(ThreadID thid, Args args);
+
+typedef struct _TypedEntry TypedEntry;
+
+struct _TypedEntry {
+  uint32_t typeid;
+  Entry entry;
+};
 
 #ifdef __cplusplus
 }

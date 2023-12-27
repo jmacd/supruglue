@@ -53,36 +53,43 @@ func (host *Host) Run() error {
 			log.Print(err)
 			continue
 		}
-		// Interpret 4 32-bit words
-		if len(dat) != cap(buf) {
-			log.Print(fmt.Errorf("data should be %d bytes, was %d", logEntrySize, len(dat)))
-			continue
-		}
-		u0 := binary.LittleEndian.Uint32(dat[0:4])
-		u1 := binary.LittleEndian.Uint32(dat[4:8])
-		u2 := binary.LittleEndian.Uint32(dat[8:12])
-		u3 := binary.LittleEndian.Uint32(dat[12:16])
-		u4 := binary.LittleEndian.Uint32(dat[16:20])
-		u5 := binary.LittleEndian.Uint32(dat[20:24])
 
-		msg, err := host.fw.ELF.CStringAt(uint64(u3))
-		if err != nil || msg == "" {
-			msg = fmt.Sprintf("<unknown msg 0x%x>", u3)
-		} else {
-			// TODO Should let %d coerce uint->int
-			msg = strings.Replace(msg, "%u", "%d", -1)
-			print := fmt.Sprintf(msg, u4, u5)
-			if strings.Contains(print, "%!(EXTRA") {
-				print = fmt.Sprintf(msg, u4)
-			}
-			if !strings.Contains(print, "%!(EXTRA") {
-				msg = print
-			}
-		}
-		elapsed := 5 * time.Duration(uint64(u2)<<32|uint64(u1))
-		ts := elapsed.String()
+		typeid := binary.LittleEndian.Uint32(dat[0:4])
+		dat = dat[4:]
+		switch typeid {
+		case 1: // TODO hard-coded for log entry type
 
-		fmt.Printf("%s [%05x] %s\n", ts, u0, msg)
+			// Interpret 4 32-bit words
+			if len(dat) != cap(buf) {
+				log.Print(fmt.Errorf("data should be %d bytes, was %d", logEntrySize, len(dat)))
+				continue
+			}
+			u0 := binary.LittleEndian.Uint32(dat[0:4])
+			u1 := binary.LittleEndian.Uint32(dat[4:8])
+			u2 := binary.LittleEndian.Uint32(dat[8:12])
+			u3 := binary.LittleEndian.Uint32(dat[12:16])
+			u4 := binary.LittleEndian.Uint32(dat[16:20])
+			u5 := binary.LittleEndian.Uint32(dat[20:24])
+
+			msg, err := host.fw.ELF.CStringAt(uint64(u3))
+			if err != nil || msg == "" {
+				msg = fmt.Sprintf("<unknown msg 0x%x>", u3)
+			} else {
+				// TODO Should let %d coerce uint->int
+				msg = strings.Replace(msg, "%u", "%d", -1)
+				print := fmt.Sprintf(msg, u4, u5)
+				if strings.Contains(print, "%!(EXTRA") {
+					print = fmt.Sprintf(msg, u4)
+				}
+				if !strings.Contains(print, "%!(EXTRA") {
+					msg = print
+				}
+			}
+			elapsed := 5 * time.Duration(uint64(u2)<<32|uint64(u1))
+			ts := elapsed.String()
+
+			fmt.Printf("%s [%05x] %s\n", ts, u0, msg)
+		}
 	}
 }
 
