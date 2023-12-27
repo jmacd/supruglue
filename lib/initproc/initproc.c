@@ -13,14 +13,26 @@
 
 void InitProcess(ThreadID thid, Args args) {
   for (;;) {
+    // Try to receive until it succeeds.  This is necessary to get the
+    // destination ID for the ARM host.
     int      err;
     char     buf[32];
     uint16_t sz = sizeof(buf);
 
     if ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
-      Sleep(1000000);
+      Sleep(100000000);
+      continue
     }
 
-    Yield();
+    // Send periodic metrics.
+    // @@@ Need a list of all threads?
+    // form rpmsg typeid 2
+    // for {
+    //   sleep...
+    //   3 words per thread:
+    //     TID
+    //     RUN
+    //     STALL
+    // }
   }
 }
