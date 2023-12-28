@@ -42,7 +42,7 @@ func New(fw *firmware.Firmware) (*Host, error) {
 const logEntrySize = 36
 
 func (host *Host) Run() error {
-	buf := make([]byte, logEntrySize)
+	buf := make([]byte, 5*logEntrySize) // 5* extra!
 
 	// TODO: clock correction, or similar
 	fmt.Println("rpmsg: channel open")

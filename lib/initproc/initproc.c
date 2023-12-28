@@ -25,16 +25,14 @@ void InitProcess(ThreadID thid, Args args) {
       continue;
     }
 
-    Yield();
+    for (;;) {
+      Sleep(2000000000);
 
-    // for (;;) {
-    //   Sleep(2000000000);
-
-    //   Thread *th;
-    //   for (th = __system.allthreads; th != NULL; th = th->allthreads) {
-    //     // @@@ important constant, make static and load via ELF
-    //     PRULOG_2u64(INFO, "thread ran %u stalled %u", th->usage.run.CYCLES, th->usage.stall.CYCLES);
-    //   }
-    // }
+      Thread *th;
+      for (th = __system.allthreads; th != NULL; th = th->allthreads) {
+        // @@@ important constant, make static and load via ELF
+        PRULOG_2u64(INFO_BLOCK, "thread ran %u stalled %u", th->usage.run.CYCLES, th->usage.stall.CYCLES);
+      }
+    }
   }
 }

@@ -17,7 +17,7 @@
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
-    PRULOG_2U(INFO, "write %u", i, 0); // Logs always yield
+    PRULOG_1u32(INFO, "write %u", i); // Logs always yield
   }
 }
 
@@ -56,8 +56,8 @@ TEST(Syslog, Simple) {
       howmany++;
       if (entry.msg == overflowMessage) {
         overflows++;
-        overflowed += entry.arg1;
-        got += entry.arg1;
+        overflowed += entry.int1.U32.LOW;
+        got += entry.int1.U32.LOW;
       } else {
         res.insert(Format(&entry));
         got += 1;

@@ -17,13 +17,6 @@ extern "C" {
 
 void SyslogProcess(ThreadID thid, Args args);
 
-typedef struct _TypedEntry TypedEntry;
-
-struct _TypedEntry {
-  uint32_t typeid;
-  Entry entry;
-};
-
 #ifdef __cplusplus
 }
 #endif

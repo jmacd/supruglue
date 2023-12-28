@@ -79,6 +79,8 @@ int __run(void) {
         longjmp(run->exec.run_jump, JC_RESUME);
         // Function call returned
         continue;
+      default:
+        continue;
       }
     }
   }
