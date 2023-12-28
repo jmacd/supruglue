@@ -68,11 +68,15 @@ void TimedSwitch(void) {
 #if SUPRUGLUE_PRU_NUM == 0
   run = PRU0_CTRL.CYCLE;
   stall = PRU0_CTRL.STALL;
+  // PRU0_CTRL.CTRL_bit.CTR_EN = 0;
   PRU0_CTRL.CYCLE = 0xffffffff;
+  // PRU0_CTRL.CTRL_bit.CTR_EN = 1;
 #elif SUPRUGLUE_PRU_NUM == 1
   run = PRU1_CTRL.CYCLE;
   stall = PRU1_CTRL.STALL;
+  // PRU1_CTRL.CTRL_bit.CTR_EN = 0;
   PRU1_CTRL.CYCLE = 0xffffffff;
+  // PRU1_CTRL.CTRL_bit.CTR_EN = 1;
 #endif
   __system_current->usage.run.CYCLES += run;
   __system_current->usage.stall.CYCLES += stall;

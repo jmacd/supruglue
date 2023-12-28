@@ -9,9 +9,6 @@
 #include "lib/soc/sysevts.h"
 #include "lib/time/clock.h"
 
-// EH? Unclear purpose.  Is it important to call ClientRecv?  Or does
-// knowing the ARM process is ready to talk matter?
-
 void InitProcess(ThreadID thid, Args args) {
   for (;;) {
     // Try to receive until it succeeds.  This is necessary to get the
@@ -25,13 +22,14 @@ void InitProcess(ThreadID thid, Args args) {
       continue;
     }
 
+    // Note we do not exit this loop. We needed to do the above once
+    // per firmware start because there is only one host.
     for (;;) {
       Sleep(2000000000);
 
       Thread *th;
       for (th = __system.allthreads; th != NULL; th = th->allthreads) {
-        // @@@ important constant, make static and load via ELF
-        PRULOG_2u64(INFO_BLOCK, "thread ran %u stalled %u", th->usage.run.CYCLES, th->usage.stall.CYCLES);
+        METLOG_2u64(th, "cpu.run.cycles=%u cpu.stall.cycles=%u", th->usage.run.CYCLES, th->usage.stall.CYCLES);
       }
     }
   }

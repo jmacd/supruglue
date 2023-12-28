@@ -97,12 +97,12 @@ void toggle_blue(ThreadID tid, Args args) {
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
-    PRULOG_0(INFO, "blue on");
+    PRULOG_0(INFO, "on");
 
     GPIO_SetPin(pin, 1);
     SleepUntil(&clock, BLUE_PERIOD);
 
-    PRULOG_0(INFO, "blue off");
+    PRULOG_0(INFO, "off");
 
     GPIO_SetPin(pin, 0);
     SleepUntil(&clock, BLUE_PERIOD);
@@ -116,12 +116,12 @@ void toggle_yellow(ThreadID tid, Args args) {
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
-    PRULOG_0(INFO, "yellow on");
+    PRULOG_0(INFO, "on");
 
     GPIO_SetPin(pin, 1);
     SleepUntil(&clock, YELLOW_PERIOD);
 
-    PRULOG_0(INFO, "yellow off");
+    PRULOG_0(INFO, "off");
 
     GPIO_SetPin(pin, 0);
     SleepUntil(&clock, YELLOW_PERIOD);

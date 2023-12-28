@@ -42,7 +42,7 @@ func New(fw *firmware.Firmware) (*Host, error) {
 const logEntrySize = 36
 
 func (host *Host) Run() error {
-	buf := make([]byte, 5*logEntrySize) // 5* extra!
+	buf := make([]byte, logEntrySize*2)
 
 	// TODO: clock correction, or similar
 	fmt.Println("rpmsg: channel open")
@@ -55,7 +55,7 @@ func (host *Host) Run() error {
 		}
 
 		// Interpret 4 32-bit words
-		if len(dat) != cap(buf) {
+		if len(dat) != logEntrySize {
 			log.Print(fmt.Errorf("data should be %d bytes, was %d", logEntrySize, len(dat)))
 			continue
 		}
@@ -71,15 +71,15 @@ func (host *Host) Run() error {
 		case flags&0x1000 != 0:
 			a = uint64(binary.LittleEndian.Uint32(dat[20:24]))
 		case flags&0x2000 != 0:
-			a = uint64(binary.LittleEndian.Uint32(dat[20:24])) << 32
-			a |= uint64(binary.LittleEndian.Uint32(dat[24:28]))
+			a = uint64(binary.LittleEndian.Uint32(dat[20:24]))
+			a |= uint64(binary.LittleEndian.Uint32(dat[24:28])) << 32
 		}
 		switch {
 		case flags&0x4000 != 0:
 			b = uint64(binary.LittleEndian.Uint32(dat[28:32]))
 		case flags&0x8000 != 0:
-			b = uint64(binary.LittleEndian.Uint32(dat[28:32])) << 32
-			b |= uint64(binary.LittleEndian.Uint32(dat[32:36]))
+			b = uint64(binary.LittleEndian.Uint32(dat[28:32]))
+			b |= uint64(binary.LittleEndian.Uint32(dat[32:36])) << 32
 		}
 
 		msg, err := host.fw.ELF.CStringAt(uint64(msgptr))
@@ -99,7 +99,13 @@ func (host *Host) Run() error {
 		elapsed := 5 * time.Duration(uint64(tshigh)<<32|uint64(tslow))
 		ts := elapsed.String()
 
-		fmt.Printf("%s [%05x] %s\n", ts, tid, msg)
+		tname := ""
+		if name, err := host.fw.ELF.ThreadNameAt(uint64(tid)); err == nil {
+			tname = name
+		} else {
+			tname = fmt.Sprintf("%05x", tid)
+		}
+		fmt.Printf("%s [%s] %s\n", ts, tname, msg)
 	}
 }
 

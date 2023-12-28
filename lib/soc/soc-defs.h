@@ -21,7 +21,10 @@ extern "C" {
 
 #define SUPRUGLUE_DEFINE_SIZED(name, type1, thing1, type2, size)                                                       \
   SUPRUGLUE_DECLARE_SIZED(name, type1, thing1, type2, size);                                                           \
+  _PRAGMA(DATA_SECTION(name, ".thread." #name))                                                                        \
   static SUPRUGLUE_SIZED_TYPENAME(name, type1, type2) name
+
+#define _PRAGMA(x) _Pragma(#x)
 
 #define _JOIN(thing, field) thing##field
 
