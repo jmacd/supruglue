@@ -14,7 +14,7 @@ System __system;
 
 SystemConfig NewSystemConfig(void) {
   return (SystemConfig){
-      .unused = 0,
+      .shutdown = 0,
   };
 }
 
@@ -41,8 +41,12 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
   return 0;
 }
 
+void Shutdown(void) {
+  __system.cfg.shutdown = 1;
+}
+
 int __run(void) {
-  while (!SystemOnChipIsShutdown()) {
+  while (!__system.cfg.shutdown && !ThreadListEmpty(&__system_runnable)) {
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
     __system.run_stack_pos = (void *)&run;

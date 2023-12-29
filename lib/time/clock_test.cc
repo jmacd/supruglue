@@ -18,7 +18,7 @@
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
-    PRULOG_1u32(INFO_BLOCK, "write %u", i); // Logs always yield
+    PRULOG_1u32(INFO_NOYIELD, "write %u", i); // Logs always yield
     Sleep(10);
   }
 }
@@ -31,8 +31,6 @@ TEST(ClockTest, SleepWake) {
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
   EXPECT_EQ(0, InterruptServiceInit());
-
-  EXPECT_EQ(0, SystemOnChipIsShutdown());
 
   ClockInit();
 
@@ -60,7 +58,7 @@ TEST(ClockTest, SleepWake) {
       res.insert(Format(&entry));
       got += 1;
     }
-    SystemOnChipShutdown();
+    Shutdown();
   });
 
   EXPECT_EQ(0, ::Run());

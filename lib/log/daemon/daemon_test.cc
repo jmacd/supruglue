@@ -6,9 +6,11 @@
 #include "absl/log/log.h"
 #include "absl/strings/str_format.h"
 #include "lib/coroutine/coroutine.h"
+#include "lib/intc/service.h"
 #include "lib/log/fmt/fmt.h"
 #include "lib/log/journal/journal.h"
 #include "lib/rpmsg/rpmsg.h"
+#include "lib/time/process.h"
 #include "gtest/gtest.h"
 
 #include <thread>
@@ -29,6 +31,9 @@ TEST(Syslog, Simple) {
   auto tt = NewTestTransport();
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
+
+  InterruptServiceInit();
+  ClockInit();
 
   EXPECT_EQ(0, Create(&writer0.thread, test_write_func, Args{.ptr = "100"}, "writer0", sizeof(writer0.space)));
   EXPECT_EQ(0, Create(&writer1.thread, test_write_func, Args{.ptr = "100"}, "writer1", sizeof(writer1.space)));
@@ -63,6 +68,7 @@ TEST(Syslog, Simple) {
         got += 1;
       }
     }
+    Shutdown();
   });
 
   EXPECT_EQ(0, ::Run());
@@ -82,6 +88,8 @@ TEST(Syslog, WithTransients) {
   auto tt = NewTestTransport();
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
+  InterruptServiceInit();
+  ClockInit();
 
   EXPECT_EQ(0, Create(&writer0.thread, test_write_func, Args{.ptr = "1"}, "writer0", sizeof(writer0.space)));
   EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(writer0.space)));
@@ -98,6 +106,8 @@ TEST(Syslog, WithTransients) {
     EXPECT_EQ(0, HostRecv(tt, &entry, &blen));
     EXPECT_EQ(blen, sizeof(entry));
     EXPECT_EQ("[writer0] write 0", Format(&entry));
+
+    Shutdown();
   });
 
   EXPECT_EQ(0, ::Run());

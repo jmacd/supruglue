@@ -14,6 +14,7 @@ using std::chrono::high_resolution_clock;
 using std::chrono::nanoseconds;
 
 high_resolution_clock::time_point started;
+high_resolution_clock::time_point switched;
 thread                           *source;
 
 void Tick(void) {
@@ -38,4 +39,15 @@ void ReadClock(Timestamp *ts) {
   auto now = high_resolution_clock::now();
 
   ts->CYCLES = duration_cast<nanoseconds>(now - started).count() / 5;
+}
+
+void TimedSwitch(void) {
+  auto now = high_resolution_clock::now();
+
+  auto run = duration_cast<nanoseconds>(now - switched).count() / 5;
+
+  __system_current->usage.run.CYCLES += run;
+  __system_current->usage.stall.CYCLES += run;
+
+  switched = now;
 }

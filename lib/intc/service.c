@@ -15,8 +15,8 @@ void serviceProcess(ThreadID thid, Args args) {
     if (ThreadListEmpty(&__system_runnable)) {
       SystemOnChipSuspend();
     }
-    Yield();
     ServiceInterrupts();
+    Yield();
   }
 }
 

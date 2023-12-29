@@ -24,7 +24,11 @@ extern "C" {
   _PRAGMA(DATA_SECTION(name, ".thread." #name))                                                                        \
   static SUPRUGLUE_SIZED_TYPENAME(name, type1, type2) name
 
+#ifdef SUPRUGLUE_TEST32
+#define _PRAGMA(x)
+#else
 #define _PRAGMA(x) _Pragma(#x)
+#endif
 
 #define _JOIN(thing, field) thing##field
 
@@ -40,7 +44,6 @@ extern "C" {
 
 // test helpers, reset functions, etc
 void SystemOnChipSetup(void);
-int  SystemOnChipIsShutdown(void);
 
 // like a dynamic __delay_cycles
 void SystemOnChipDelay(int32_t cycles);

@@ -26,6 +26,8 @@ cc_test(
         "//lib/intc",
         "//lib/log/fmt",
         "//lib/rpmsg/test32",
+        "//lib/time:process",
+        "//lib/intc:service",
         "@com_google_absl//absl/log",
         "@com_google_googletest//:gtest_main",
     ],

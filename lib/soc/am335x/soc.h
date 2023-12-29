@@ -22,10 +22,6 @@ extern void SystemOnChipDelay(int cycles);
 // Defined in sleep.s.
 extern void SystemOnChipSuspend(void);
 
-inline int SystemOnChipIsShutdown(void) {
-  return 0;
-}
-
 #define ARCH_NUM_SYSEVTS 64
 
 #ifdef __cplusplus

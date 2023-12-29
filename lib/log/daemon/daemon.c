@@ -1,6 +1,8 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
+#include <stdio.h>
+
 #include "daemon.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
