@@ -19,5 +19,5 @@ void SystemOnChipSetup(void) {
 }
 
 void Shutdown(void) {
-  __system.shutdown = 1;
+  __system_shutdown = 1;
 }
