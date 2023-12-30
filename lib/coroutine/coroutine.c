@@ -14,7 +14,7 @@ System __system;
 
 SystemConfig NewSystemConfig(void) {
   return (SystemConfig){
-      .shutdown = 0,
+      .export_interval = 10 * TIME_SECOND,
   };
 }
 
@@ -25,6 +25,7 @@ int Init(SystemConfig cfg) {
   SystemOnChipSetup();
   ThreadListInit(&__system_runnable);
   JournalInit(&sys->journal);
+  __system_shutdown = 0;
   return 0;
 }
 
@@ -41,12 +42,8 @@ int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t
   return 0;
 }
 
-void Shutdown(void) {
-  __system.cfg.shutdown = 1;
-}
-
 int __run(void) {
-  while (!__system.cfg.shutdown && !ThreadListEmpty(&__system_runnable)) {
+  while (!__system_shutdown && !ThreadListEmpty(&__system_runnable)) {
     Thread *volatile run = ThreadListPopFront(&__system_runnable);
 
     __system.run_stack_pos = (void *)&run;

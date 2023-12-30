@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+#define TIME_SECOND 200000000
+
 extern Timestamp __clock;
 
 #ifdef __cplusplus

@@ -33,18 +33,18 @@ void TimeInit(void) {
 
 void TimeStart(void) {
   started = high_resolution_clock::now();
+  switched = started;
 }
 
 void ReadClock(Timestamp *ts) {
   auto now = high_resolution_clock::now();
 
-  ts->CYCLES = duration_cast<nanoseconds>(now - started).count() / 5;
+  ts->CYCLES = duration_cast<nanoseconds>(now - started).count();
 }
 
 void TimedSwitch(void) {
   auto now = high_resolution_clock::now();
-
-  auto run = duration_cast<nanoseconds>(now - switched).count() / 5;
+  auto run = duration_cast<nanoseconds>(now - switched).count();
 
   __system_current->usage.run.CYCLES += run;
   __system_current->usage.stall.CYCLES += run;

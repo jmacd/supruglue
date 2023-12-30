@@ -18,14 +18,14 @@ void InitProcess(ThreadID thid, Args args) {
     uint16_t sz = sizeof(buf);
 
     if ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
-      Sleep(100000000);
+      Sleep(TIME_SECOND / 2);
       continue;
     }
 
     // Note we do not exit this loop. We needed to do the above once
     // per firmware start because there is only one host.
     for (;;) {
-      Sleep(2000000000);
+      Sleep(__system.cfg.export_interval);
 
       Thread *th;
       for (th = __system.allthreads; th != NULL; th = th->allthreads) {

@@ -21,7 +21,7 @@ typedef struct _System       System;
 typedef struct _SystemConfig SystemConfig;
 
 struct _SystemConfig {
-  int32_t shutdown;
+  int32_t export_interval;
 };
 
 struct _System {
@@ -41,8 +41,6 @@ int Init(SystemConfig cfg);
 int Create(Thread *thread, ThreadFunc *func, Args args, const char *name, size_t stack_size);
 
 int Run(void);
-
-void Shutdown(void);
 
 #ifdef __cplusplus
 }

@@ -49,6 +49,8 @@ void SystemOnChipSetup(void);
 void SystemOnChipDelay(int32_t cycles);
 void SystemOnChipSuspend(void);
 
+void Shutdown(void);
+
 // Counts 5ns cycles.
 typedef struct _Timestamp Timestamp;
 
@@ -76,6 +78,8 @@ struct _CPUCounter {
   Timestamp run;
   Timestamp stall;
 };
+
+extern int __system_shutdown;
 
 #ifdef __cplusplus
 }

@@ -16,6 +16,9 @@ cc_library(
         "soc.h",
         ":sysevts_gen",
     ],
+    srcs = [
+        "soc.c",
+    ],
     deps = [
         ":defs",
     ] + select({

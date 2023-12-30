@@ -17,3 +17,7 @@ void SystemOnChipSetup(void) {
   PRU1_CTRL.WAKEUP_EN = PRU_HOST1_INTERRUPT;
 #endif
 }
+
+void Shutdown(void) {
+  __system.shutdown = 1;
+}
