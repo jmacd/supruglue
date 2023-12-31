@@ -10,7 +10,7 @@ cc_library(
         "intc.h",
     ],
     deps = [
-        "@com_google_absl//absl/log",
         "//lib/intc:defs",
+        "@com_google_absl//absl/log",
     ],
 )

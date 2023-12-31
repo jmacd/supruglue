@@ -26,11 +26,11 @@ cc_library(
 
 cc_library(
     name = "service",
-    hdrs = [
-        "service.h",
-    ],
     srcs = [
         "service.c",
+    ],
+    hdrs = [
+        "service.h",
     ],
     deps = [
         ":intc",

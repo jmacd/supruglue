@@ -16,10 +16,10 @@ cc_binary(
         "//lib/coroutine",
         "//lib/gpio",
         "//lib/initproc",
+        "//lib/intc:service",
         "//lib/log/daemon",
         "//lib/rpmsg",
         "//lib/time:process",
-        "//lib/intc:service",
         "//tools/toolchain/am335x",
     ],
 )

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jmacd/supruglue/tools/internal/firmware"
+	"github.com/jmacd/supruglue/tools/internal/fwstate"
 )
 
 const deviceName = "/dev/rpmsg_pru30"
@@ -20,6 +21,7 @@ type RPMsgDevice struct {
 type Host struct {
 	rpm *RPMsgDevice
 	fw  *firmware.Firmware
+	ms  *fwstate.Metrics
 }
 
 func New(fw *firmware.Firmware) (*Host, error) {
@@ -36,6 +38,7 @@ func New(fw *firmware.Firmware) (*Host, error) {
 	return &Host{
 		rpm: rpm,
 		fw:  fw,
+		ms:  fwstate.NewMetrics(),
 	}, nil
 }
 
@@ -46,6 +49,17 @@ func (host *Host) Run() error {
 
 	// TODO: clock correction, or similar
 	fmt.Println("rpmsg: channel open")
+
+	go func() {
+		t := time.NewTicker(time.Second * 5)
+		defer t.Stop()
+		for {
+			select {
+			case <-t.C:
+				host.ms.Show()
+			}
+		}
+	}()
 
 	for {
 		dat, err := host.rpm.Read(buf)
@@ -85,26 +99,32 @@ func (host *Host) Run() error {
 		msg, err := host.fw.ELF.CStringAt(uint64(msgptr))
 		if err != nil || msg == "" {
 			msg = fmt.Sprintf("<unknown msg 0x%x>", msg)
-		} else {
-			// TODO Should let %d coerce uint->int; use the flags
-			msg = strings.Replace(msg, "%u", "%d", -1)
-			print := fmt.Sprintf(msg, a, b)
-			if strings.Contains(print, "%!(EXTRA") {
-				print = fmt.Sprintf(msg, a)
-			}
-			if !strings.Contains(print, "%!(EXTRA") {
-				msg = print
-			}
 		}
-		elapsed := 5 * time.Duration(uint64(tshigh)<<32|uint64(tslow))
-		ts := elapsed.String()
 
+		elapsed := 5 * time.Duration(uint64(tshigh)<<32|uint64(tslow))
 		tname := ""
 		if name, err := host.fw.ELF.ThreadNameAt(uint64(tid)); err == nil {
 			tname = name
 		} else {
 			tname = fmt.Sprintf("%05x", tid)
 		}
+
+		if (flags & 0x10) != 0 {
+			host.ms.Update(elapsed, tname, msg, flags, a, b)
+			continue
+		}
+
+		msg = strings.Replace(msg, "%u", "%d", -1)
+		print := fmt.Sprintf(msg, a, b)
+		if strings.Contains(print, "%!(EXTRA") {
+			print = fmt.Sprintf(msg, a)
+		}
+		if !strings.Contains(print, "%!(EXTRA") {
+			msg = print
+		}
+
+		ts := elapsed.String()
+
 		fmt.Printf("%s [%s] %s\n", ts, tname, msg)
 	}
 }

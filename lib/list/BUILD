@@ -5,10 +5,10 @@ package(default_visibility = ["//visibility:public"])
 # Re-evaluate. See ./save/list-old.h.
 cc_library(
     name = "list",
+    srcs = [
+    ],
     hdrs = [
         "list.h",
-    ],
-    srcs = [
     ],
 )
 

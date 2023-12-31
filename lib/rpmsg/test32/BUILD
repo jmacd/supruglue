@@ -11,8 +11,8 @@ cc_library(
         "rpmsg.h",
     ],
     deps = [
-        "//lib/rpmsg:defs",
         "//lib/coroutine",
+        "//lib/rpmsg:defs",
         "@com_google_absl//absl/synchronization",
     ],
 )

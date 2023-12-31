@@ -10,12 +10,12 @@ cc_library(
         "initproc.h",
     ],
     deps = [
+        "//lib/coroutine",
         "//lib/debug",
         "//lib/intc",
+        "//lib/log/journal",
         "//lib/rpmsg",
         "//lib/time",
-        "//lib/coroutine",
-        "//lib/log/journal",
     ],
 )
 
@@ -27,11 +27,11 @@ cc_test(
     deps = [
         ":initproc",
         "//lib/intc",
+        "//lib/intc:service",
+        "//lib/log/daemon",
         "//lib/log/fmt",
         "//lib/rpmsg/test32",
         "//lib/time:process",
-        "//lib/log/daemon",
-        "//lib/intc:service",
         "@com_google_absl//absl/log",
         "@com_google_googletest//:gtest_main",
     ],
