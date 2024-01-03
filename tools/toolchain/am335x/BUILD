@@ -24,6 +24,9 @@ filegroup(
         "//tools/toolchain:pru1": [
             "pru1.cmd",
         ],
+    }),
+    target_compatible_with = select({
+        "//tools/toolchain:am335x": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
 )

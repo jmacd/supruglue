@@ -24,7 +24,6 @@ void test_write_func(ThreadID tid, Args args) {
 }
 
 SUPRUGLUE_DEFINE_THREAD(writer, 500);
-SUPRUGLUE_DEFINE_THREAD(syslog, 500);
 
 TEST(ClockTest, SleepWake) {
   auto tt = NewTestTransport();
@@ -33,9 +32,9 @@ TEST(ClockTest, SleepWake) {
   EXPECT_EQ(0, InterruptServiceInit());
 
   ClockInit();
+  SyslogInit();
 
   EXPECT_EQ(0, Create(&writer.thread, test_write_func, Args{.ptr = "100"}, "writer", sizeof(writer.space)));
-  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(syslog.space)));
 
   std::unordered_set<std::string> res;
   std::unordered_set<std::string> expect;

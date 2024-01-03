@@ -1,3 +1,4 @@
+
 # -*- Mode: Python -*-
 package(default_visibility = ["//visibility:public"])
 
@@ -44,6 +45,9 @@ filegroup(
         "//tools/toolchain:pru1": [
             "pru1.yaml",
         ],
+    }),
+    target_compatible_with = select({
+        "//tools/toolchain:am335x": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
 )

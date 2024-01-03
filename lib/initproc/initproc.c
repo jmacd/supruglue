@@ -9,15 +9,14 @@
 #include "lib/soc/sysevts.h"
 #include "lib/time/clock.h"
 
-void InitProcess(ThreadID thid, Args args) {
+void initProcessThread(ThreadID thid, Args args) {
   for (;;) {
     // Try to receive until it succeeds.  This is necessary to get the
     // destination ID for the ARM host.
-    int      err;
     char     buf[32];
     uint16_t sz = sizeof(buf);
 
-    if ((err = ClientRecv(&__transport, buf, &sz)) != 0) {
+    if (ClientRecv(&__transport, buf, &sz) != 0) {
       Sleep(TIME_SECOND / 2);
       continue;
     }
@@ -33,4 +32,12 @@ void InitProcess(ThreadID thid, Args args) {
       }
     }
   }
+}
+
+SUPRUGLUE_DEFINE_THREAD(init, 512);
+
+int ProcessInit(void) {
+  Args args;
+  args.ptr = "";
+  return Create(&init.thread, initProcessThread, args, "init", sizeof(init.space));
 }

@@ -11,18 +11,26 @@
 #include "lib/soc/sysevts.h"
 #include "lib/time/clock.h"
 
-void SyslogProcess(ThreadID thid, Args args) {
+void syslogProcess(ThreadID thid, Args args) {
   for (;;) {
     Entry entry;
 
     JournalRead(&__system.journal, &entry, JR_BLOCKING);
 
-    int err;
-    while ((err = ClientSend(&__transport, &entry, sizeof(entry))) != 0) {
+    while (ClientSend(&__transport, &entry, sizeof(entry)) != 0) {
       // TODO: Flash user LEDs?
       Sleep(TIME_SECOND / 2);
     }
 
     Yield();
   }
+}
+
+// The 512 byte stack is needed for host testing.  TODO: for on-PRU too?
+SUPRUGLUE_DEFINE_THREAD(syslog, 512);
+
+int SyslogInit(void) {
+  Args args;
+  args.ptr = "";
+  return Create(&syslog.thread, syslogProcess, args, "syslog", sizeof(syslog.space));
 }

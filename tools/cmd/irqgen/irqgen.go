@@ -20,7 +20,7 @@ func main() {
 	}
 	sevts, err := csv.ReadFile[arch.SystemEvent](os.Args[1])
 	if err != nil {
-		log.Fatalf("unmarshal sysevts.csv: %v\n", err)
+		log.Fatalf("unmarshal %s: %v\n", os.Args[1], err)
 	}
 	sysevtMap := arch.SystemEventMap(sevts)
 

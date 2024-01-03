@@ -128,37 +128,23 @@ void toggle_yellow(ThreadID tid, Args args) {
   }
 }
 
-SUPRUGLUE_DEFINE_THREAD(syslog, 256);
-SUPRUGLUE_DEFINE_THREAD(init, 256);
 SUPRUGLUE_DEFINE_THREAD(blue, 256);
 SUPRUGLUE_DEFINE_THREAD(yellow, 256);
 
 int main(void) {
-
-  Args args1;
-  Args args2;
-  int  err = 0;
+  Args args;
 
   Init(NewSystemConfig());
-
   InterruptServiceInit();
   ClockInit();
+  RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
+  SyslogInit();
+  ProcessInit();
 
-  err = RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
-  if (err != 0) {
-    // @@@ this has failed b/c wrong event number... what would we do?
-    // (q: why compile-in such checks? is there a way to panic?)
-  }
+  args.ptr = "0";
 
-  args1.ptr = "1";
-  args2.ptr = "0";
+  Create(&blue.thread, toggle_blue, args, "blue", sizeof(blue.space));
+  Create(&yellow.thread, toggle_yellow, args, "yellow", sizeof(yellow.space));
 
-  err = Create(&init.thread, InitProcess, args1, "init", sizeof(init.space));
-  err = Create(&syslog.thread, SyslogProcess, args2, "syslog", sizeof(syslog.space));
-
-  err = Create(&blue.thread, toggle_blue, args2, "blue", sizeof(blue.space));
-  err = Create(&yellow.thread, toggle_yellow, args2, "yellow", sizeof(yellow.space));
-
-  err = Run();
-  return err;
+  return Run();
 }

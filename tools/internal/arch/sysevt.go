@@ -15,7 +15,7 @@ type SystemEvent struct {
 
 func (se SystemEvent) Validate() error {
 	if se.SignalName == "" {
-		return fmt.Errorf("system event empty name: %s", se.Number)
+		return fmt.Errorf("system event empty name: %d", se.Number())
 	}
 	if _, err := strconv.ParseInt(se.EventNumber, 10, 64); err != nil {
 		return fmt.Errorf("system event range: %w", err)

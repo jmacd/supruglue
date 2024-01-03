@@ -27,16 +27,15 @@ cc_binary(
 genrule(
     name = "irqgen",
     srcs = [
+        "//arch:sysevts",
         "//lib/rpmsg/am335x:irq",
         "//lib/time/am335x:iep_tim_cap_cmp_pend",
-        "//arch:sysevts",
     ],
     outs = [
         "irq.c",
     ],
-    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //lib/rpmsg/am335x:irq) $(location //lib/time/am335x:iep_tim_cap_cmp_pend) > $@",
+    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(SRCS) > $@",
     tools = [
         "//tools/cmd/irqgen",
-        "//tools/toolchain/am335x",
     ],
 )

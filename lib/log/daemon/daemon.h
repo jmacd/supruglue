@@ -12,10 +12,7 @@
 extern "C" {
 #endif
 
-// Thread function that reads log messages from other threads via the
-// journal and conveys them over RPMsg to the host.
-
-void SyslogProcess(ThreadID thid, Args args);
+int SyslogInit(void);
 
 #ifdef __cplusplus
 }

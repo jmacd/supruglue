@@ -25,7 +25,6 @@ void test_write_func(ThreadID tid, Args args) {
 
 SUPRUGLUE_DEFINE_THREAD(writer0, 500);
 SUPRUGLUE_DEFINE_THREAD(writer1, 500);
-SUPRUGLUE_DEFINE_THREAD(syslog, 500);
 
 TEST(Syslog, Simple) {
   auto tt = NewTestTransport();
@@ -34,10 +33,10 @@ TEST(Syslog, Simple) {
 
   InterruptServiceInit();
   ClockInit();
+  SyslogInit();
 
   EXPECT_EQ(0, Create(&writer0.thread, test_write_func, Args{.ptr = "100"}, "writer0", sizeof(writer0.space)));
   EXPECT_EQ(0, Create(&writer1.thread, test_write_func, Args{.ptr = "100"}, "writer1", sizeof(writer1.space)));
-  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(syslog.space)));
 
   std::unordered_set<std::string> res;
   std::unordered_set<std::string> expect;
@@ -90,9 +89,9 @@ TEST(Syslog, WithTransients) {
   EXPECT_EQ(0, Init(NewSystemConfig()));
   InterruptServiceInit();
   ClockInit();
+  SyslogInit();
 
   EXPECT_EQ(0, Create(&writer0.thread, test_write_func, Args{.ptr = "1"}, "writer0", sizeof(writer0.space)));
-  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(writer0.space)));
 
   std::thread client([tt] {
     // Some transients.

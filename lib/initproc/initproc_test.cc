@@ -15,9 +15,6 @@
 #include <utility>
 #include <vector>
 
-SUPRUGLUE_DEFINE_THREAD(init, 500);
-SUPRUGLUE_DEFINE_THREAD(syslog, 500);
-
 using std::make_pair;
 using std::pair;
 using std::thread;
@@ -31,9 +28,8 @@ TEST(InitProc, Simple) {
 
   InterruptServiceInit();
   ClockInit();
-
-  EXPECT_EQ(0, Create(&init.thread, InitProcess, Args{.ptr = ""}, "init", sizeof(init.space)));
-  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(syslog.space)));
+  SyslogInit();
+  ProcessInit();
 
   // Count all threads
   int thread_count = 0;
