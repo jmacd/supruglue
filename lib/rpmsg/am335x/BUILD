@@ -20,3 +20,30 @@ cc_library(
         "@ti-pru-support//lib/src/rpmsg_lib",
     ],
 )
+
+filegroup(
+    name = "pru0_irq",
+    srcs = [
+        "pru0.yaml",
+    ],
+)
+
+filegroup(
+    name = "pru1_irq",
+    srcs = [
+        "pru1.yaml",
+    ],
+)
+
+filegroup(
+    name = "irq",
+    srcs = select({
+        "//tools/toolchain:pru0": [
+            "pru0.yaml",
+        ],
+        "//tools/toolchain:pru1": [
+            "pru1.yaml",
+        ],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)

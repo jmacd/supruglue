@@ -1,15 +1,15 @@
 # -*- Mode: Python -*-
 cc_binary(
-    name = "example_pru0",
+    name = "two_leds",
     srcs = [
         "example.c",
         ":irqgen",
     ],
     additional_linker_inputs = [
-        "//tools/toolchain/am335x:pru0_cmd",
+        "//tools/toolchain/am335x:linker_cmd",
     ],
     linkopts = [
-        "$(location //tools/toolchain/am335x:pru0_cmd)",
+        "$(location //tools/toolchain/am335x:linker_cmd)",
         "--stack_size=0x1000",
     ],
     deps = [
@@ -24,24 +24,19 @@ cc_binary(
     ],
 )
 
-# cc_binary(
-#     name = "local",
-#     srcs = ["local.c"],
-#     deps = [
-#         "//lib/coroutine",
-#     ],
-# )
-
 genrule(
     name = "irqgen",
     srcs = [
-        "//tools/toolchain/am335x:pru0_irq",
+        "//lib/rpmsg/am335x:irq",
         "//lib/time/am335x:iep_tim_cap_cmp_pend",
         "//arch:sysevts",
     ],
     outs = [
-        "rsc.c",
+        "irq.c",
     ],
-    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //tools/toolchain/am335x:pru0_irq) $(location //lib/time/am335x:iep_tim_cap_cmp_pend) > $@",
-    tools = ["//tools/cmd/irqgen"],
+    cmd = "./$(location //tools/cmd/irqgen:irqgen) $(location //arch:sysevts) $(location //lib/rpmsg/am335x:irq) $(location //lib/time/am335x:iep_tim_cap_cmp_pend) > $@",
+    tools = [
+        "//tools/cmd/irqgen",
+        "//tools/toolchain/am335x",
+    ],
 )
