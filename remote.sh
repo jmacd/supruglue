@@ -50,7 +50,7 @@ configPins
 # cat /sys/class/remoteproc/remoteproc1/state
 
 mv supructl ./bin
-mv example_pru0 ./fw
+mv two_leds  ./fw 
 
-./bin/supructl start --firmware ./fw/example_pru0
+./bin/supructl start  --remoteproc /sys/class/remoteproc/remoteproc2 --firmware ./fw/two_leds
 #./bin/supructl rodata --firmware ./fw/example_pru0
