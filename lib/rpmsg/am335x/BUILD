@@ -1,4 +1,3 @@
-
 # -*- Mode: Python -*-
 package(default_visibility = ["//visibility:public"])
 

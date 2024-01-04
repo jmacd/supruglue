@@ -87,4 +87,3 @@ platform(
         "@io_bazel_rules_go//go/toolchain:cgo_off",
     ],
 )
-

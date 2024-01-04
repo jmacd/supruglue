@@ -1,5 +1,5 @@
 incoming:
 - event: SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ
-  channel: 1
+  channel: 2
   host: 1
   desc: Rpmsg driver from the ARM to the PRU1

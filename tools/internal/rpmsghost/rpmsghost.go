@@ -10,9 +10,10 @@ import (
 
 	"github.com/jmacd/supruglue/tools/internal/firmware"
 	"github.com/jmacd/supruglue/tools/internal/fwstate"
+	"github.com/jmacd/supruglue/tools/internal/remoteproc"
 )
 
-const deviceName = "/dev/rpmsg_pru30"
+const logEntrySize = 36
 
 type RPMsgDevice struct {
 	file *os.File
@@ -24,8 +25,15 @@ type Host struct {
 	ms  *fwstate.Metrics
 }
 
-func New(fw *firmware.Firmware) (*Host, error) {
-	rpm, err := openRPMsgDevice()
+func deviceName(rp *remoteproc.RemoteProc) string {
+	if strings.HasPrefix(rp.Directory(), "remoteproc1") {
+		return "/dev/rpmsg_pru30"
+	}
+	return "/dev/rpmsg_pru31"
+}
+
+func New(fw *firmware.Firmware, rp *remoteproc.RemoteProc) (*Host, error) {
+	rpm, err := openRPMsgDevice(rp)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +49,6 @@ func New(fw *firmware.Firmware) (*Host, error) {
 		ms:  fwstate.NewMetrics(),
 	}, nil
 }
-
-const logEntrySize = 36
 
 func (host *Host) Run() error {
 	buf := make([]byte, logEntrySize*2)
@@ -131,7 +137,7 @@ func (host *Host) Run() error {
 
 const retryDelay = 100 * time.Millisecond
 
-func openRPMsgDevice() (*RPMsgDevice, error) {
+func openRPMsgDevice(rp *remoteproc.RemoteProc) (*RPMsgDevice, error) {
 	const numTries = 10
 	var err error
 	for tries := 0; tries < numTries; tries++ {
@@ -139,7 +145,7 @@ func openRPMsgDevice() (*RPMsgDevice, error) {
 			fmt.Println("rpmsg:", err)
 		}
 		var file *os.File
-		file, err = os.OpenFile(deviceName, os.O_RDWR, 0666)
+		file, err = os.OpenFile(deviceName(rp), os.O_RDWR, 0666)
 		if err != nil {
 			time.Sleep(retryDelay)
 			continue

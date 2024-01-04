@@ -88,7 +88,7 @@ func runStart(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("start firmware: %w", err)
 	}
 
-	app, err := rpmsghost.New(fw)
+	app, err := rpmsghost.New(fw, rp)
 	if err != nil {
 		return fmt.Errorf("rpmsg host: %w", err)
 	}
@@ -113,7 +113,11 @@ func runJournal(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("firmware: %w", err)
 	}
-	app, err := rpmsghost.New(fw)
+	rp, err := remoteproc.Open(*flagRemoteProcDir, *flagFirmwareDir)
+	if err != nil {
+		return fmt.Errorf("remoteproc: %w", err)
+	}
+	app, err := rpmsghost.New(fw, rp)
 	if err != nil {
 		return fmt.Errorf("rpmsg host: %w", err)
 	}

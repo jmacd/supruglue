@@ -8,5 +8,6 @@ go_library(
     deps = [
         "//tools/internal/firmware",
         "//tools/internal/fwstate",
+        "//tools/internal/remoteproc",
     ],
 )

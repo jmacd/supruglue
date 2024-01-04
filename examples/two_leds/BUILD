@@ -27,6 +27,9 @@ cc_binary(
 genrule(
     name = "irqgen",
     srcs = [
+        # Order is important: args[0] is all events
+        # Remaining args define arriving system events.
+        # (Only) one should set the host.
         "//arch:sysevts",
         "//lib/rpmsg/am335x:irq",
         "//lib/time/am335x:iep_tim_cap_cmp_pend",
