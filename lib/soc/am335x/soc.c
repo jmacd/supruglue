@@ -5,8 +5,6 @@
 #include "external/ti-pru-support/include/am335x/pru_cfg.h"
 #include "external/ti-pru-support/include/am335x/pru_ctrl.h"
 
-void *__dummy;
-
 void SystemOnChipSetup(void) {
   // Allow OCP master port access by the PRU.
   CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;

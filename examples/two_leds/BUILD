@@ -2,7 +2,7 @@
 cc_binary(
     name = "two_leds",
     srcs = [
-        "example.c",
+        "two_leds.c",
         ":irqgen",
     ],
     additional_linker_inputs = [
@@ -20,6 +20,7 @@ cc_binary(
         "//lib/log/daemon",
         "//lib/rpmsg",
         "//lib/time:process",
+        "//lib/resource",
         "//tools/toolchain/am335x",
     ],
 )

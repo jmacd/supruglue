@@ -10,6 +10,7 @@
 #include "lib/debug/debug.h"
 #include "lib/time/clock.h"
 
+#pragma DATA_SECTION(__system_shutdown, ".resource_table")
 System __system;
 
 SystemConfig NewSystemConfig(void) {
