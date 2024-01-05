@@ -52,5 +52,6 @@ configPins
 mv supructl ./bin
 mv two_leds  ./fw 
 
-./bin/supructl start  --remoteproc /sys/class/remoteproc/remoteproc2 --firmware ./fw/two_leds
+#./bin/supructl start  --remoteproc /sys/class/remoteproc/remoteproc2 --firmware ./fw/two_leds
+./bin/supructl start  --remoteproc /sys/class/remoteproc/remoteproc1 --firmware ./fw/two_leds
 #./bin/supructl rodata --firmware ./fw/example_pru0

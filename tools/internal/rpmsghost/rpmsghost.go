@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -26,7 +27,7 @@ type Host struct {
 }
 
 func deviceName(rp *remoteproc.RemoteProc) string {
-	if strings.HasPrefix(rp.Directory(), "remoteproc1") {
+	if path.Base(rp.Directory()) == "remoteproc1" {
 		return "/dev/rpmsg_pru30"
 	}
 	return "/dev/rpmsg_pru31"
