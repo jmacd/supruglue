@@ -90,17 +90,21 @@ func (host *Host) Run() error {
 
 		switch {
 		case flags&0x1000 != 0:
-			a = uint64(binary.LittleEndian.Uint32(dat[20:24]))
+			a = uint64(binary.LittleEndian.Uint32(dat[24:28]))
+			fmt.Println("A1", a)
 		case flags&0x2000 != 0:
 			a = uint64(binary.LittleEndian.Uint32(dat[20:24]))
 			a |= uint64(binary.LittleEndian.Uint32(dat[24:28])) << 32
+			fmt.Println("A2", a)
 		}
 		switch {
 		case flags&0x4000 != 0:
-			b = uint64(binary.LittleEndian.Uint32(dat[28:32]))
+			b = uint64(binary.LittleEndian.Uint32(dat[32:36]))
+			fmt.Println("B1", b)
 		case flags&0x8000 != 0:
 			b = uint64(binary.LittleEndian.Uint32(dat[28:32]))
 			b |= uint64(binary.LittleEndian.Uint32(dat[32:36])) << 32
+			fmt.Println("B2", b)
 		}
 
 		msg, err := host.fw.ELF.CStringAt(uint64(msgptr))

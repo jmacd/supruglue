@@ -6,6 +6,9 @@ cc_library(
     hdrs = [
         "gpio.h",
     ],
+    srcs = [
+        "gpio.c",
+    ],
     deps = [
         "//lib/gpio:defs",
     ],

@@ -39,8 +39,7 @@ void toggle_blue(ThreadID tid, Args args) {
 
 void read_yellow(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_25);
-
-  // GPIO_EnableInput(pin);
+  gpio_pin other = GPIO_PIN(P9_23);
 
   PRULOG_1u32(INFO, "starting yellow reader %uns", PERIOD / 2);
 
@@ -49,7 +48,19 @@ void read_yellow(ThreadID tid, Args args) {
   while (1) {
     uint32_t value = GPIO_GetPin(pin);
 
-    PRULOG_1u32(INFO, "yellow is %u", value);
+    if (value == 0) {
+      PRULOG_1u32(INFO, "yellow is 0 %u", value);
+    } else if (value == 1) {
+      PRULOG_1u32(INFO, "yellow is 1 %u", value);
+    } else {
+      PRULOG_1u32(INFO, "yellow is weird %u", value);
+    }
+
+    SleepUntil(&clock, 20000000);
+    uint32_t save = GPIO_GetPin(other);
+    GPIO_SetPin(other, value);
+    SleepUntil(&clock, 20000000);
+    GPIO_SetPin(other, save);
 
     SleepUntil(&clock, PERIOD / 2);
   }
@@ -65,6 +76,7 @@ int main(void) {
   InterruptServiceInit();
   ClockInit();
   RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
+  GPIO_Init();
   SyslogInit();
   ProcessInit();
 

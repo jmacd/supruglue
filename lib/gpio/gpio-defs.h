@@ -79,6 +79,8 @@ void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v);
 
 uint32_t GPIO_GetRegister(gpio_bank *g, int r);
 
+void GPIO_Init(void);
+
 #ifdef __cplusplus
 }
 #endif

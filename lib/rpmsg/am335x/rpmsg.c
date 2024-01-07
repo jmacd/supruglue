@@ -109,6 +109,8 @@ int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
 
   int err = pru_rpmsg_send(&transport->channel, transport->peer_dst_addr, transport->peer_src_addr, (void *)data, len);
   if (err != 0) {
+    // IS THIS HAPPENING? OR THE ABOVE? We are copying from an address on the stack
+    // and what ... can it move?   @@@  Hmm, nope.
     SemaDown(&transport->kick_lock);
   }
   return err;

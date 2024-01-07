@@ -20,12 +20,13 @@
 extern "C" {
 #endif
 
-static inline int GPIO_GetPin(gpio_pin pin) {
+static inline uint32_t GPIO_GetPin(gpio_pin pin) {
+  // TODO: which is smaller?
   // return (GPIO_GetRegister(pin.bank, GPIOREG_DATAIN) & (1 << pin.bit)) != 0;
   return (GPIO_GetRegister(pin.bank, GPIOREG_DATAIN) & (1 << pin.bit)) == 0 ? 0 : 1;
 }
 
-static inline void GPIO_SetPin(gpio_pin pin, int value) {
+static inline void GPIO_SetPin(gpio_pin pin, uint32_t value) {
   GPIO_SetRegister(pin.bank, value ? GPIOREG_SETDATAOUT : GPIOREG_CLEARDATAOUT, 1 << pin.bit);
 }
 
