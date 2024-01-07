@@ -57,8 +57,8 @@ typedef enum _JournalWriteFlags JournalWriteFlags;
 struct _Integer {
   union {
     struct {
-      uint32_t HIGH;
       uint32_t LOW;
+      uint32_t HIGH;
     } U32;
 
     uint64_t U64;
