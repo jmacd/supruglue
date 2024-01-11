@@ -13,11 +13,13 @@ cc_binary(
         "--stack_size=0x1000",
     ],
     deps = [
+        "//lib/cap",
         "//lib/coroutine",
         "//lib/gpio",
         "//lib/initproc",
         "//lib/intc:service",
         "//lib/log/daemon",
+        "//lib/pwm",
         "//lib/rpmsg",
         "//lib/time:process",
         "//lib/resource",

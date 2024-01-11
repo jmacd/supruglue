@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "lib/args/args.h"
+#include "lib/cap/cap.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
 #include "lib/gpio/gpio.h"
@@ -10,6 +11,7 @@
 #include "lib/intc/service.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/pinmap/pinmap.h"
+#include "lib/pwm/pwm.h"
 #include "lib/resource/table.h"
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/time/clock.h"
@@ -63,6 +65,8 @@ int main(void) {
   GPIO_Init();
   SyslogInit();
   ProcessInit();
+  CAP_Init();
+  PWM_Init();
 
   args.ptr = "0";
 
