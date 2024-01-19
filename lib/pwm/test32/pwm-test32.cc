@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "pwm.h"
+#include "pwm-test32.h"
 
 void PWM_Init(void) {
 }

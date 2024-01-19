@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "cap.h"
+#include "cap-test32.h"
 
 void CAP_Init(void) {
 }

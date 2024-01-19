@@ -1,5 +1,5 @@
 #include "lib/pinmap/pinmap.h"
-#include "lib/pwm/cap.h"
+#include "lib/pwm/pwm.h"
 #include "lib/soc/soc.h"
 #include "gtest/gtest.h"
 

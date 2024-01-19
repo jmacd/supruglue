@@ -4,10 +4,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test32",
     srcs = [
-        "cap-am335x.cc",
+        "cap-test32.cc",
     ],
     hdrs = [
-        "cap-am335x.h",
+        "cap-test32.h",
     ],
     deps = [
         "//lib/cap:defs",
@@ -15,7 +15,7 @@ cc_library(
 )
 
 cc_test(
-    name = "cap_test",
+    name = "test",
     srcs = ["cap_test.cc"],
     deps = [
         "//lib/cap",

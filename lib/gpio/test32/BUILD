@@ -15,7 +15,7 @@ cc_library(
 )
 
 cc_test(
-    name = "gpio_test",
+    name = "test",
     srcs = ["gpio_test.cc"],
     deps = [
         "//lib/gpio",

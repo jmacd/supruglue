@@ -11,5 +11,6 @@ cc_library(
     ],
     deps = [
         "//lib/gpio:defs",
+        "//tools/toolchain/am335x",
     ],
 )

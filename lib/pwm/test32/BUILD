@@ -4,10 +4,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test32",
     srcs = [
-        "pwm-am335x.cc",
+        "pwm-test32.cc",
     ],
     hdrs = [
-        "pwm-am335x.h",
+        "pwm-test32.h",
     ],
     deps = [
         "//lib/pwm:defs",
@@ -15,7 +15,7 @@ cc_library(
 )
 
 cc_test(
-    name = "pwm_test",
+    name = "test",
     srcs = ["pwm_test.cc"],
     deps = [
         "//lib/pwm",
