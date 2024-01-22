@@ -14,3 +14,10 @@ cc_library(
         "//tools/toolchain/am335x",
     ],
 )
+
+filegroup(
+    name = "epwm0_intr_pend",
+    srcs = [
+        "epwm0_intr_pend.yaml",
+    ],
+)

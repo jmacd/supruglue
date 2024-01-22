@@ -14,7 +14,7 @@ Event Number,Signal Name,Source,MII RT Signal Name
 12,latch0_in,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
 13,sync1_out_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
 14,sync0_out_pend,PRU-ICSS IEP,PRU-ICSS0 Internal Interrupts
-15,pr1_ecap_intr_req,PRU-ICSS eCAP,PRU-ICSS0 Internal Interrupts
+15,pr1_pru_ecap_intr_req,PRU-ICSS eCAP,PRU-ICSS0 Internal Interrupts
 16,pr1_pru_mst_intr[0]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
 17,pr1_pru_mst_intr[1]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
 18,pr1_pru_mst_intr[2]_intr_req,pru0 or pru1,PRU-ICSS0 Internal Interrupts
@@ -34,18 +34,18 @@ Event Number,Signal Name,Source,MII RT Signal Name
 32,nirq,UART1,PRU-ICSS0 PRU0_RX_ERR
 33,mcasp_x_intr[0]_pend,McASP1,Tx PRU-ICSS0 PRU0_RX_ERR32
 34,mcasp_r_intr[0]_pend,McASP1,Rx PRU-ICSS0 PRU0_RX_SFD
-35,ecap_intr[0]_intr_pend,eCAP1,PRU-ICSS0 PRU0_RX_SOF
-36,ecap_intr[1]_intr_pend,eCAP2,PRU-ICSS0 PRU0_RX_CRC
-37,epwm_intr[0]_intr_pend,eHRPWM2,PRU-ICSS0 PRU0_RX_NIBBLE_ODD
+35,ecap1_intr_pend,eCAP1,PRU-ICSS0 PRU0_RX_SOF
+36,ecap2_intr_pend,eCAP2,PRU-ICSS0 PRU0_RX_CRC
+37,epwm2_intr_pend,eHRPWM2,PRU-ICSS0 PRU0_RX_NIBBLE_ODD
 38,dcan_uerr,DCAN0,PRU-ICSS0 PRU0_RX_OVERFLOW
 39,dcan_int1,DCAN0,PRU-ICSS0 PORT0_TX_UNDERFLOW
 40,dcan_intr,DCAN0,PRU-ICSS0 PORT0_TX_OVERFLOW
 41,POINTRPEND,I2C0,PRU-ICSS0 MDIO_MII_LINK[0]
-42,ecap_intr[2]_intr_pend,eCAP0,PRU-ICSS0 PRU0_RX_EOF
-43,epwm_intr[1]_intr_pend,eHRPWM0,(pr1_mii0_col & pr1_mii0_txen) (external)
+42,ecap0_intr_pend,eCAP0,PRU-ICSS0 PRU0_RX_EOF
+43,epwm0_intr_pend,eHRPWM0,(pr1_mii0_col & pr1_mii0_txen) (external)
 44,SINTERRUPTN,McSPI0,PRU-ICSS0 PRU1_RX_ERR
 45,eqep_intr_intr_pend,eQEP0,PRU-ICSS0 PRU1_RX_ERR32
-46,epwm_intr[2]_intr_pend,eHRPWM1,PRU-ICSS0 PRU1_RX_SFD
+46,epwm1_intr_pend,eHRPWM1,PRU-ICSS0 PRU1_RX_SFD
 47,c0_misc_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_SOF
 48,c0_tx_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_CRC
 49,c0_rx_pend,3PGSW (GEMAC),PRU-ICSS0 PRU1_RX_NIBBLE_ODD
