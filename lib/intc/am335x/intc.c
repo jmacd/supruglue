@@ -44,10 +44,12 @@ void ControllerInit(void) {
   // assign to ESR0/ESR1.   TODO or not, see above. // @@@
   CT_INTC.EISR_bit.EN_SET_IDX = ARM_TO_PRU_EVT;
   CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
+  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_EPWM1_INTR_PEND;
 
   // Unset the raw events
   CT_INTC.SICR_bit.STS_CLR_IDX = ARM_TO_PRU_EVT;
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
+  CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM1_INTR_PEND;
 
   // Re-enable events
   CT_INTC.GER_bit.EN_HINT_ANY = 1;

@@ -4,11 +4,28 @@
 #include "pwm-am335x.h"
 #include "external/ti-pru-support/include/am335x/sys_pwmss.h"
 
+// 1. Disable global interrupts(CPUINTMflag)
+// 2. Disablee PWM interrupts
+// 3. Initialize peripheral registers
+// 4. Clear any spuriouse PWM flags
+// 5. Enable ePWM interrupts
+// 6. Enable global interrupts
+
+// Also need to enable the TBCLK for EPWM1
+// 9.3.1.31 pwmss_ctrl Register (offset = 664h) [reset = 0h]
+
+// Also need to pinmux the EPWMxA output
+
+// See https://forum.beagleboard.org/t/pwmss-control-by-pru-with-kernel-4-19/31246/19
+// Need a device tree hack.
+
+#define CONTROL_MODULE ((uint32_t *)0x44E10000)
+
 void PWM_Init(void) {
   //////////////////////////////////////////////////////////////////////
   // Time-Base
 
-  PWMSS0.EPWM_TBCTL = (3 << 14) | // FREE_SOFT: Free run
+  PWMSS1.EPWM_TBCTL = (3 << 14) | // FREE_SOFT: Free run
                       (0 << 13) | // PHSDIR: n/a in up-count mode
                       (0 << 10) | // CLKDIV: Time-base clock prescale bits
                       (1 << 7) |  // HSPCLKDIV: (Default) high-speed clock prescale bits
@@ -29,21 +46,23 @@ void PWM_Init(void) {
   // CMPA: Not used
   // CMPAHR: Not used
 
-  PWMSS0.EPWM_TBPRD = 1000; // TBPRD: Time-base period (16 bits)
+  PWMSS1.EPWM_TBPRD = 1000; // TBPRD: Time-base period (16 bits)
 
   // CMPCTL: All defaults
   // CMPAHR: Not used
-  PWMSS0.EPWM_CMPA = 500; // CMPB: Compare value for clearing EPWMxA
-  PWMSS0.EPWM_CMPB = 750; // CMPB: Compare value for sample interrupt
+  PWMSS1.EPWM_CMPA = 500; // CMPB: Compare value for clearing EPWMxA
+  PWMSS1.EPWM_CMPB = 750; // CMPB: Compare value for sample interrupt
 
   //////////////////////////////////////////////////////////////////////
   // Action qualifier
 
-  PWMSS0.EPWM_AQCTLA = (2 << 0) | // ZRO: force EPWMxA high when TBCNT == 0
-                       (1 << 4);  // CAU: force EPWMxA low when TBCNT == CMPA
+  PWMSS1.EPWM_AQCTLA = (2 << 0) | // ZRO: force EPWMxA low when TBCNT == 0
+                       (1 << 4);  // CAU: force EPWMxA high when TBCNT == CMPA
   // AQCTLB: Not used
-  // AQSFRC: Not used
-  // AQCSFRC: Not used
+
+  // @@@
+  // PWMSS1.EPWM_AQSFRC = (3 << 6);  // Immediate mode
+  // PWMSS1.EPWM_AQCSFRC = (1 << 0); // Force low on EPWMxA
 
   //////////////////////////////////////////////////////////////////////
   // Chopper: Not used
@@ -52,7 +71,17 @@ void PWM_Init(void) {
   //////////////////////////////////////////////////////////////////////
   // Event trigger
 
-  PWMSS0.EPWM_ETSEL = (1 << 3) | // INTEN: Enable interrupt
+  PWMSS1.EPWM_ETSEL = (1 << 3) | // INTEN: Enable interrupt
                       (6 << 0);  // INTSEL: CMPB incrementing
-  PWMSS0.EPWM_ETPS = (1 << 0);   // INTPRD: Every event
+  PWMSS1.EPWM_ETPS = (1 << 0);   // INTPRD: Every event
+
+  //////////////////////////////////////////////////////////////////////
+  // Control module
+  CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
+
+  // Note: accomplis this with `config-pin P9_14 pwm`
+  // CONTROL_MODULE[0x848 / WORDSZ] = (6 << 0); // P9_14 == Mode 6
+
+  // PWMSS enablement?
+  PWMSS1.CLKCONFIG_bit.EPWMCLK_EN = 1;
 }

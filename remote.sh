@@ -11,7 +11,7 @@ PID=""
 #OUT_GPIOs=${ALL_GPIOs}
 
 OUT_GPIOs="gpio49" # P9.23
-IN_GPIOs="gpio117" # P9.25
+IN_GPIOs="gpio117 gpio60" # P9.25 P9.12
 
 LEDs="beaglebone:green:usr0 beaglebone:green:usr1 beaglebone:green:usr2 beaglebone:green:usr3"
 
@@ -36,6 +36,10 @@ configPins() {
 }
 
 configPins
+
+# Works!
+#config-pin P9_14 pwm
+
 
 # echo "Stopping ..."
 # echo stop > /sys/class/remoteproc/remoteproc1/state

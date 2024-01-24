@@ -21,3 +21,17 @@ filegroup(
         "epwm0_intr_pend.yaml",
     ],
 )
+
+filegroup(
+    name = "epwm1_intr_pend",
+    srcs = [
+        "epwm1_intr_pend.yaml",
+    ],
+)
+
+filegroup(
+    name = "epwm2_intr_pend",
+    srcs = [
+        "epwm2_intr_pend.yaml",
+    ],
+)
