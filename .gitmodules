@@ -1,0 +1,3 @@
+[submodule "kernel/ti-linux-kernel-dev"]
+	path = kernel/ti-linux-kernel-dev
+	url = git@github.com:RobertCNelson/ti-linux-kernel-dev.git
