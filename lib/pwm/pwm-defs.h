@@ -11,6 +11,7 @@ extern "C" {
 #include "lib/soc/soc.h"
 
 void PWM_Init(void);
+void PWM_ClearInterrupt(void);
 
 #ifdef __cplusplus
 }

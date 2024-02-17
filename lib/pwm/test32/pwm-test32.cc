@@ -7,3 +7,6 @@
 
 void PWM_Init(void) {
 }
+
+void PWM_ClearInterrupt(void) {
+}

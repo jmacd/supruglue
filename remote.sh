@@ -38,7 +38,7 @@ configPins() {
 configPins
 
 # Works!
-#config-pin P9_14 pwm
+config-pin P9_14 pwm
 
 
 # echo "Stopping ..."

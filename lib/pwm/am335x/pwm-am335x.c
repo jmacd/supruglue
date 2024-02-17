@@ -21,13 +21,17 @@
 
 #define CONTROL_MODULE ((uint32_t *)0x44E10000)
 
+void PWM_ClearInterrupt(void) {
+  PWMSS1.EPWM_ETCLR = (1 << 0);
+}
+
 void PWM_Init(void) {
   //////////////////////////////////////////////////////////////////////
   // Time-Base
 
   PWMSS1.EPWM_TBCTL = (3 << 14) | // FREE_SOFT: Free run
                       (0 << 13) | // PHSDIR: n/a in up-count mode
-                      (0 << 10) | // CLKDIV: Time-base clock prescale bits
+                      (7 << 10) | // CLKDIV: Time-base clock prescale bits (/128)
                       (1 << 7) |  // HSPCLKDIV: (Default) high-speed clock prescale bits
                       (0 << 6) |  // SWFSYNC: No force sync pulse
                       (0 << 4) |  // SYNCOSEL: Sync output from EPWMxSYNC
@@ -46,12 +50,12 @@ void PWM_Init(void) {
   // CMPA: Not used
   // CMPAHR: Not used
 
-  PWMSS1.EPWM_TBPRD = 1000; // TBPRD: Time-base period (16 bits)
+  PWMSS1.EPWM_TBPRD = 10000; // TBPRD: Time-base period (16 bits)
 
   // CMPCTL: All defaults
   // CMPAHR: Not used
-  PWMSS1.EPWM_CMPA = 500; // CMPB: Compare value for clearing EPWMxA
-  PWMSS1.EPWM_CMPB = 750; // CMPB: Compare value for sample interrupt
+  PWMSS1.EPWM_CMPA = 5000; // CMPB: Compare value for clearing EPWMxA
+  PWMSS1.EPWM_CMPB = 7500; // CMPB: Compare value for sample interrupt
 
   //////////////////////////////////////////////////////////////////////
   // Action qualifier
@@ -74,6 +78,9 @@ void PWM_Init(void) {
   PWMSS1.EPWM_ETSEL = (1 << 3) | // INTEN: Enable interrupt
                       (6 << 0);  // INTSEL: CMPB incrementing
   PWMSS1.EPWM_ETPS = (1 << 0);   // INTPRD: Every event
+
+  // Clear pending interrupt!
+  PWMSS1.EPWM_ETCLR = (1 << 0);
 
   //////////////////////////////////////////////////////////////////////
   // Control module

@@ -25,18 +25,22 @@ void pwmHandler(void) {
   gpio_pin pin = GPIO_PIN(P9_12);
   uint32_t value = GPIO_GetPin(pin);
   PRULOG_1u32(INFO, "interrupt EPWM1 output A", value);
+  PWM_ClearInterrupt();
 }
 
 void runBlue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_12);
 
   PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
+  PWM_ClearInterrupt();
 
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
     uint32_t value = GPIO_GetPin(pin);
-    PRULOG_1u32(INFO_NOYIELD, "read %u", value);
+    if (value) {
+      PRULOG_1u32(INFO_NOYIELD, "read %u", value);
+    }
     SleepUntil(&clock, PERIOD / 2);
   }
 }
