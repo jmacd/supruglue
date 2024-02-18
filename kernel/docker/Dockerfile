@@ -20,3 +20,6 @@ RUN apt-get -y install u-boot-tools
 RUN apt-get -y install libncurses-dev:amd64
 RUN apt-get -y install libssl-dev:amd64
 RUN apt-get -y install wget
+RUN apt-get -y install rsync
+RUN apt-get -y install kmod
+

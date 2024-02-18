@@ -19,6 +19,8 @@
 // See https://forum.beagleboard.org/t/pwmss-control-by-pru-with-kernel-4-19/31246/19
 // Need a device tree hack.
 
+// https://e2e.ti.com/support/processors-group/processors/f/processors-forum/478720/beagle-bone-black-pru-not-able-to-initialize-pwmss0-or-pwmss1
+
 #define CONTROL_MODULE ((uint32_t *)0x44E10000)
 
 void PWM_ClearInterrupt(void) {
