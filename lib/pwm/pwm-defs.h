@@ -12,6 +12,7 @@ extern "C" {
 
 void PWM_Init(void);
 void PWM_ClearInterrupt(void);
+void PWM_Enable(void);
 
 #ifdef __cplusplus
 }

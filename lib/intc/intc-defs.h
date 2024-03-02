@@ -17,6 +17,7 @@ typedef void(InterruptHandler)(void);
 extern InterruptController __controller;
 
 void ControllerInit(void);
+void ControllerEnable(void);
 void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler);
 void ServiceInterrupts(void);
 

@@ -38,21 +38,28 @@ void ControllerInit(void) {
   CT_INTC.SECR0 = 0xffffffff;
   CT_INTC.SECR1 = 0xffffffff;
 
-  // Use EISR (indexed) or ESR (32bit) to enable system events.
-  //
-  // Note: fewer instructions, maybe, if we assemble a bit map and
-  // assign to ESR0/ESR1.   TODO or not, see above. // @@@
-  CT_INTC.EISR_bit.EN_SET_IDX = ARM_TO_PRU_EVT;
-  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
-  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_EPWM1_INTR_PEND;
-
   // Unset the raw events
   CT_INTC.SICR_bit.STS_CLR_IDX = ARM_TO_PRU_EVT;
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM1_INTR_PEND;
 
-  // Re-enable events
-  CT_INTC.GER_bit.EN_HINT_ANY = 1;
+  // Doesn't appear necessary, these are all incoming and setup
+  // by the kernel.
+  //
+  // Use EISR (indexed) or ESR (32bit) to enable system events.
+  //
+  // Note: fewer instructions, maybe, if we assemble a bit map and
+  // assign to ESR0/ESR1.   TODO or not, see above. // @@@
+  // CT_INTC.EISR_bit.EN_SET_IDX = ARM_TO_PRU_EVT;
+  //
+  // CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
+  // CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_EPWM1_INTR_PEND;
+  //
+  // TODO like this
+  // CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PRU_TO_EDMA; // sysevt 18 / channel 9
+  // CT_INTC.CMR4_bit.CH_MAP_18 = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
+  // CT_INTC.HMR2_bit.HINT_MAP_9 = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
+  // CT_INTC.HIEISR_bit.HINT_EN_SET_IDX = HOST_INTERRUPT_CHANNEL_PRU_TO_EDMA;
 }
 
 void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
@@ -70,4 +77,9 @@ void ServiceInterrupts(void) {
 
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;
   }
+}
+
+void ControllerEnable(void) {
+  // Re-enable events
+  CT_INTC.GER_bit.EN_HINT_ANY = 1;
 }

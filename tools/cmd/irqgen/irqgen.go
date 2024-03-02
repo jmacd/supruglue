@@ -97,6 +97,7 @@ struct pru_irq_rsc supruglue_incoming_irq_rsc = {
 `, os.Args[2], guard, guard, len(combined.Incoming), func() string {
 		var sb strings.Builder
 		sb.WriteString("  {\n")
+		sb.WriteString("    // { Event, Channel, Host }\n")
 		for _, irq := range combined.Incoming {
 			sb.WriteString("    { ")
 			sb.WriteString(irq.Event)

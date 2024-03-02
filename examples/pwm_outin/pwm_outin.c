@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "external/ti-pru-support/include/am335x/sys_pwmss.h"
+
 #include "lib/args/args.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
@@ -38,9 +40,18 @@ void runBlue(ThreadID tid, Args args) {
   ReadClock(&clock);
   while (1) {
     uint32_t value = GPIO_GetPin(pin);
-    if (value) {
-      PRULOG_1u32(INFO_NOYIELD, "read %u", value);
-    }
+
+    uint32_t tbcnt = PWMSS1.EPWM_TBCNT;
+    //  uint32_t probe = PWMSS1.EPWM_ETPS;
+    // uint32_t probe = PWMSS1.EPWM_ETFLG;
+    // uint32_t probe = EDMA_BASE[SHADOW1(EDMAREG_SERH)];
+    uint32_t probe = PWMSS1.EPWM_ETSEL;
+    // uint32_t probe = PWMSS1.EPWM_CMPB;
+
+    PRULOG_2u32(INFO_NOYIELD, "read %u probe %u", tbcnt, probe);
+
+    PWMSS1.EPWM_ETCLR = 1;
+
     SleepUntil(&clock, PERIOD / 2);
   }
 }
@@ -64,6 +75,11 @@ int main(void) {
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
   InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
+
+  PWM_Enable();
+
+  // @@@ TODO need to add this call in other tests, examples...
+  ControllerEnable();
 
   return Run();
 }
