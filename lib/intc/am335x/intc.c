@@ -28,7 +28,7 @@ void ControllerInit(void) {
     __controller.handler[evt] = NULL;
   }
 
-  // Disable interrupts until configured.
+  // Disable interrupts until enabled in ControllerEnable().
   CT_INTC.GER_bit.EN_HINT_ANY = 0;
 
   // Clear pending system event enabled.  All system events are disabled.
@@ -51,8 +51,13 @@ void ServiceInterrupts(void) {
   while ((__R31 & ARM_TO_PRU_IRQ) != 0) {
     uint8_t evt = HIPRIO_EVT;
 
-    // TODO: Can't understand why use of debug.h helpers
-    // in this spot isn't working!
+    // TODO: Can't use debug.h helpers here because they run longer
+    // than one IEP cycle and lead to an endless interrupt cycle
+    // because presently, the IEP interrupt has highest priority.
+    // (Here, 46 is the EPWM1EVT event, which is not working.)
+    // if (evt == 46) {
+    //   flash(1);
+    // }
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {
@@ -63,7 +68,7 @@ void ServiceInterrupts(void) {
   }
 }
 
+// ControllerEnable starts the interrupt controller.
 void ControllerEnable(void) {
-  // Re-enable events
   CT_INTC.GER_bit.EN_HINT_ANY = 1;
 }
