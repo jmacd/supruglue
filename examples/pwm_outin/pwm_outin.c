@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "external/ti-pru-support/include/am335x/pru_intc.h" // @@@
 #include "external/ti-pru-support/include/am335x/sys_pwmss.h"
 
 #include "lib/args/args.h"
@@ -41,16 +42,21 @@ void runBlue(ThreadID tid, Args args) {
   while (1) {
     uint32_t value = GPIO_GetPin(pin);
 
-    uint32_t tbcnt = PWMSS1.EPWM_TBCNT;
-    //  uint32_t probe = PWMSS1.EPWM_ETPS;
-    // uint32_t probe = PWMSS1.EPWM_ETFLG;
-    // uint32_t probe = EDMA_BASE[SHADOW1(EDMAREG_SERH)];
-    uint32_t probe = PWMSS1.EPWM_ETSEL;
-    // uint32_t probe = PWMSS1.EPWM_CMPB;
+    // uint32_t val1 = PWMSS1.EPWM_TBCNT;
+    // uint32_t val2 = PWMSS1.EPWM_ETPS;
+    // uint32_t val2 = PWMSS1.EPWM_ETFLG;
+    // uint32_t val2 = PWMSS1.EPWM_ETSEL;
+    // uint32_t val2 = PWMSS1.EPWM_CMPB;
+    // uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_SERH)];
+    uint32_t val1 = EDMA_BASE[SHADOW1(EDMAREG_IER)];
+    uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_IERH)];
 
-    PRULOG_2u32(INFO_NOYIELD, "read %u probe %u", tbcnt, probe);
+    val1 = CT_INTC.ESR0;
+    val2 = CT_INTC.ESR1;
 
-    PWMSS1.EPWM_ETCLR = 1;
+    PRULOG_2u32(INFO_NOYIELD, "val1 %u val2 %u", val1, val2);
+
+    PWM_ClearInterrupt();
 
     SleepUntil(&clock, PERIOD / 2);
   }

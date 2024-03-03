@@ -44,7 +44,6 @@ void flash(int n) {
     SystemOnChipDelay(30000000);
     uled1(1);
     uled2(1);
-
     uled3(1);
     uled4(1);
     yellow(1);
@@ -61,5 +60,9 @@ void solid(int n) {
     uled3(1);
     uled4(1);
     SystemOnChipDelay(200000000);
+    uled1(0);
+    uled2(0);
+    uled3(0);
+    uled4(0);
   }
 }
