@@ -5,22 +5,17 @@
 #include "absl/synchronization/mutex.h"
 
 absl::Mutex __system_lock;
-int         __system_enabled;
 
 void SystemOnChipSetup() {
-  absl::MutexLock lock(&__system_lock);
-  __system_enabled = 1;
 }
 
 void SystemOnChipDelay(int32_t cycles) {
 }
 
-int SystemOnChipIsShutdown(void) {
-  absl::MutexLock lock(&__system_lock);
-  return !__system_enabled;
+void SystemOnChipSuspend(void) {
 }
 
-void SystemOnChipShutdown(void) {
+void Shutdown(void) {
   absl::MutexLock lock(&__system_lock);
-  __system_enabled = 0;
+  __system_shutdown = 1;
 }

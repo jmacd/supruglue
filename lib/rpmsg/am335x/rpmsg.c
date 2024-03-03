@@ -70,14 +70,16 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
   }
 
-  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick);
-
   // The system events and port are core-specific.
 #if SUPRUGLUE_PRU_NUM == 0
+  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick);
+  // @@@
   transport->channel_port = RPMSG_CHANNEL_PORT_0;
   sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
   sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
 #elif SUPRUGLUE_PRU_NUM == 1
+  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ, &RpmsgKick);
+  // @@@
   transport->channel_port = RPMSG_CHANNEL_PORT_1;
   sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;
   sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ;
@@ -107,6 +109,8 @@ int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
 
   int err = pru_rpmsg_send(&transport->channel, transport->peer_dst_addr, transport->peer_src_addr, (void *)data, len);
   if (err != 0) {
+    // IS THIS HAPPENING? OR THE ABOVE? We are copying from an address on the stack
+    // and what ... can it move?   @@@  Hmm, nope.
     SemaDown(&transport->kick_lock);
   }
   return err;

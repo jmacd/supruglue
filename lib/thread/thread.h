@@ -49,7 +49,12 @@ struct _Thread {
   const char *name;
   int32_t     stack_size;
   ThreadState state;
-  Timestamp   when;
+
+  // when is used by Sleep() to calculate the wakeup
+  Timestamp when;
+
+  // usage counts run/stall time in cycles.
+  CPUCounter usage;
 
   union {
     jmp_buf run_jump;
@@ -58,6 +63,8 @@ struct _Thread {
       Args        args;
     } call;
   } exec;
+
+  Thread *allthreads;
 
   uint8_t stack[0];
 };

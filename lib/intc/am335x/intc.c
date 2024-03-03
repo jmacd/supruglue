@@ -8,14 +8,19 @@
 #include "lib/intc/am335x/intc.h"
 #include "lib/soc/sysevts.h"
 
-// Interrupt inputs set bits 30 and 31 in register R31.
-#define PRU_HOST0_INTERRUPT 0x40000000
-#define PRU_HOST1_INTERRUPT 0x80000000
-#define PRU_HOST_ANY_INTERRUPT 0xc0000000
-
 volatile register uint32_t __R31;
 
 InterruptController __controller;
+
+#if SUPRUGLUE_PRU_NUM == 0
+#define ARM_TO_PRU_EVT SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ
+#define ARM_TO_PRU_IRQ PRU_HOST0_INTERRUPT
+#define HIPRIO_EVT CT_INTC.HIPIR0
+#else
+#define ARM_TO_PRU_EVT SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ
+#define ARM_TO_PRU_IRQ PRU_HOST1_INTERRUPT
+#define HIPRIO_EVT CT_INTC.HIPIR1
+#endif
 
 void ControllerInit(void) {
   uint8_t evt;
@@ -23,29 +28,19 @@ void ControllerInit(void) {
     __controller.handler[evt] = NULL;
   }
 
-  // Disable interrupts until configured.
+  // Disable interrupts until enabled in ControllerEnable().
   CT_INTC.GER_bit.EN_HINT_ANY = 0;
 
   // Clear pending system event enabled.  All system events are disabled.
+  // TODO: this will clobber another PRU.  should only handle events
+  // this PRU will use.
   CT_INTC.SECR0 = 0xffffffff;
   CT_INTC.SECR1 = 0xffffffff;
 
-  // Use EISR (indexed) or ESR (32bit) to enable system events.
-  //
-  // Note: fewer instructions, maybe, if we assemble a bit map and
-  // assign to ESR0/ESR1.
-  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
-  CT_INTC.EISR_bit.EN_SET_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
-
-  // Enable host interrupt 0
-  // CT_INTC.HIER_bit.EN_HINT = 0x1;
-
   // Unset the raw events
-  CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
+  CT_INTC.SICR_bit.STS_CLR_IDX = ARM_TO_PRU_EVT;
   CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
-
-  // Re-enable events
-  CT_INTC.GER_bit.EN_HINT_ANY = 1;
+  CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM1_INTR_PEND;
 }
 
 void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
@@ -53,8 +48,16 @@ void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
 }
 
 void ServiceInterrupts(void) {
-  while ((__R31 & PRU_HOST0_INTERRUPT) != 0) {
-    uint8_t evt = CT_INTC.HIPIR0;
+  while ((__R31 & ARM_TO_PRU_IRQ) != 0) {
+    uint8_t evt = HIPRIO_EVT;
+
+    // TODO: Can't use debug.h helpers here because they run longer
+    // than one IEP cycle and lead to an endless interrupt cycle
+    // because presently, the IEP interrupt has highest priority.
+    // (Here, 46 is the EPWM1EVT event, which is not working.)
+    // if (evt == 46) {
+    //   flash(1);
+    // }
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {
@@ -63,4 +66,9 @@ void ServiceInterrupts(void) {
 
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;
   }
+}
+
+// ControllerEnable starts the interrupt controller.
+void ControllerEnable(void) {
+  CT_INTC.GER_bit.EN_HINT_ANY = 1;
 }

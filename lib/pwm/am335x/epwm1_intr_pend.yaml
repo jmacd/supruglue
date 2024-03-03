@@ -1,0 +1,4 @@
+incoming:
+- event: SYSEVT_EPWM1_INTR_PEND
+  channel: 4
+  desc: eHRPWM interrupt from ePWM module 1

@@ -10,8 +10,8 @@ cc_library(
         "clock-test32.h",
     ],
     deps = [
-        "//lib/thread",
         "//lib/intc",
+        "//lib/thread",
         "//lib/time:defs",
         "@com_google_absl//absl/log",
     ],

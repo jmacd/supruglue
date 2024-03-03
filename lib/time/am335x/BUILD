@@ -3,16 +3,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "am335x",
-    hdrs = [
-        "clock-am335x.h",
-    ],
     srcs = [
         "clock-am335x.c",
     ],
+    hdrs = [
+        "clock-am335x.h",
+    ],
     deps = [
-        "//lib/thread",
-        "//lib/sync",
         "//lib/intc",
+        "//lib/sync",
+        "//lib/thread",
         "//lib/time:defs",
         "//tools/toolchain/am335x",
     ],

@@ -22,11 +22,8 @@ achieve success.
 In 2021, after nearly twenty years working for Big Tech companies I
 moved to the Mendocino coast and became the owner/operator of the
 Caspar, California community water system.  With a background in
-open-source software and specializing in telemetry systems, you
-guessed it--
-
-I'm writing Supruglue as the foundation for an open-source SCADA
-system.
+open-source software and specializing in telemetry systems, I'm
+writing Supruglue as the foundation for an open-source SCADA system.
 
 ### WORK IN PROGRESS
 
@@ -34,10 +31,8 @@ This repository is under development.
 
 The next steps are:
 
-- Time support: timestamps, sleep & timer functions
 - Carveout support: setup regions for bulk data transfer
-- Interrupt controller logic
-- Drivers: eCAP, PWM, DMA, etc.
+- Drivers: i2c, eCAP, PWM, DMA, etc.
 - Multi-PRU coordination.
 
 Sample application goals:
@@ -70,15 +65,17 @@ To cross-compile for the Beaglebone ARM:
 bazel build --config=arm ...
 ```
 
-### Example
+### Examples
+
+#### Two LEDs
 
 The example will alternatingly flash two LEDs on pins `P9_23` and `P9_25`.
 
 ```
-bazel build --config=pru0 //examples:example_pru0
+bazel build --config=pru0 //examples/two_leds:example_pru0
 ```
 
-The firmware is located in `bazel-out/pru-fastbuild/bin/examples/example_pru0`
+The firmware is located in `bazel-out/pru-fastbuild/bin/examples/two_leds/example_pru0`
 
 To build the Supruglue command-line interface,
 

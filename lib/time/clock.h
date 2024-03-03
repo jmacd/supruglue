@@ -18,9 +18,17 @@ extern "C" {
 #include "lib/time/test32/clock-test32.h"
 #endif
 
-void Sleep(uint32_t nanos);
-
+void Sleep(uint32_t cycles);
 void TimeAddCycles(Timestamp *clock, uint32_t cycles);
+void SleepUntil(Timestamp *when, uint32_t cycles);
+
+inline void Sleep(uint32_t cycles) {
+  SleepUntil(&__system_current->when, cycles);
+}
+
+inline void TimeAddCycles(Timestamp *clock, uint32_t cycles) {
+  clock->CYCLES += cycles;
+}
 
 #ifdef __cplusplus
 }

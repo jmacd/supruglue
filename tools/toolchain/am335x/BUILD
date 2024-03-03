@@ -2,31 +2,33 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "pru0_cmd",
+    name = "pru0_linker_cmd",
     srcs = [
         "pru0.cmd",
     ],
 )
 
 filegroup(
-    name = "pru1_cmd",
+    name = "pru1_linker_cmd",
     srcs = [
         "pru1.cmd",
     ],
 )
 
 filegroup(
-    name = "pru0_irq",
-    srcs = [
-        "pru0.yaml",
-    ],
-)
-
-filegroup(
-    name = "pru1_irq",
-    srcs = [
-        "pru1.yaml",
-    ],
+    name = "linker_cmd",
+    srcs = select({
+        "//tools/toolchain:pru0": [
+            "pru0.cmd",
+        ],
+        "//tools/toolchain:pru1": [
+            "pru1.cmd",
+        ],
+    }),
+    target_compatible_with = select({
+        "//tools/toolchain:am335x": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 cc_library(

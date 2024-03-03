@@ -11,8 +11,8 @@ cc_library(
     ],
     deps = [
         "//lib/soc:defs",
-        "@com_google_absl//absl/synchronization",
         "//tools/toolchain/am335x:incompatible",
+        "@com_google_absl//absl/synchronization",
         "@ti-pru-support//include",
     ],
 )

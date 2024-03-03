@@ -56,3 +56,7 @@ void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
 void RaiseInterrupt(uint8_t evt) {
   __controller.test->Raise(evt);
 }
+
+void ControllerEnable(void) {
+  // @@@
+}

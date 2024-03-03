@@ -24,8 +24,10 @@ cc_test(
     deps = [
         ":daemon",
         "//lib/intc",
+        "//lib/intc:service",
         "//lib/log/fmt",
         "//lib/rpmsg/test32",
+        "//lib/time:process",
         "@com_google_absl//absl/log",
         "@com_google_googletest//:gtest_main",
     ],

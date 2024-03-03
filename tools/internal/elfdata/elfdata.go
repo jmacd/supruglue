@@ -13,6 +13,8 @@ import (
 type ELF struct {
 	addr   uint64
 	rodata []byte
+
+	threads map[uint64]string
 }
 
 func Open(fw string) (*ELF, error) {
@@ -22,10 +24,32 @@ func Open(fw string) (*ELF, error) {
 		return nil, err
 	}
 
+	threads := map[uint64]string{}
+
 	for _, sect := range f.Sections {
-		if sect.Type != elf.SHT_PROGBITS || sect.Size == 0 || strings.HasPrefix(sect.Name, ".debug") {
+		switch {
+		case sect.Size == 0:
+			continue
+		case strings.HasPrefix(sect.Name, ".debug_"):
+			continue
+		case strings.HasPrefix(sect.Name, ".TI."):
+			continue
+		case strings.HasPrefix(sect.Name, ".creg."):
+			continue
+		case strings.HasPrefix(sect.Name, "__TI_"):
+			continue
+		case map[string]bool{
+			".strtab":   true,
+			".symtab":   true,
+			".shstrtab": true,
+		}[sect.Name]:
 			continue
 		}
+
+		if strings.HasPrefix(sect.Name, ".thread.") {
+			threads[sect.Addr] = sect.Name[len(".thread."):]
+		}
+
 		fmt.Printf("%s: %s: %d bytes\n", base, sect.Name, sect.Size)
 	}
 
@@ -40,8 +64,9 @@ func Open(fw string) (*ELF, error) {
 	}
 
 	return &ELF{
-		addr:   sect.Addr,
-		rodata: rodata,
+		addr:    sect.Addr,
+		rodata:  rodata,
+		threads: threads,
 	}, nil
 }
 
@@ -92,4 +117,12 @@ func (elf *ELF) CStringAt(addr uint64) (string, error) {
 		b = append(b, elf.rodata[off])
 	}
 	return string(b), nil
+}
+
+func (elf *ELF) ThreadNameAt(addr uint64) (string, error) {
+	name, ok := elf.threads[addr]
+	if !ok {
+		return "", fmt.Errorf("no thread at this address: %u", addr)
+	}
+	return name, nil
 }

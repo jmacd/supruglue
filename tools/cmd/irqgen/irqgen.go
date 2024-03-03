@@ -20,11 +20,12 @@ func main() {
 	}
 	sevts, err := csv.ReadFile[arch.SystemEvent](os.Args[1])
 	if err != nil {
-		log.Fatalf("unmarshal sysevts.csv: %v\n", err)
+		log.Fatalf("unmarshal %s: %v\n", os.Args[1], err)
 	}
 	sysevtMap := arch.SystemEventMap(sevts)
 
 	var combined arch.IRQs
+	hostIRQ := -1
 
 	for _, arg := range os.Args[2:] {
 		obj := map[string]interface{}{}
@@ -55,8 +56,18 @@ func main() {
 			if !ok {
 				log.Fatalf("cannot find system event %s\n", result.Incoming[i].Event)
 			}
+			if result.Incoming[i].Host != nil {
+				if hostIRQ >= 0 {
+					log.Fatalf("multiple host interrupts set\n")
+				}
+				hostIRQ = *result.Incoming[i].Host
+			}
 		}
 		combined.Incoming = append(combined.Incoming, result.Incoming...)
+	}
+
+	if hostIRQ < 0 {
+		log.Fatalf("missing host interrupt\n")
 	}
 
 	guard := strings.ToUpper("supruglue_include_irqgen_h")
@@ -86,13 +97,14 @@ struct pru_irq_rsc supruglue_incoming_irq_rsc = {
 `, os.Args[2], guard, guard, len(combined.Incoming), func() string {
 		var sb strings.Builder
 		sb.WriteString("  {\n")
+		sb.WriteString("    // { Event, Channel, Host }\n")
 		for _, irq := range combined.Incoming {
 			sb.WriteString("    { ")
 			sb.WriteString(irq.Event)
 			sb.WriteString(", ")
 			sb.WriteString(fmt.Sprint(irq.Channel))
 			sb.WriteString(", ")
-			sb.WriteString(fmt.Sprint(irq.Host))
+			sb.WriteString(fmt.Sprint(hostIRQ))
 			sb.WriteString("},\n")
 		}
 		sb.WriteString("  },\n")

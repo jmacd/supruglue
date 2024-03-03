@@ -11,10 +11,6 @@ protected:
   void SetUp() override {
     SystemOnChipSetup();
   }
-
-  void TearDown() override {
-    SystemOnChipShutdown();
-  }
 };
 
 TEST_F(GpioTest, Register) {

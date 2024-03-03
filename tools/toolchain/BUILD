@@ -52,12 +52,36 @@ constraint_value(
     constraint_setting = ":pru_soc",
 )
 
+constraint_setting(name = "pru_num")
+
+constraint_value(
+    name = "pru0",
+    constraint_setting = ":pru_num",
+)
+
+constraint_value(
+    name = "pru1",
+    constraint_setting = ":pru_num",
+)
+
 # See https://github.com/bazelbuild/rules_go/issues/2591
 # why for Go toolchain selection we list host platform os/cpu.
 platform(
-    name = "real_pru",
+    name = "real_pru0",
     constraint_values = [
         ":am335x",
+        ":pru0",
+        "@platforms//os:osx",
+        "@platforms//cpu:arm64",
+        "@io_bazel_rules_go//go/toolchain:cgo_off",
+    ],
+)
+
+platform(
+    name = "real_pru1",
+    constraint_values = [
+        ":am335x",
+        ":pru1",
         "@platforms//os:osx",
         "@platforms//cpu:arm64",
         "@io_bazel_rules_go//go/toolchain:cgo_off",

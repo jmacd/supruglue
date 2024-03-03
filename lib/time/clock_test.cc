@@ -4,6 +4,7 @@
 #include "absl/log/log.h"
 #include "absl/strings/str_format.h"
 #include "lib/coroutine/coroutine.h"
+#include "lib/intc/service.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/log/fmt/fmt.h"
 #include "lib/rpmsg/rpmsg.h"
@@ -17,25 +18,23 @@
 void test_write_func(ThreadID tid, Args args) {
   int32_t cnt = Atoi(args.ptr);
   for (int32_t i = 0; i < cnt; i++) {
-    PRULOG_2U(INFO_BLOCK, "write %u", i, 0); // Logs always yield
+    PRULOG_1u32(INFO_NOYIELD, "write %u", i); // Logs always yield
     Sleep(10);
   }
 }
 
 SUPRUGLUE_DEFINE_THREAD(writer, 500);
-SUPRUGLUE_DEFINE_THREAD(syslog, 500);
 
 TEST(ClockTest, SleepWake) {
   auto tt = NewTestTransport();
 
   EXPECT_EQ(0, Init(NewSystemConfig()));
-
-  EXPECT_EQ(0, SystemOnChipIsShutdown());
+  EXPECT_EQ(0, InterruptServiceInit());
 
   ClockInit();
+  SyslogInit();
 
   EXPECT_EQ(0, Create(&writer.thread, test_write_func, Args{.ptr = "100"}, "writer", sizeof(writer.space)));
-  EXPECT_EQ(0, Create(&syslog.thread, SyslogProcess, Args{.ptr = ""}, "syslog", sizeof(syslog.space)));
 
   std::unordered_set<std::string> res;
   std::unordered_set<std::string> expect;
@@ -58,7 +57,7 @@ TEST(ClockTest, SleepWake) {
       res.insert(Format(&entry));
       got += 1;
     }
-    SystemOnChipShutdown();
+    Shutdown();
   });
 
   EXPECT_EQ(0, ::Run());

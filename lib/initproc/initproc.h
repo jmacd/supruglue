@@ -11,10 +11,7 @@
 extern "C" {
 #endif
 
-// Thread function that reads input messages from the ARM host, at a
-// minimum handles RPMsg interrupts.
-
-void InitProcess(ThreadID thid, Args args);
+int ProcessInit(void);
 
 #ifdef __cplusplus
 }

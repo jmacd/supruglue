@@ -23,3 +23,17 @@ cc_library(
         "//conditions:default": ["//lib/intc/test32"],
     }),
 )
+
+cc_library(
+    name = "service",
+    srcs = [
+        "service.c",
+    ],
+    hdrs = [
+        "service.h",
+    ],
+    deps = [
+        ":intc",
+        "//lib/coroutine",
+    ],
+)

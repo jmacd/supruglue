@@ -44,7 +44,7 @@ int JournalRead(Journal *jl, Entry *record, JournalReadFlags flags) {
   return 0;
 }
 
-static Entry *getEntry(Journal *jl) {
+Entry *getEntry(Journal *jl) {
   Block *block;
   // Empty case: add the first block.
   if (BlockListEmpty(&jl->data)) {
@@ -73,7 +73,7 @@ static Entry *getEntry(Journal *jl) {
   int32_t loss = NUM_PER_BLOCK + 1;
   // If an overflow record is being lost, retain its loss count.
   if (swap->entries[0].msg == overflowMessage) {
-    loss += swap->entries[0].arg1 - 1;
+    loss += swap->entries[0].int1.U32.LOW - 1;
   }
 
   // Block is now the second-newest record, and its entry[0] is the
@@ -81,8 +81,8 @@ static Entry *getEntry(Journal *jl) {
   Entry *entry = &block->entries[0];
   entry->tid = OVERFLOW_THREAD_ID;
   entry->msg = overflowMessage;
-  entry->arg1 = loss;
-  entry->arg2 = 0;
+  entry->int1.U32.LOW = loss;
+  entry->int2.U32.LOW = 0;
 
   // Swap is the newest record.
   swap->count = 1;
@@ -90,17 +90,12 @@ static Entry *getEntry(Journal *jl) {
   return &swap->entries[0];
 }
 
-void JournalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2, JournalWriteFlags flags) {
-  Entry *entry = getEntry(jl);
-  entry->tid = tid;
-  entry->msg = msg;
-  entry->arg1 = arg1;
-  entry->arg2 = arg2;
+void setEntry(Journal *jl, Entry *entry) {
   ReadClock(&entry->time);
 
   SemaUp(&jl->lock);
 
-  if ((flags & JW_YIELD) != 0) {
+  if ((entry->flags & JW_YIELD) != 0) {
     Yield();
   }
 }

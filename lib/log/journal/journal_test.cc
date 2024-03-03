@@ -8,9 +8,19 @@
 #define HALF ((NUM_BLOCKS * NUM_PER_BLOCK) >> 1)
 #define QUARTER ((NUM_BLOCKS * NUM_PER_BLOCK) >> 2)
 
+void journalWrite(Journal *jl, ThreadID tid, const char *msg, int32_t arg1, int32_t arg2, int32_t flags) {
+  Entry *entry = getEntry(jl);
+  entry->tid = tid;
+  entry->flags = flags;
+  entry->msg = msg;
+  entry->int1.U32.LOW = arg1;
+  entry->int2.U32.LOW = arg2;
+  setEntry(jl, entry);
+}
+
 void testWrite(Journal *jl, int32_t o, int32_t n) {
   for (int32_t i = o; i < n; i++) {
-    JournalWrite(jl, i, "nice journal", i, i + 1, JW_NONE);
+    journalWrite(jl, i, "nice journal", i, i + 1, JW_NONE);
   }
 }
 
@@ -19,8 +29,8 @@ void testRead(Journal *jl, int32_t i) {
   EXPECT_EQ(0, JournalRead(jl, &entry, JR_NONE));
   EXPECT_EQ(i, entry.tid);
   EXPECT_STREQ("nice journal", entry.msg);
-  EXPECT_EQ(i, entry.arg1);
-  EXPECT_EQ(i + 1, entry.arg2);
+  EXPECT_EQ(i, entry.int1.U32.LOW);
+  EXPECT_EQ(i + 1, entry.int2.U32.LOW);
 }
 
 void testReadOverflow(Journal *jl, int32_t i) {
@@ -28,8 +38,8 @@ void testReadOverflow(Journal *jl, int32_t i) {
   EXPECT_EQ(0, JournalRead(jl, &entry, JR_NONE));
   EXPECT_EQ(OVERFLOW_THREAD_ID, entry.tid);
   EXPECT_STREQ(overflowMessage, entry.msg);
-  EXPECT_EQ(i, entry.arg1);
-  EXPECT_EQ(0, entry.arg2);
+  EXPECT_EQ(i, entry.int1.U32.LOW);
+  EXPECT_EQ(0, entry.int2.U32.LOW);
 }
 
 TEST(Journal, EmptyRead) {
@@ -84,14 +94,14 @@ TEST(Journal, RepeatOverflow) {
       for (int i = 0; i < TOTAL * repeat; i++) {
         // write so many
         for (int w = 0; w < writes; w++) {
-          JournalWrite(&jl, 2 * i, "repeat", 0, 0, JW_NONE);
+          journalWrite(&jl, 2 * i, "repeat", 0, 0, JW_NONE);
         }
         // read so many (fewer)
         for (int r = 0; r < reads; r++) {
           Entry entry;
           EXPECT_EQ(0, JournalRead(&jl, &entry, JR_NONE));
           if (entry.msg == overflowMessage) {
-            counted += entry.arg1;
+            counted += entry.int1.U32.LOW;
           } else {
             counted += 1;
           }
@@ -106,7 +116,7 @@ TEST(Journal, RepeatOverflow) {
         }
 
         if (entry.msg == overflowMessage) {
-          counted += entry.arg1;
+          counted += entry.int1.U32.LOW;
         } else {
           counted += 1;
         }

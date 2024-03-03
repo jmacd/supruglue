@@ -15,12 +15,12 @@ std::string Format(Entry *entry) {
 
   auto fmt2str = absl::ParsedFormat<'u', 'u'>::New(entry->msg);
   if (fmt2str) {
-    std::string res = absl::StrFormat(*fmt2str, entry->arg1, entry->arg2);
+    std::string res = absl::StrFormat(*fmt2str, entry->int1.U32.LOW, entry->int2.U32.LOW);
     return hdr + res;
   }
   auto fmt1str = absl::ParsedFormat<'u'>::New(entry->msg);
   if (fmt1str) {
-    std::string res = absl::StrFormat(*fmt1str, entry->arg1);
+    std::string res = absl::StrFormat(*fmt1str, entry->int1.U32.LOW);
     return hdr + res;
   }
   // TODO shrug.

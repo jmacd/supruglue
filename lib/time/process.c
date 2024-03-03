@@ -23,12 +23,10 @@ void clockProcess(ThreadID thid, Args args) {
     while (p != &__asleep) {
       Thread *th = ThreadListEntry(p);
 
+      p = p->next;
       int runnable = clk.CYCLES >= th->when.CYCLES;
       if (runnable) {
         ThreadListRemove(th);
-      }
-      p = p->next;
-      if (runnable) {
         ThreadListPushFront(&__system_runnable, th);
       }
     }

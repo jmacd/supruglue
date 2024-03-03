@@ -46,10 +46,11 @@ cc_test(
     name = "test",
     srcs = ["clock_test.cc"],
     deps = [
-        "//lib/time:process",
-        "//lib/log/fmt",
+        "//lib/intc:service",
         "//lib/log/daemon",
+        "//lib/log/fmt",
         "//lib/rpmsg/test32",
+        "//lib/time:process",
         "@com_google_absl//absl/log",
         "@com_google_googletest//:gtest_main",
     ],

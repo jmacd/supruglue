@@ -24,6 +24,9 @@ inline uint32_t GPIO_GetRegister(gpio_bank *g, int r) {
   return (uint32_t)g[r];
 }
 
+inline void GPIO_Init(void) {
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -16,7 +16,7 @@ extern "C" {
 // generally here because they are just integers.  Let's hope they're
 // the same in other platforms.
 
-enum _GpioBankNumber {
+enum _GpioFieldNumber {
   GPIOREG_REVISION = NUM_WORDS(0x0),         // Section 25.4.1.1
   GPIOREG_SYSCONFIG = NUM_WORDS(0x10),       // Section 25.4.1.2
   GPIOREG_EOI = NUM_WORDS(0x20),             // Section 25.4.1.3
@@ -45,7 +45,7 @@ enum _GpioBankNumber {
   GPIOREG_SETDATAOUT = NUM_WORDS(0x194),     // Section 25.4.1.26
 };
 
-typedef enum _GpioBankNumber GpioBankNumber;
+typedef enum _GpioFieldNumber GpioFieldNumber;
 
 typedef uint32_t gpio_bank;
 
@@ -78,6 +78,8 @@ typedef struct _gpio_pin gpio_pin;
 void GPIO_SetRegister(gpio_bank *g, int r, uint32_t v);
 
 uint32_t GPIO_GetRegister(gpio_bank *g, int r);
+
+void GPIO_Init(void);
 
 #ifdef __cplusplus
 }

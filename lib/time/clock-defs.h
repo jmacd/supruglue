@@ -17,6 +17,8 @@ void TimeInit(void);
 
 void TimeStart(void);
 
+void TimedSwitch(void);
+
 // Read the clock.
 void ReadClock(Timestamp *ts);
 

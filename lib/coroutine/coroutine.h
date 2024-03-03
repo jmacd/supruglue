@@ -21,13 +21,14 @@ typedef struct _System       System;
 typedef struct _SystemConfig SystemConfig;
 
 struct _SystemConfig {
-  int32_t unused;
+  int32_t export_interval;
 };
 
 struct _System {
   SystemConfig cfg;
   jmp_buf      return_jump;
   void        *run_stack_pos;
+  Thread      *allthreads;
   Journal      journal;
 };
 

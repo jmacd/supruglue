@@ -21,6 +21,7 @@ extern const char *const overflowMessage;
 typedef struct _Journal Journal;
 typedef struct _Entry   Entry;
 typedef struct _Block   Block;
+typedef struct _Integer Integer;
 
 #define NUM_PER_BLOCK 8
 #define NUM_BLOCKS 4
@@ -35,22 +36,42 @@ enum _JournalReadFlags {
 enum _JournalWriteFlags {
   JW_NONE = 0,
   JW_YIELD = 0x1,
-  JW_INFO_BLOCK = 0x10,         // INFO will Block
-  JW_INFO = 0x10 | JW_YIELD,    // INFO will Yield
-  JW_WARNING_BLOCK = 0x20,      // WARNING will Block
-  JW_WARNING = 0x20 | JW_YIELD, // WARNING will Yield
-  JW_FATAL = 0x40,              // FATAL will Block
+
+  JW_METRICS = 0x10, // Metrics do not yield
+  JW_INFO_NOYIELD = 0x20,
+  JW_WARNING_NOYIELD = 0x40,
+  JW_FATAL = 0x80, // Fatal does not yield
+
+  JW_INFO = JW_INFO_NOYIELD | JW_YIELD,       // INFO will Yield
+  JW_WARNING = JW_WARNING_NOYIELD | JW_YIELD, // WARNING will Yield
+
+  JW_FMT_Au32 = 0x1000,
+  JW_FMT_Au64 = 0x2000,
+  JW_FMT_Bu32 = 0x4000,
+  JW_FMT_Bu64 = 0x8000,
 };
 
 typedef enum _JournalReadFlags  JournalReadFlags;
 typedef enum _JournalWriteFlags JournalWriteFlags;
 
+struct _Integer {
+  union {
+    struct {
+      uint32_t LOW;
+      uint32_t HIGH;
+    } U32;
+
+    uint64_t U64;
+  };
+};
+
 struct _Entry {
   ThreadID    tid;
+  uint32_t    flags;
   Timestamp   time;
   const char *msg;
-  int32_t     arg1;
-  int32_t     arg2;
+  Integer     int1;
+  Integer     int2;
 };
 
 struct _Block {
@@ -71,10 +92,61 @@ SUPRUGLUE_DEFINE_LIST_INLINE(BlockList, Block, list);
 
 void JournalInit(Journal *jl);
 int  JournalRead(Journal *jl, Entry *record, JournalReadFlags flags);
-void JournalWrite(Journal *jl, ThreadID tid, const char *fmt, int32_t arg1, int32_t arg2, JournalWriteFlags flags);
 
-#define PRULOG_2U(level, fmt, arg1, arg2)                                                                              \
-  JournalWrite(&__system.journal, TID(__system_current), (fmt), (arg1), (arg2), JW_##level)
+Entry *getEntry(Journal *jl);
+void   setEntry(Journal *jl, Entry *entry);
+
+#define PRULOG_2u32(level, fmt, arg1, arg2)                                                                            \
+  do {                                                                                                                 \
+    Entry *entry = getEntry(&__system.journal);                                                                        \
+    entry->tid = TID(__system_current);                                                                                \
+    entry->flags = JW_##level | JW_FMT_Au32 | JW_FMT_Bu32;                                                             \
+    entry->msg = (fmt);                                                                                                \
+    entry->int1.U32.LOW = (arg1);                                                                                      \
+    entry->int2.U32.LOW = (arg2);                                                                                      \
+    setEntry(&__system.journal, entry);                                                                                \
+  } while (0)
+
+#define PRULOG_1u32(level, fmt, arg1)                                                                                  \
+  do {                                                                                                                 \
+    Entry *entry = getEntry(&__system.journal);                                                                        \
+    entry->tid = TID(__system_current);                                                                                \
+    entry->flags = JW_##level | JW_FMT_Au32;                                                                           \
+    entry->msg = (fmt);                                                                                                \
+    entry->int1.U32.LOW = (arg1);                                                                                      \
+    setEntry(&__system.journal, entry);                                                                                \
+  } while (0)
+
+#define PRULOG_2u64(level, fmt, arg1, arg2)                                                                            \
+  do {                                                                                                                 \
+    Entry *entry = getEntry(&__system.journal);                                                                        \
+    entry->tid = TID(__system_current);                                                                                \
+    entry->flags = JW_##level | JW_FMT_Au64 | JW_FMT_Bu64;                                                             \
+    entry->msg = (fmt);                                                                                                \
+    entry->int1.U64 = (arg1);                                                                                          \
+    entry->int2.U64 = (arg2);                                                                                          \
+    setEntry(&__system.journal, entry);                                                                                \
+  } while (0)
+
+#define PRULOG_0(level, fmt)                                                                                           \
+  do {                                                                                                                 \
+    Entry *entry = getEntry(&__system.journal);                                                                        \
+    entry->tid = TID(__system_current);                                                                                \
+    entry->flags = JW_##level;                                                                                         \
+    entry->msg = (fmt);                                                                                                \
+    setEntry(&__system.journal, entry);                                                                                \
+  } while (0)
+
+#define METLOG_2u64(th, fmt, arg1, arg2)                                                                               \
+  do {                                                                                                                 \
+    Entry *entry = getEntry(&__system.journal);                                                                        \
+    entry->tid = TID(th);                                                                                              \
+    entry->flags = JW_METRICS | JW_FMT_Au64 | JW_FMT_Bu64;                                                             \
+    entry->msg = (fmt);                                                                                                \
+    entry->int1.U64 = (arg1);                                                                                          \
+    entry->int2.U64 = (arg2);                                                                                          \
+    setEntry(&__system.journal, entry);                                                                                \
+  } while (0)
 
 #ifdef __cplusplus
 }

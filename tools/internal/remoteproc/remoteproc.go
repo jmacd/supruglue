@@ -62,6 +62,10 @@ func openDir(dir string) error {
 	return nil
 }
 
+func (rp *RemoteProc) Directory() string {
+	return rp.rpDir
+}
+
 func Open(rpDir, fwDir string) (*RemoteProc, error) {
 	rp := &RemoteProc{
 		rpDir: rpDir,

@@ -12,6 +12,9 @@ cc_library(
 
 cc_library(
     name = "soc",
+    srcs = [
+        "soc.c",
+    ],
     hdrs = [
         "soc.h",
         ":sysevts_gen",
