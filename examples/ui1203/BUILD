@@ -1,8 +1,8 @@
 # -*- Mode: Python -*-
 cc_binary(
-    name = "pwm_outin",
+    name = "ui1203",
     srcs = [
-        "pwm_outin.c",
+        "ui1203.c",
         ":irqgen",
     ],
     additional_linker_inputs = [
@@ -19,7 +19,6 @@ cc_binary(
         "//lib/intc:service",
         "//lib/log/daemon",
         "//lib/rpmsg",
-        "//lib/pwm",
         "//lib/time:process",
         "//lib/resource",
         "//tools/toolchain/am335x",
@@ -35,7 +34,6 @@ genrule(
         "//arch:sysevts",
         "//lib/rpmsg/am335x:irq",
         "//lib/time/am335x:iep_tim_cap_cmp_pend",
-        "//lib/pwm/am335x:epwm1_intr_pend",
     ],
     outs = [
         "irq.c",
