@@ -24,6 +24,10 @@ extern void SystemOnChipSuspend(void);
 
 #define ARCH_NUM_SYSEVTS 64
 
+// Control module base address (Pinmux, DMA crossbar, etc.) --
+// See TRM section 9.
+#define CONTROL_MODULE ((uint32_t *)0x44e10000)
+
 #ifdef __cplusplus
 }
 #endif

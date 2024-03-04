@@ -16,6 +16,8 @@ cc_library(
     hdrs = [
         "intc.h",
     ],
+    srcs = [
+    ],
     deps = [
         ":defs",
     ] + select({

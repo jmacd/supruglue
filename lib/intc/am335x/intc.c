@@ -51,13 +51,8 @@ void ServiceInterrupts(void) {
   while ((__R31 & ARM_TO_PRU_IRQ) != 0) {
     uint8_t evt = HIPRIO_EVT;
 
-    // TODO: Can't use debug.h helpers here because they run longer
+    // Note: Can't use debug.h helpers here because they run longer
     // than one IEP cycle and lead to an endless interrupt cycle
-    // because presently, the IEP interrupt has highest priority.
-    // (Here, 46 is the EPWM1EVT event, which is not working.)
-    // if (evt == 46) {
-    //   flash(1);
-    // }
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {

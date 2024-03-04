@@ -48,13 +48,13 @@ void runBlue(ThreadID tid, Args args) {
     // uint32_t val2 = PWMSS1.EPWM_ETSEL;
     // uint32_t val2 = PWMSS1.EPWM_CMPB;
     // uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_SERH)];
-    uint32_t val1 = EDMA_BASE[SHADOW1(EDMAREG_IER)];
-    uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_IERH)];
+    uint32_t val1;
+    uint32_t val2;
 
-    val1 = CT_INTC.ESR0;
-    val2 = CT_INTC.ESR1;
+    val1 = CT_INTC.ESR1;
+    val2 = PWMSS1.EPWM_ETFLG;
 
-    PRULOG_2u32(INFO_NOYIELD, "val1 %u val2 %u", val1, val2);
+    PRULOG_2u32(INFO_NOYIELD, "esr1 %u etflg %u", val1, val2);
 
     PWM_ClearInterrupt();
 
@@ -84,7 +84,7 @@ int main(void) {
 
   PWM_Enable();
 
-  // @@@ TODO need to add this call in other tests, examples...
+  // @@@ TODO/Note: this call has to be added in other tests, following PWM_Enable, examples...
   ControllerEnable();
 
   return Run();
