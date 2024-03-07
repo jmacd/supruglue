@@ -1,0 +1,4 @@
+Module,Base,Unit,Layout
+ePWM0,0x4830_0200,2,ePWM
+ePWM1,0x4830_2200,2,ePWM
+ePWM2,0x4830_4200,2,ePWM

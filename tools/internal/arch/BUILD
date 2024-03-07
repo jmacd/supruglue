@@ -5,7 +5,9 @@ go_library(
     name = "arch",
     srcs = [
         "irq.go",
+        "module.go",
         "pin.go",
+        "register.go",
         "sysevt.go",
     ],
     importpath = "github.com/jmacd/supruglue/tools/internal/arch",

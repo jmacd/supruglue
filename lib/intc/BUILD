@@ -13,10 +13,10 @@ cc_library(
 
 cc_library(
     name = "intc",
+    srcs = [
+    ],
     hdrs = [
         "intc.h",
-    ],
-    srcs = [
     ],
     deps = [
         ":defs",

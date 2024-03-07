@@ -29,7 +29,7 @@ void pwmHandler(void) {
   gpio_pin pin = GPIO_PIN(P9_12);
   uint32_t value = GPIO_GetPin(pin);
   PRULOG_1u32(INFO, "interrupt EPWM1 output A", value);
-  PWM_ClearInterrupt();
+  // PWM_ClearInterrupt();
 }
 
 void runBlue(ThreadID tid, Args args) {
@@ -52,12 +52,17 @@ void runBlue(ThreadID tid, Args args) {
     uint32_t val1;
     uint32_t val2;
 
-    val1 = CT_INTC.ESR1;
+    val1 = PWMSS1.EPWM_TBCNT;
     val2 = PWMSS1.EPWM_ETFLG;
 
-    PRULOG_2u32(INFO_NOYIELD, "esr1 %u etflg %u", val1, val2);
+    PRULOG_2u32(INFO_NOYIELD, "tbcntx(b) %u etflg %u", val1, val2);
 
     PWM_ClearInterrupt();
+
+    val1 = PWMSS1.EPWM_TBCNT;
+    val2 = PWMSS1.EPWM_ETFLG;
+
+    PRULOG_2u32(INFO_NOYIELD, "tbcnt(a) %u etflg %u", val1, val2);
 
     SleepUntil(&clock, PERIOD / 2);
   }
@@ -83,7 +88,7 @@ int main(void) {
 
   InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
 
-  PWM_Enable();
+  // PWM_Enable();
 
   // @@@ TODO/Note: this call has to be added in other tests, following PWM_Enable, examples...
   ControllerEnable();

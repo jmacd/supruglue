@@ -71,6 +71,12 @@
 // output can be observed by looping back to a GPIO pin, which the example
 // `examples/pwm_outin` does.
 
+// Note: The pinmix step has been accomplished, for now, using
+// `config-pin P9_14 pwm`.  In theory, we can do this with the
+// control module:
+//
+// CONTROL_MODULE[0x848 / WORDSZ] = (6 << 0); // P9_14 == Mode 6
+
 // PWM_ClearInterrupt is called from the interrupt servicing routine.
 //
 void PWM_ClearInterrupt(void) {
@@ -78,7 +84,7 @@ void PWM_ClearInterrupt(void) {
   // EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = EDMA_dmaChannelMask;
 
   // Clear the event.
-  PWM_BASE.EPWM_ETCLR = 1;
+  // PWM_BASE.EPWM_ETCLR = 1;
 }
 
 // PWM_Init initializes but does not start the PWM.
@@ -107,6 +113,7 @@ void PWM_Init(void) {
   // CMPA: Not used
   // CMPAHR: Not used
 
+  PWM_BASE.EPWM_TBCNT = 0;     // TBCNT: Time-base clock (16 bits)
   PWM_BASE.EPWM_TBPRD = 10000; // TBPRD: Time-base period (16 bits)
 
   // CMPCTL: All defaults
@@ -137,22 +144,20 @@ void PWM_Init(void) {
 
   // Clear pending interrupt!
   PWM_BASE.EPWM_ETCLR = (1 << 0);
-
-  //////////////////////////////////////////////////////////////////////
-  // Control module
-  CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
-
-  // Note: The pinmix step has been accomplished, for now, using
-  // `config-pin P9_14 pwm`.  In theory, we can do this with the
-  // control module:
-  //
-  // CONTROL_MODULE[0x848 / WORDSZ] = (6 << 0); // P9_14 == Mode 6
-
-  // Enable the PWM clock.
-  PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
 }
 
 // PWM_Enable enables PWM interrupts.
 void PWM_Enable(void) {
-  PWM_BASE.EPWM_ETSEL |= (1 << 3);
+
+  //////////////////////////////////////////////////////////////////////
+  // Control module
+  CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
+  // CONTROL_MODULE[0x664 / WORDSZ] = (0 << 1); // Enable TBCLK for EPWM1
+
+  // Enable the PWM clock.
+  PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
+  // PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 0;
+
+  PWM_BASE.EPWM_ETSEL = (1 << 3) | // Interrupts enabled
+                        (6 << 0);  // Interrupt on CMB-B == TBCNT
 }

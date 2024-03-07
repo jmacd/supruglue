@@ -14,7 +14,7 @@ System __system;
 
 SystemConfig NewSystemConfig(void) {
   return (SystemConfig){
-      .export_interval = 10 * TIME_SECOND,
+      .export_interval = 60 * TIME_SECOND,
   };
 }
 
