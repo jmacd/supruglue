@@ -181,7 +181,6 @@ func fromNum(in string) uint32 {
 }
 
 func mmap(file *os.File, addr uint32, size int) ([]byte, error) {
-	fmt.Printf("MMAP %x [%x] FD %d\n", addr, size, file.Fd())
 	return syscall.Mmap(
 		int(file.Fd()),
 		int64(addr),
@@ -190,6 +189,11 @@ func mmap(file *os.File, addr uint32, size int) ([]byte, error) {
 		syscall.MAP_SHARED,
 	)
 }
+
+func munmap(data []byte) error {
+	return syscall.Munmap(data)
+}
+
 func runDump(cmd *cobra.Command, args []string) error {
 	const listing = "am335x-map.csv"
 
@@ -245,28 +249,47 @@ func runDump(cmd *cobra.Command, args []string) error {
 	}
 
 	layout := layouts[dumpMod.Layout]
-	start := fromNum(dumpMod.Base)
-	size := abbrevHex(layout[len(layout)-1].Offset) + fromNum(dumpMod.Unit)
-
-	// TODO@@@
-	size = 4096
-	start = start & ^(size - 1)
+	base := fromNum(dumpMod.Base)
 
 	mem, err := os.OpenFile("/dev/mem", os.O_RDWR|os.O_SYNC, 0)
 	if err != nil {
 		return fmt.Errorf("open /dev/mem: %w", err)
 	}
 
-	ptr, err := mmap(mem, start, int(size))
-	if err != nil {
-		return fmt.Errorf("mmap /dev/mem: %w", err)
-	}
+	var ptr []byte
+	var paddr uint32
 
-	ints := (*[100]uint16)(unsafe.Pointer(&ptr[0]))
+	defer mem.Close()
+	defer munmap(ptr)
 
-	// TODO!
-	for i := uint32(0); i < (size / fromNum(dumpMod.Unit)); i++ {
-		fmt.Printf("@%x: %x\n", i, ints[i])
+	for _, reg := range layout {
+
+		const pgsz uint32 = 4096
+
+		addr := base + abbrevHex(reg.Offset)
+		page := addr & ^(pgsz - 1)
+		pgoff := addr & (pgsz - 1)
+
+		if page != paddr {
+			if ptr != nil {
+				munmap(ptr)
+				ptr = nil
+			}
+			paddr = page
+			ptr, err = mmap(mem, page, int(pgsz))
+			if err != nil {
+				return fmt.Errorf("mmap /dev/mem: %w", err)
+			}
+		}
+
+		var val any
+		switch fromNum(dumpMod.Unit) {
+		case 2:
+			val = (*(*[2048]uint16)(unsafe.Pointer(&ptr[0])))[pgoff/2]
+		case 4:
+			val = (*(*[1024]uint32)(unsafe.Pointer(&ptr[0])))[pgoff/4]
+		}
+		fmt.Printf("@%x: %s = %x\n", addr, reg.Name, val)
 	}
 
 	return nil

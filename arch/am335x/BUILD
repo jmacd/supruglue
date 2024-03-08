@@ -5,10 +5,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 filegroup(
     name = "defs",
-    srcs = [
-        "am335x-map.csv",
-        "ePWM.csv",
-    ],
+    srcs = glob(["*.csv"]),
 )
 
 go_library(

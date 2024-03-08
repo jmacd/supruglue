@@ -1,0 +1,203 @@
+Offset,Name,Description
+0h,PID,Peripheral Identification Register
+4h,CCCFG,EDMA3CC Configuration Register
+10h,SYSCONFIG,EDMA3CC System Configuration Register
+100h,DCHMAP_0,DMA Channel Mapping Register 0
+104h,DCHMAP_1,DMA Channel Mapping Register 1
+108h,DCHMAP_2,DMA Channel Mapping Register 2
+10Ch,DCHMAP_3,DMA Channel Mapping Register 3
+110h,DCHMAP_4,DMA Channel Mapping Register 4
+114h,DCHMAP_5,DMA Channel Mapping Register 5
+118h,DCHMAP_6,DMA Channel Mapping Register 6
+11Ch,DCHMAP_7,DMA Channel Mapping Register 7
+120h,DCHMAP_8,DMA Channel Mapping Register 8
+124h,DCHMAP_9,DMA Channel Mapping Register 9
+128h,DCHMAP_10,DMA Channel Mapping Register 10
+12Ch,DCHMAP_11,DMA Channel Mapping Register 11
+130h,DCHMAP_12,DMA Channel Mapping Register 12
+134h,DCHMAP_13,DMA Channel Mapping Register 13
+138h,DCHMAP_14,DMA Channel Mapping Register 14
+13Ch,DCHMAP_15,DMA Channel Mapping Register 15
+140h,DCHMAP_16,DMA Channel Mapping Register 16
+144h,DCHMAP_17,DMA Channel Mapping Register 17
+148h,DCHMAP_18,DMA Channel Mapping Register 18
+14Ch,DCHMAP_19,DMA Channel Mapping Register 19
+150h,DCHMAP_20,DMA Channel Mapping Register 20
+154h,DCHMAP_21,DMA Channel Mapping Register 21
+158h,DCHMAP_22,DMA Channel Mapping Register 22
+15Ch,DCHMAP_23,DMA Channel Mapping Register 23
+160h,DCHMAP_24,DMA Channel Mapping Register 24
+164h,DCHMAP_25,DMA Channel Mapping Register 25
+168h,DCHMAP_26,DMA Channel Mapping Register 26
+16Ch,DCHMAP_27,DMA Channel Mapping Register 27
+170h,DCHMAP_28,DMA Channel Mapping Register 28
+174h,DCHMAP_29,DMA Channel Mapping Register 29
+178h,DCHMAP_30,DMA Channel Mapping Register 30
+17Ch,DCHMAP_31,DMA Channel Mapping Register 31
+180h,DCHMAP_32,DMA Channel Mapping Register 32
+184h,DCHMAP_33,DMA Channel Mapping Register 33
+188h,DCHMAP_34,DMA Channel Mapping Register 34
+18Ch,DCHMAP_35,DMA Channel Mapping Register 35
+190h,DCHMAP_36,DMA Channel Mapping Register 36
+194h,DCHMAP_37,DMA Channel Mapping Register 37
+198h,DCHMAP_38,DMA Channel Mapping Register 38
+19Ch,DCHMAP_39,DMA Channel Mapping Register 39
+1A0h,DCHMAP_40,DMA Channel Mapping Register 40
+1A4h,DCHMAP_41,DMA Channel Mapping Register 41
+1A8h,DCHMAP_42,DMA Channel Mapping Register 42
+1ACh,DCHMAP_43,DMA Channel Mapping Register 43
+1B0h,DCHMAP_44,DMA Channel Mapping Register 44
+1B4h,DCHMAP_45,DMA Channel Mapping Register 45
+1B8h,DCHMAP_46,DMA Channel Mapping Register 46
+1BCh,DCHMAP_47,DMA Channel Mapping Register 47
+1C0h,DCHMAP_48,DMA Channel Mapping Register 48
+1C4h,DCHMAP_49,DMA Channel Mapping Register 49
+1C8h,DCHMAP_50,DMA Channel Mapping Register 50
+1CCh,DCHMAP_51,DMA Channel Mapping Register 51
+1D0h,DCHMAP_52,DMA Channel Mapping Register 52
+1D4h,DCHMAP_53,DMA Channel Mapping Register 53
+1D8h,DCHMAP_54,DMA Channel Mapping Register 54
+1DCh,DCHMAP_55,DMA Channel Mapping Register 55
+1E0h,DCHMAP_56,DMA Channel Mapping Register 56
+1E4h,DCHMAP_57,DMA Channel Mapping Register 57
+1E8h,DCHMAP_58,DMA Channel Mapping Register 58
+1ECh,DCHMAP_59,DMA Channel Mapping Register 59
+1F0h,DCHMAP_60,DMA Channel Mapping Register 60
+1F4h,DCHMAP_61,DMA Channel Mapping Register 61
+1F8h,DCHMAP_62,DMA Channel Mapping Register 62
+1FCh,DCHMAP_63,DMA Channel Mapping Register 63
+200h,QCHMAP_0,QDMA Channel Mapping Register 0
+204h,QCHMAP_1,QDMA Channel Mapping Register 1
+208h,QCHMAP_2,QDMA Channel Mapping Register 2
+20Ch,QCHMAP_3,QDMA Channel Mapping Register 3
+210h,QCHMAP_4,QDMA Channel Mapping Register 4
+214h,QCHMAP_5,QDMA Channel Mapping Register 5
+218h,QCHMAP_6,QDMA Channel Mapping Register 6
+21Ch,QCHMAP_7,QDMA Channel Mapping Register 7
+240h,DMAQNUM_0,DMA Queue Number Register 0
+244h,DMAQNUM_1,DMA Queue Number Register 1
+248h,DMAQNUM_2,DMA Queue Number Register 2
+24Ch,DMAQNUM_3,DMA Queue Number Register 3
+250h,DMAQNUM_4,DMA Queue Number Register 4
+254h,DMAQNUM_5,DMA Queue Number Register 5
+258h,DMAQNUM_6,DMA Queue Number Register 6
+25Ch,DMAQNUM_7,DMA Queue Number Register 7
+260h,QDMAQNUM,QDMA Queue Number Register
+284h,QUEPRI,Queue Priority Register
+300h,EMR,Event Missed Register
+304h,EMRH,Event Missed Register High
+308h,EMCR,Event Missed Clear Register
+30Ch,EMCRH,Event Missed Clear Register High
+310h,QEMR,QDMA Event Missed Register
+314h,QEMCR,QDMA Event Missed Clear Register
+318h,CCERR,EDMA3CC Error Register
+31Ch,CCERRCLR,EDMA3CC Error Clear Register
+320h,EEVAL,Error Evaluate Register
+340h,DRAE0,DMA Region Access Enable Register for Region 0
+344h,DRAEH0,DMA Region Access Enable Register High for Region 0
+348h,DRAE1,DMA Region Access Enable Register for Region 1
+34Ch,DRAEH1,DMA Region Access Enable Register High for Region 1
+350h,DRAE2,DMA Region Access Enable Register for Region 2
+354h,DRAEH2,DMA Region Access Enable Register High for Region 2
+358h,DRAE3,DMA Region Access Enable Register for Region 3
+35Ch,DRAEH3,DMA Region Access Enable Register High for Region 3
+380h,QRAE_0,QDMA Region Access Enable Register for Region 0
+384h,QRAE_1,QDMA Region Access Enable Register for Region 1
+388h,QRAE_2,QDMA Region Access Enable Register for Region 2
+38Ch,QRAE_3,QDMA Region Access Enable Register for Region 3
+400h,Q0E0,Event Queue 0 Entry 0
+404h,Q0E1,Event Queue 0 Entry 1
+408h,Q0E2,Event Queue 0 Entry 2
+40Ch,Q0E3,Event Queue 0 Entry 3
+410h,Q0E4,Event Queue 0 Entry 4
+414h,Q0E5,Event Queue 0 Entry 5
+418h,Q0E6,Event Queue 0 Entry 6
+41Ch,Q0E7,Event Queue 0 Entry 7
+420h,Q0E8,Event Queue 0 Entry 8
+424h,Q0E9,Event Queue 0 Entry 9
+428h,Q0E10,Event Queue 0 Entry 10
+42Ch,Q0E11,Event Queue 0 Entry 11
+430h,Q0E12,Event Queue 0 Entry 12
+434h,Q0E13,Event Queue 0 Entry 13
+438h,Q0E14,Event Queue 0 Entry 14
+43Ch,Q0E15,Event Queue 0 Entry 15
+440h,Q1E0,Event Queue 1 Entry 0
+444h,Q1E1,Event Queue 1 Entry 1
+448h,Q1E2,Event Queue 1 Entry 2
+44Ch,Q1E3,Event Queue 1 Entry 3
+450h,Q1E4,Event Queue 1 Entry 4
+454h,Q1E5,Event Queue 1 Entry 5
+458h,Q1E6,Event Queue 1 Entry 6
+45Ch,Q1E7,Event Queue 1 Entry 7
+460h,Q1E8,Event Queue 1 Entry 8
+464h,Q1E9,Event Queue 1 Entry 9
+468h,Q1E10,Event Queue 1 Entry 10
+46Ch,Q1E11,Event Queue 1 Entry 11
+470h,Q1E12,Event Queue 1 Entry 12
+474h,Q1E13,Event Queue 1 Entry 13
+478h,Q1E14,Event Queue 1 Entry 14
+47Ch,Q1E15,Event Queue 1 Entry 15
+480h,Q2E0,Event Queue 2 Entry 0
+484h,Q2E1,Event Queue 2 Entry 1
+488h,Q2E2,Event Queue 2 Entry 2
+48Ch,Q2E3,Event Queue 2 Entry 3
+490h,Q2E4,Event Queue 2 Entry 4
+494h,Q2E5,Event Queue 2 Entry 5
+498h,Q2E6,Event Queue 2 Entry 6
+49Ch,Q2E7,Event Queue 2 Entry 7
+4A0h,Q2E8,Event Queue 2 Entry 8
+4A4h,Q2E9,Event Queue 2 Entry 9
+4A8h,Q2E10,Event Queue 2 Entry 10
+4ACh,Q2E11,Event Queue 2 Entry 11
+4B0h,Q2E12,Event Queue 2 Entry 12
+4B4h,Q2E13,Event Queue 2 Entry 13
+4B8h,Q2E14,Event Queue 2 Entry 14
+4BCh,Q2E15,Event Queue 2 Entry 15
+600h,QSTAT_0,Queue Status Register 0
+604h,QSTAT_1,Queue Status Register 1
+608h,QSTAT_2,Queue Status Register 2
+620h,QWMTHRA,Queue Watermark Threshold A Register
+640h,CCSTAT,EDMA3CC Status Register
+800h,MPFAR,Memory Protection Fault Address Register
+804h,MPFSR,Memory Protection Fault Status Register
+808h,MPFCR,Memory Protection Fault Command Register
+80Ch,MPPAG,Memory Protection Page Attribute Register
+810h,MPPA_0,Global Memory Protection Page Attribute Register for Region 0
+814h,MPPA_1,Global Memory Protection Page Attribute Register for Region 1
+818h,MPPA_2,Global Memory Protection Page Attribute Register for Region 2
+81Ch,MPPA_3,Global Memory Protection Page Attribute Register for Region 3
+1000h,ER,Event Register
+1004h,ERH,Event Register High
+1008h,ECR,Event Clear Register
+100Ch,ECRH,Event Clear Register High
+1010h,ESR,Event Set Register
+1014h,ESRH,Event Set Register High
+1018h,CER,Chained Event Register
+101Ch,CERH,Chained Event Register High
+1020h,EER,Event Enable Register
+1024h,EERH,Event Enable Register High
+1028h,EECR,Event Enable Clear Register
+102Ch,EECRH,Event Enable Clear Register High
+1030h,EESR,Event Enable Set Register
+1034h,EESRH,Event Enable Set Register High
+1038h,SER,Secondary Event Register
+103Ch,SERH,Secondary Event Register High
+1040h,SECR,Secondary Event Clear Register
+1044h,SECRH,Secondary Event Clear Register High
+1050h,IER,Interrupt Enable Register
+1054h,IERH,Interrupt Enable Register High
+1058h,IECR,Interrupt Enable Clear Register
+105Ch,IECRH,Interrupt Enable Clear Register High
+1060h,IESR,Interrupt Enable Set Register
+1064h,IESRH,Interrupt Enable Set Register High
+1068h,IPR,Interrupt Pending Register
+106Ch,IPRH,Interrupt Pending Register High
+1070h,ICR,Interrupt Clear Register
+1074h,ICRH,Interrupt Clear Register High
+1078h,IEVAL,Interrupt Evaluate Register
+1080h,QER,QDMA Event Register
+1084h,QEER,QDMA Event Enable Register
+1088h,QEECR,QDMA Event Enable Clear Register
+108Ch,QEESR,QDMA Event Enable Set Register
+1090h,QSER,QDMA Secondary Event Register
+1094h,QSECR,QDMA Secondary Event Clear Register
