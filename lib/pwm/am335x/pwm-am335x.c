@@ -81,10 +81,10 @@
 //
 void PWM_ClearInterrupt(void) {
   // Experimental: do we need to clear a DMA interrupt, too?
-  // EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = EDMA_dmaChannelMask;
+  EDMA_BASE[SHADOW1(EDMAREG_ICR)] = EDMA_dmaChannelMask;
 
   // Clear the event.
-  // PWM_BASE.EPWM_ETCLR = 1;
+  PWM_BASE.EPWM_ETCLR = 1;
 }
 
 // PWM_Init initializes but does not start the PWM.
@@ -144,6 +144,60 @@ void PWM_Init(void) {
 
   // Clear pending interrupt!
   PWM_BASE.EPWM_ETCLR = (1 << 0);
+
+  // DMA setup
+  // The following experimental code attempts to create a dummy PaRaM
+  // entry, because there appears to be no way to "just send an event"
+  // to one of the interrupt controllers.
+
+  // Setup EDMA region access for Shadow Region 1
+  // Note the Linux kernel uses Shadow Region 0.
+  //
+  // DRAE1 == DMA Region Access Enable shadow region 1.
+  //
+  // We enable a single channel in this region.
+  EDMA_BASE[EDMA_DRAE1] = EDMA_dmaChannelMask;
+  EDMA_BASE[EDMA_DRAE1] = EDMA_paramNumberMask;
+
+  // Map DMA Channel to PaRAM w/ same number.
+  EDMA_BASE[EDMA_DCHMAP_N(EDMA_dmaChannel)] = EDMA_paramNumber << 5;
+
+  // Note DMAQNUM_1 configures the channel controller for channels
+  // 8-15.  This is specific to channel 15 => queue 2.
+  EDMA_BASE[EDMA_DMAQNUM_1] = 0x20000000;
+
+  // Enable channel for an event trigger.
+  EDMA_BASE[SHADOW1(EDMAREG_EESR)] = EDMA_dmaChannelMask;
+  EDMA_BASE[SHADOW1(EDMAREG_IECR)] = EDMA_dmaChannelMask;
+
+  // Clear secondary & missed register
+  EDMA_BASE[SHADOW1(EDMAREG_SECR)] = EDMA_dmaChannelMask;
+  EDMA_BASE[EDMA_EMCR] = EDMA_dmaChannelMask;
+
+  // Setup and store Dummy PaRAM.
+  uint16_t paramOffset = EDMA_PARAM_OFFSET;
+  paramOffset += ((EDMA_paramNumber * EDMA_PARAM_SIZE) / WORDSZ);
+
+  volatile edmaParam *edma_param_entry = (volatile edmaParam *)(EDMA_BASE + paramOffset);
+  // memset(edma_param_entry, 0, sizeof(*edma_param_entry));
+
+  edma_param_entry->lnkrld.link = 0xFFFF;
+  edma_param_entry->lnkrld.bcntrld = 0x0000;
+  edma_param_entry->opt.static_set = 1;
+
+  // Transfer complete interrupt enable.
+  edma_param_entry->opt.tcinten = 1;
+
+  // Intermediate transfer completion chaining enable.
+  // not needed, used for splitting the transfer
+  // edma_param_entry->opt.itcchen = 1;
+  edma_param_entry->opt.tcc = EDMA_dmaChannel;
+
+  edma_param_entry->ccnt.ccnt = 1;
+  edma_param_entry->abcnt.acnt = 1;
+  edma_param_entry->abcnt.bcnt = 1;
+  edma_param_entry->src = 0x10000 + 1;
+  edma_param_entry->dst = 0x10000;
 }
 
 // PWM_Enable enables PWM interrupts.
@@ -152,11 +206,9 @@ void PWM_Enable(void) {
   //////////////////////////////////////////////////////////////////////
   // Control module
   CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
-  // CONTROL_MODULE[0x664 / WORDSZ] = (0 << 1); // Enable TBCLK for EPWM1
 
   // Enable the PWM clock.
   PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
-  // PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 0;
 
   PWM_BASE.EPWM_ETSEL = (1 << 3) | // Interrupts enabled
                         (6 << 0);  // Interrupt on CMB-B == TBCNT

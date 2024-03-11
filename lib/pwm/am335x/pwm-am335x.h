@@ -70,13 +70,20 @@ extern "C" {
 #define EDMAREG_QSECR 0x94 // QDMA Secondary Event Clear Register Section 11.4.1.125
 
 #define EDMA_DCHMAP_N(N) ((0x100 + (N << 2)) / WORDSZ)
+#define EDMA_DMAQNUM_0 (0x240 / WORDSZ) // DMA Queue Number Register 0
+#define EDMA_DMAQNUM_1 (0x244 / WORDSZ) // DMA Queue Number Register 1
+#define EDMA_DMAQNUM_2 (0x248 / WORDSZ) // DMA Queue Number Register 2
+#define EDMA_DMAQNUM_3 (0x24C / WORDSZ) // DMA Queue Number Register 3
 #define EDMA_DMAQNUM_4 (0x250 / WORDSZ) // DMA Queue Number Register 4
+#define EDMA_DMAQNUM_5 (0x254 / WORDSZ) // DMA Queue Number Register 5
+#define EDMA_DMAQNUM_6 (0x258 / WORDSZ) // DMA Queue Number Register 6
+#define EDMA_DMAQNUM_7 (0x25C / WORDSZ) // DMA Queue Number Register 7
 #define SHADOW1(reg) ((0x2200 + reg) / WORDSZ)
 
 #define EDMA_dmaChannel 15
-#define EDMA_dmaChannelMask (1 << (EDMA_dmaChannel - 32))
+#define EDMA_dmaChannelMask (((uint32_t)1) << EDMA_dmaChannel)
 #define EDMA_paramNumber EDMA_dmaChannel
-#define EDMA_paramNumberMask (1 << (EDMA_paramNumber - 32))
+#define EDMA_paramNumberMask (((uint32_t)1) << EDMA_paramNumber)
 
 // (TRM 11.3.3.1)
 #define EDMA_PARAM_OFFSET (0x4000 / WORDSZ)

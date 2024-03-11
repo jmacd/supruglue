@@ -58,7 +58,8 @@ func (host *Host) Run() error {
 	fmt.Println("rpmsg: channel open")
 
 	go func() {
-		t := time.NewTicker(time.Second * 5)
+		// @@@ config
+		t := time.NewTicker(time.Second * 60)
 		defer t.Stop()
 		for {
 			select {

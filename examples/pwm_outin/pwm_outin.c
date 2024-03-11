@@ -88,7 +88,7 @@ int main(void) {
 
   InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
 
-  // PWM_Enable();
+  PWM_Enable();
 
   // @@@ TODO/Note: this call has to be added in other tests, following PWM_Enable, examples...
   ControllerEnable();
