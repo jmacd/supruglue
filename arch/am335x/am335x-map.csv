@@ -1,7 +1,10 @@
 Module,Base,Unit,Layout
-ePWM0,0x4830_0200,2,ePWM
-ePWM1,0x4830_2200,2,ePWM
-ePWM2,0x4830_4200,2,ePWM
+pwmss-epwm0,0x4830_0200,2,pwmss-epwm
+pwmss-epwm1,0x4830_2200,2,pwmss-epwm
+pwmss-epwm2,0x4830_4200,2,pwmss-epwm
+pwmss0,0x4830_0000,4,pwmss
+pwmss1,0x4830_2000,4,pwmss
+pwmss2,0x4830_4000,4,pwmss
 edma-tpcc,0x4900_0000,4,edma-tpcc
 pru-intc,0x4A32_0000,4,pru-intc
 soc-ctrl,0x44E1_0000,4,soc-ctrl
