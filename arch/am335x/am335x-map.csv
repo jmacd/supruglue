@@ -3,3 +3,5 @@ ePWM0,0x4830_0200,2,ePWM
 ePWM1,0x4830_2200,2,ePWM
 ePWM2,0x4830_4200,2,ePWM
 edma-tpcc,0x4900_0000,4,edma-tpcc
+pru-intc,0x4A32_0000,4,pru-intc
+soc-ctrl,0x44E1_0000,4,soc-ctrl
