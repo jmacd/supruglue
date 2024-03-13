@@ -8,3 +8,4 @@ pwmss2,0x4830_4000,4,pwmss
 edma-tpcc,0x4900_0000,4,edma-tpcc
 pru-intc,0x4A32_0000,4,pru-intc
 soc-ctrl,0x44E1_0000,4,soc-ctrl
+clock-per,0x44E0_0000,4,clock-per

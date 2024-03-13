@@ -82,7 +82,7 @@
 void PWM_ClearInterrupt(void) {
   // Experimental: do we need to clear a DMA interrupt, too?
   // EDMA_BASE[SHADOW1(EDMAREG_ICR)] = EDMA_dmaChannelMask;
-  // EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
+  EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
 
   // Clear the event.
   PWM_BASE.EPWM_ETCLR = 1;
@@ -90,12 +90,21 @@ void PWM_ClearInterrupt(void) {
 
 // PWM_Init initializes but does not start the PWM.
 void PWM_Init(void) {
+  // Enable the PWM clock.
+  PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
+  PWM_BASE.SYSCONFIG_bit.IDLEMODE = 2;
+
   //////////////////////////////////////////////////////////////////////
   // Control module
-  CONTROL_MODULE[0x664 / WORDSZ] = (0 << 1); // Enable TBCLK for EPWM1
+  CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
 
+  // DO NOT DO THIS: You can't setup the peripheral when the
+  // (not sure) interface or functional clock is disabled.
+  // //////////////////////////////////////////////////////////////////////
+  // Control module
+  // CONTROL_MODULE[0x664 / WORDSZ] = (0 << 1); // Enable TBCLK for EPWM1
   // Enable the PWM clock.
-  PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 0;
+  // PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 0;
 
   //////////////////////////////////////////////////////////////////////
   // Time-Base
@@ -208,13 +217,18 @@ void PWM_Init(void) {
 
 // PWM_Enable enables PWM interrupts.
 void PWM_Enable(void) {
-  // Enable the PWM clock.
-  PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
+  // // Enable the PWM clock.
+  // PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
+  // PWM_BASE.SYSCONFIG_bit.IDLEMODE = 2;
 
-  //////////////////////////////////////////////////////////////////////
-  // Control module
-  CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
+  // //////////////////////////////////////////////////////////////////////
+  // // Control module
+  // CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
 
   PWM_BASE.EPWM_ETSEL = (1 << 3) | // Interrupts enabled
                         (6 << 0);  // Interrupt on CMB-B == TBCNT
 }
+
+// @4a320204: SRSR1 = 40000000
+// TODO: This looks like event 62, which is tpcc_errint_pend_po
+// so possible EDMA is still the problem

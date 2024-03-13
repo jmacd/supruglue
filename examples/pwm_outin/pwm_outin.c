@@ -29,14 +29,14 @@ void pwmHandler(void) {
   gpio_pin pin = GPIO_PIN(P9_12);
   uint32_t value = GPIO_GetPin(pin);
   PRULOG_1u32(INFO, "interrupt EPWM1 output A", value);
-  // PWM_ClearInterrupt();
+  PWM_ClearInterrupt();
 }
 
 void runBlue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_12);
 
   PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
-  PWM_ClearInterrupt();
+  // PWM_ClearInterrupt();
 
   Timestamp clock;
   ReadClock(&clock);
@@ -57,7 +57,7 @@ void runBlue(ThreadID tid, Args args) {
 
     PRULOG_2u32(INFO_NOYIELD, "tbcntx(b) %u etflg %u", val1, val2);
 
-    PWM_ClearInterrupt();
+    // PWM_ClearInterrupt();
 
     val1 = PWMSS1.EPWM_TBCNT;
     val2 = PWMSS1.EPWM_ETFLG;
