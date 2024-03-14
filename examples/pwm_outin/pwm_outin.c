@@ -86,9 +86,21 @@ int main(void) {
 
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
-  InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
+  // InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
+  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler);
+
+  PWM_ClearInterrupt();
+
+  int32_t flag = PWMSS1.EPWM_ETFLG;
+  int32_t clk = PWMSS1.EPWM_TBCNT;
+
+  PRULOG_2u32(INFO_NOYIELD, "about to enable %u %u", flag, clk);
 
   PWM_Enable();
+
+  flag = PWMSS1.EPWM_ETFLG;
+  clk = PWMSS1.EPWM_TBCNT;
+  PRULOG_2u32(INFO_NOYIELD, "now enabled %u %u", flag, clk);
 
   // @@@ TODO/Note: this call has to be added in other tests, following PWM_Enable, examples...
   ControllerEnable();
