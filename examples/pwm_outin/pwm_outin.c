@@ -28,7 +28,8 @@
 void pwmHandler(void) {
   gpio_pin pin = GPIO_PIN(P9_12);
   uint32_t value = GPIO_GetPin(pin);
-  PRULOG_1u32(INFO, "interrupt EPWM1 output A", value);
+  uint32_t clk = PWMSS1.EPWM_TBCNT;
+  PRULOG_2u32(INFO, "interrupt EPWM1 output A %u %u", value, clk);
   PWM_ClearInterrupt();
 }
 
@@ -86,7 +87,6 @@ int main(void) {
 
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
-  // InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
   InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler);
 
   PWM_ClearInterrupt();

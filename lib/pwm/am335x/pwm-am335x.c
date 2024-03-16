@@ -30,7 +30,6 @@
 // as DMA events. The interrupt registers should be used to enable and
 // clear the current DMA event in order for the ePWM module to
 // generate subsequent DMA events.
-
 // Various other things we know:
 //
 // 1. The paragraph from 15.2.2.9.3 indicates a connection with the
@@ -80,13 +79,15 @@
 // PWM_ClearInterrupt is called from the interrupt servicing routine.
 //
 void PWM_ClearInterrupt(void) {
-  // Clear the event.
-  PWM_BASE.EPWM_ETCLR = 1;
-
-  // Experimental: do we need to clear a DMA interrupt, too?
-  EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
-  // EDMA_BASE[SHADOW1(EDMAREG_ICR)] = EDMA_dmaChannelMask;
+  // Important! Clear the DMA interrupt, THEN clear the DMA trigger
+  // event.
   EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1 << 31;
+
+  // Clear the DMA event
+  EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
+
+  // Clear the flag.  Very important this has to happen after the above.
+  PWM_BASE.EPWM_ETCLR = 1;
 }
 
 // PWM_Init initializes but does not start the PWM.
@@ -111,7 +112,7 @@ void PWM_Init(void) {
   //////////////////////////////////////////////////////////////////////
   // Time-Base
 
-  PWM_BASE.EPWM_TBCTL = (0 << 14) | // FREE_SOFT: Free run
+  PWM_BASE.EPWM_TBCTL = (0 << 14) | // FREE_SOFT: Disabled.
                         (0 << 13) | // PHSDIR: n/a in up-count mode
                         (7 << 10) | // CLKDIV: Time-base clock prescale bits (/128)
                         (1 << 7) |  // HSPCLKDIV: (Default) high-speed clock prescale bits
@@ -174,7 +175,7 @@ void PWM_Init(void) {
   //
   // We enable a single channel in this region.
   EDMA_BASE[EDMA_DRAE1] = EDMA_dmaChannelMask;
-  EDMA_BASE[EDMA_DRAEH1] = 1U << 31; // 63
+  EDMA_BASE[EDMA_DRAEH1] = 1U << 31; // 63: wait probably not needed for
 
   // Map DMA Channel to PaRAM w/ same number.
   EDMA_BASE[EDMA_DCHMAP_N(EDMA_dmaChannel)] = EDMA_paramNumber << 5;
@@ -185,9 +186,7 @@ void PWM_Init(void) {
 
   // Enable channel for an event trigger.
   EDMA_BASE[SHADOW1(EDMAREG_EESR)] = EDMA_dmaChannelMask;
-  // EDMA_BASE[SHADOW1(EDMAREG_IESR)] = EDMA_dmaChannelMask;
   EDMA_BASE[SHADOW1(EDMAREG_ICR)] = EDMA_dmaChannelMask;
-  // EDMA_BASE[SHADOW1(EDMAREG_IECR)] = EDMA_dmaChannelMask;
 
   // Clear and enable the register (was added to shadow region above)
   EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1 << 31;  // which is event 63
@@ -210,12 +209,7 @@ void PWM_Init(void) {
 
   // Transfer complete interrupt enable.
   edma_param_entry->opt.tcinten = 1;
-
-  // Intermediate transfer completion chaining enable.
-  // not needed, used for splitting the transfer
-  // edma_param_entry->opt.itcchen = 1;
   edma_param_entry->opt.tcc = 63;
-  // edma_param_entry->opt.tcc = 15; // @@@
 
   edma_param_entry->ccnt.ccnt = 1;
   edma_param_entry->abcnt.acnt = 1;
