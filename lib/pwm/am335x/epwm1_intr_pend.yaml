@@ -2,6 +2,3 @@ incoming:
 - event: SYSEVT_TPCC_INT_PEND_PO1
   channel: 5
   desc: EDMA interrupt routed from ePWM module 1
-- event: SYSEVT_EPWM1_INTR_PEND
-  channel: 4
-  desc: eHRPWM interrupt from ePWM module 1 (not routed?)

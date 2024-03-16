@@ -36,13 +36,6 @@ void ControllerInit(void) {
   // this PRU will use.
   CT_INTC.SECR0 = 0xffffffff;
   CT_INTC.SECR1 = 0xffffffff;
-
-  // Unset the raw events
-  // CT_INTC.SICR_bit.STS_CLR_IDX = ARM_TO_PRU_EVT;
-  // CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
-  // CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM1_INTR_PEND;
-
-  // CT_INTC.HIER_bit.EN_HINT |= 8;
 }
 
 void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {

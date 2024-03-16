@@ -37,33 +37,14 @@ void runBlue(ThreadID tid, Args args) {
   gpio_pin pin = GPIO_PIN(P9_12);
 
   PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
-  // PWM_ClearInterrupt();
 
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
     uint32_t value = GPIO_GetPin(pin);
+    uint32_t tbcnt = PWMSS1.EPWM_TBCNT;
 
-    // uint32_t val1 = PWMSS1.EPWM_TBCNT;
-    // uint32_t val2 = PWMSS1.EPWM_ETPS;
-    // uint32_t val2 = PWMSS1.EPWM_ETFLG;
-    // uint32_t val2 = PWMSS1.EPWM_ETSEL;
-    // uint32_t val2 = PWMSS1.EPWM_CMPB;
-    // uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_SERH)];
-    uint32_t val1;
-    uint32_t val2;
-
-    val1 = PWMSS1.EPWM_TBCNT;
-    val2 = PWMSS1.EPWM_ETFLG;
-
-    PRULOG_2u32(INFO_NOYIELD, "tbcntx(b) %u etflg %u", val1, val2);
-
-    // PWM_ClearInterrupt();
-
-    val1 = PWMSS1.EPWM_TBCNT;
-    val2 = PWMSS1.EPWM_ETFLG;
-
-    PRULOG_2u32(INFO_NOYIELD, "tbcnt(a) %u etflg %u", val1, val2);
+    PRULOG_2u32(INFO_NOYIELD, "read value %u tbcnt %u", value, tbcnt);
 
     SleepUntil(&clock, PERIOD / 2);
   }
@@ -91,18 +72,8 @@ int main(void) {
 
   PWM_ClearInterrupt();
 
-  int32_t flag = PWMSS1.EPWM_ETFLG;
-  int32_t clk = PWMSS1.EPWM_TBCNT;
-
-  PRULOG_2u32(INFO_NOYIELD, "about to enable %u %u", flag, clk);
-
   PWM_Enable();
 
-  flag = PWMSS1.EPWM_ETFLG;
-  clk = PWMSS1.EPWM_TBCNT;
-  PRULOG_2u32(INFO_NOYIELD, "now enabled %u %u", flag, clk);
-
-  // @@@ TODO/Note: this call has to be added in other tests, following PWM_Enable, examples...
   ControllerEnable();
 
   return Run();

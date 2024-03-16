@@ -225,14 +225,10 @@ void PWM_Enable(void) {
   // PWM_BASE.SYSCONFIG_bit.IDLEMODE = 2;
   PWM_BASE.EPWM_TBCTL |= (3 << 14); // FREE_SOFT: Free run
 
-  // //////////////////////////////////////////////////////////////////////
-  // // Control module
-  // CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
+  //////////////////////////////////////////////////////////////////////
+  // Control module
+  CONTROL_MODULE[0x664 / WORDSZ] = (1 << 1); // Enable TBCLK for EPWM1
 
   PWM_BASE.EPWM_ETSEL = (1 << 3) | // Interrupts enabled
                         (6 << 0);  // Interrupt on CMB-B == TBCNT
 }
-
-// @4a320204: SRSR1 = 40000000
-// TODO: This looks like event 62, which is tpcc_errint_pend_po
-// so possible EDMA is still the problem
