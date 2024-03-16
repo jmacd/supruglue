@@ -2,10 +2,14 @@ Module,Base,Unit,Layout
 pwmss-epwm0,0x4830_0200,2,pwmss-epwm
 pwmss-epwm1,0x4830_2200,2,pwmss-epwm
 pwmss-epwm2,0x4830_4200,2,pwmss-epwm
+pwmss-ecap0,0x4830_0100,2,pwmss-ecap
+pwmss-ecap1,0x4830_2100,2,pwmss-ecap
+pwmss-ecap2,0x4830_4100,2,pwmss-ecap
 pwmss0,0x4830_0000,4,pwmss
 pwmss1,0x4830_2000,4,pwmss
 pwmss2,0x4830_4000,4,pwmss
 edma-tpcc,0x4900_0000,4,edma-tpcc
 pru-intc,0x4A32_0000,4,pru-intc
+pru-iep,0x4A32_E000,4,pru-iep
 soc-ctrl,0x44E1_0000,4,soc-ctrl
 clock-per,0x44E0_0000,4,clock-per
