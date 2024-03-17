@@ -68,6 +68,7 @@ int main(void) {
   GPIO_Init();
   SyslogInit();
   ProcessInit();
+  CAP_Init();
 
   args.ptr = "0";
 
@@ -76,6 +77,7 @@ int main(void) {
   InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler);
   InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, ecapHandler);
 
+  // @@@ TODO remove
   PWM_ClearInterrupt();
 
   CAP_Enable();
