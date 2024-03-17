@@ -6,14 +6,19 @@
 
 #define PWM_BASE PWMSS1
 
-// Status: the code in this directory is a work-in-progress, and not
-// completely functional.  Here, epwmss1 is initialized with a simple
-// counting-up waveform, with:
+// TODO: generate DMA event defs
+#define EDMA_dmaChannel 15
+#define EDMA_dmaChannelMask (((uint32_t)1) << EDMA_dmaChannel)
+#define EDMA_paramNumber EDMA_dmaChannel
+#define EDMA_paramNumberMask (((uint32_t)1) << EDMA_paramNumber)
+
+// Status:
 // - Prescaler at 1/128
 // - Period 10000
 // - CMPA 5000
 // - CMPB 7500
 // - AQ: output low on TBCNT==0, high on TBCNT=CMPA (i.e., 50% duty)
+// - Interrupt on CMPB
 
 // PWM initialization procedure, from the am335x TRM 15.2.2.2:
 //
@@ -30,41 +35,6 @@
 // as DMA events. The interrupt registers should be used to enable and
 // clear the current DMA event in order for the ePWM module to
 // generate subsequent DMA events.
-// Various other things we know:
-//
-// 1. The paragraph from 15.2.2.9.3 indicates a connection with the
-//    DMA controller, but it is unclear whether one needs to be
-//    concerned with the DMA controller.  EDMA channel 35 == ePWMEVT1.
-//    Do we need a dummy PaRaM entry so that the DMA controller is
-//    satisfied and will allow interrupts to be generated?
-//
-// 2. Need to enable the TBCLK for EPWM1 using the PWMSS_CTRL
-//    register (TRM 9.3.1.31) (offset = 664h)
-//
-// 3. Need to pinmux the EPWMxA output.
-//
-// 4. According to some forum threads, the device tree needs to be
-//    configured to give the PRU control over it.
-//    See https://e2e.ti.com/support/processors-group/processors/f/processors-forum/918237/am4378-arm-to-pru-event
-//    See https://forum.beagleboard.org/t/pwmss-control-by-pru-with-kernel-4-19/31246/19
-//    Using a device-tree with `status = "disabled"` to prevent the kernel from
-//    adopting the PWM hardware.
-//
-//      ehrpwm1: pwm@200 {
-//      	compatible = "ti,am3352-ehrpwm";
-//      	#pwm-cells = <3>;
-//      	reg = <0x200 0x80>;
-//      	clocks = <&ehrpwm1_tbclk>, <&l4ls_gclk>;
-//      	clock-names = "tbclk", "fck";
-//      	status = "disabled";
-//      };
-//
-// 5. Searched and searched for any examples or forum discussions on this
-//    topic, found very little.  I assume that anyone trying to the eQEP
-//    interrupts to work is in the same situation, so here's one:
-//
-//      https://e2e.ti.com/support/processors-group/processors/f/processors-forum/478720/beagle-bone-black-pru-not-able-to-initialize-pwmss0-or-pwmss1
-//      https://e2e.ti.com/support/processors-group/processors/f/processors-forum/362435/am335x-unable-to-receive-pwm-interrupt-on-pru
 //
 // Current state: the PWM is configured and running correctly -- the PWM
 // output can be observed by looping back to a GPIO pin, which the example
@@ -175,7 +145,7 @@ void PWM_Init(void) {
   //
   // We enable a single channel in this region.
   EDMA_BASE[EDMA_DRAE1] = EDMA_dmaChannelMask;
-  EDMA_BASE[EDMA_DRAEH1] = 1U << 31; // 63: wait probably not needed for
+  EDMA_BASE[EDMA_DRAEH1] = 1U << 31;
 
   // Map DMA Channel to PaRAM w/ same number.
   EDMA_BASE[EDMA_DCHMAP_N(EDMA_dmaChannel)] = EDMA_paramNumber << 5;
@@ -220,9 +190,6 @@ void PWM_Init(void) {
 
 // PWM_Enable enables PWM interrupts.
 void PWM_Enable(void) {
-  // // Enable the PWM clock.
-  // PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
-  // PWM_BASE.SYSCONFIG_bit.IDLEMODE = 2;
   PWM_BASE.EPWM_TBCTL |= (3 << 14); // FREE_SOFT: Free run
 
   //////////////////////////////////////////////////////////////////////

@@ -1,4 +1,39 @@
 
+//
+// 1. The paragraph from 15.2.2.9.3 indicates a connection with the
+//    DMA controller, but it is unclear whether one needs to be
+//    concerned with the DMA controller.  EDMA channel 35 == ePWMEVT1.
+//    Do we need a dummy PaRaM entry so that the DMA controller is
+//    satisfied and will allow interrupts to be generated?
+//
+// 2. Need to enable the TBCLK for EPWM1 using the PWMSS_CTRL
+//    register (TRM 9.3.1.31) (offset = 664h)
+//
+// 3. Need to pinmux the EPWMxA output.
+//
+// 4. According to some forum threads, the device tree needs to be
+//    configured to give the PRU control over it.
+//    See https://e2e.ti.com/support/processors-group/processors/f/processors-forum/918237/am4378-arm-to-pru-event
+//    See https://forum.beagleboard.org/t/pwmss-control-by-pru-with-kernel-4-19/31246/19
+//    Using a device-tree with `status = "disabled"` to prevent the kernel from
+//    adopting the PWM hardware.
+//
+//      ehrpwm1: pwm@200 {
+//      	compatible = "ti,am3352-ehrpwm";
+//      	#pwm-cells = <3>;
+//      	reg = <0x200 0x80>;
+//      	clocks = <&ehrpwm1_tbclk>, <&l4ls_gclk>;
+//      	clock-names = "tbclk", "fck";
+//      	status = "disabled";
+//      };
+//
+// 5. Searched and searched for any examples or forum discussions on this
+//    topic, found very little.  I assume that anyone trying to the eQEP
+//    interrupts to work is in the same situation, so here's one:
+//
+//      https://e2e.ti.com/support/processors-group/processors/f/processors-forum/478720/beagle-bone-black-pru-not-able-to-initialize-pwmss0-or-pwmss1
+//      https://e2e.ti.com/support/processors-group/processors/f/processors-forum/362435/am335x-unable-to-receive-pwm-interrupt-on-pru
+
 Cheatsheet on PWMSS
 
 0h IDVER IP Revision Register Section 15.1.3.1

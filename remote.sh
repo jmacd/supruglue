@@ -39,6 +39,8 @@ configPins
 
 # Works!
 config-pin P9_14 pwm
+config-pin P9_92 pru_in
+#config-pin P9_42 pru_ecap
 
 
 # echo "Stopping ..."

@@ -11,6 +11,7 @@ cc_library(
     ],
     deps = [
         "//lib/pwm:defs",
+        "//lib/dma/am335x",
         "//tools/toolchain/am335x",
     ],
 )

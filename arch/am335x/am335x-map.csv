@@ -9,7 +9,8 @@ pwmss0,0x4830_0000,4,pwmss
 pwmss1,0x4830_2000,4,pwmss
 pwmss2,0x4830_4000,4,pwmss
 edma-tpcc,0x4900_0000,4,edma-tpcc
-pru-intc,0x4A32_0000,4,pru-intc
-pru-iep,0x4A32_E000,4,pru-iep
 soc-ctrl,0x44E1_0000,4,soc-ctrl
 clock-per,0x44E0_0000,4,clock-per
+pru-intc,0x4A32_0000,4,pru-intc
+pru-iep,0x4A32_E000,4,pru-iep
+pru-ecap,0x4A33_0000,2,pwmss-ecap

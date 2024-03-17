@@ -3,10 +3,12 @@
 #include <stdlib.h>
 
 // @@@ TODO: here for diagnostics, remove!
+#include "external/ti-pru-support/include/am335x/pru_ecap.h"
 #include "external/ti-pru-support/include/am335x/pru_intc.h"
 #include "external/ti-pru-support/include/am335x/sys_pwmss.h"
 
 #include "lib/args/args.h"
+#include "lib/cap/cap.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
 #include "lib/gpio/gpio.h"
@@ -26,25 +28,28 @@
 #define PERIOD (2000000000U / 5)
 
 void pwmHandler(void) {
-  gpio_pin pin = GPIO_PIN(P9_12);
-  uint32_t value = GPIO_GetPin(pin);
   uint32_t clk = PWMSS1.EPWM_TBCNT;
-  PRULOG_2u32(INFO, "interrupt EPWM1 output A %u %u", value, clk);
+  PRULOG_1u32(INFO, "interrupt EPWM1 output A %u %u", clk);
   PWM_ClearInterrupt();
 }
 
-void runBlue(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(P9_12);
+void ecapHandler(void) {
+  uint32_t down = CT_ECAP.CAP1;
+  uint32_t up = CT_ECAP.CAP2;
+  PRULOG_2u32(INFO, "interrupt ECAP", down, up);
+  CAP_ClearInterrupt();
+}
 
+void runBlue(ThreadID tid, Args args) {
   PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
 
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
-    uint32_t value = GPIO_GetPin(pin);
-    uint32_t tbcnt = PWMSS1.EPWM_TBCNT;
+    uint32_t cap = CT_ECAP.TSCTR;
+    uint32_t pwm = PWMSS1.EPWM_TBCNT;
 
-    PRULOG_2u32(INFO_NOYIELD, "read value %u tbcnt %u", value, tbcnt);
+    PRULOG_2u32(INFO_NOYIELD, "read clocks cap %u tbcnt %u", cap, pwm);
 
     SleepUntil(&clock, PERIOD / 2);
   }
@@ -69,11 +74,12 @@ int main(void) {
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
   InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler);
+  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, ecapHandler);
 
   PWM_ClearInterrupt();
 
+  CAP_Enable();
   PWM_Enable();
-
   ControllerEnable();
 
   return Run();

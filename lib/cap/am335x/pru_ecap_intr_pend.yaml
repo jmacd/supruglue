@@ -1,0 +1,4 @@
+incoming:
+- event: SYSEVT_PR1_PRU_ECAP_INTR_REQ
+  channel: 5
+  desc: PRU eCAP
