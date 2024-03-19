@@ -5,6 +5,8 @@
 #include "external/ti-pru-support/include/am335x/pru_ecap.h"
 
 void CAP_Init(void) {
+  CT_ECAP.ECCLR = 0xFF;
+
   CT_ECAP.ECCTL1 = (3 << 14) | // Free run
                    (1 << 8) |  // Capture enable
                    (1 << 7) |  // Reset after 4
@@ -17,19 +19,21 @@ void CAP_Init(void) {
                    (0 << 0);   // Cap1 polarity rising
 
   CT_ECAP.ECCTL2 = (0 << 9) | // Capture mode
-                   (3 << 6) | // Sync out disable
+                   (0 << 6) | // Sync out disable
                    (0 << 5) | // Sync in disable
                    (0 << 4) | // Stopped
                    (1 << 1) | // Capture 2 events
                    (0 << 0);  // Continuous
 
-  CT_ECAP.ECEINT = (1 << 2); // Interrupt on Cap2
+  // CT_ECAP.ECEINT = (1 << 2); // Interrupt on Cap2
+  CT_ECAP.ECEINT = (1 << 5); // Interrupt on Oflow
 }
 
 void CAP_Enable(void) {
-  CT_ECAP.ECCTL2 = (1 << 4); // Run
+  CT_ECAP.ECCTL2 |= (1 << 4); // Run
+  CT_ECAP.ECCLR = 0xFF;
 }
 
 void CAP_ClearInterrupt(void) {
-  CT_ECAP.ECCLR = 1;
+  CT_ECAP.ECCLR = 0x20;
 }
