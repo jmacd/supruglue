@@ -9,13 +9,13 @@ void CAP_Init(void) {
 
   CT_ECAP.ECCTL1 = (3 << 14) | // Free run
                    (1 << 8) |  // Capture enable
-                   (1 << 7) |  // Reset after 4
+                   (0 << 7) |  // Reset after 4
                    (0 << 6) |  // Cap4 polarity falling
-                   (1 << 5) |  // Reset after 3
-                   (1 << 4) |  // Cap3 polarity rising
-                   (0 << 3) |  // Reset after 2
-                   (0 << 2) |  // Cap2 polarity falling
-                   (0 << 1) |  // Reset after 1
+                   (0 << 5) |  // Reset after 3
+                   (0 << 4) |  // Cap3 polarity rising
+                   (1 << 3) |  // Reset after 2
+                   (1 << 2) |  // Cap2 polarity falling
+                   (1 << 1) |  // Reset after 1
                    (0 << 0);   // Cap1 polarity rising
 
   CT_ECAP.ECCTL2 = (0 << 9) | // Capture mode
@@ -25,15 +25,16 @@ void CAP_Init(void) {
                    (1 << 1) | // Capture 2 events
                    (0 << 0);  // Continuous
 
-  // CT_ECAP.ECEINT = (1 << 2); // Interrupt on Cap2
-  CT_ECAP.ECEINT = (1 << 5); // Interrupt on Oflow
+  CT_ECAP.ECEINT = (1 << 2); // Interrupt on Cap2
 }
 
 void CAP_Enable(void) {
   CT_ECAP.ECCTL2 |= (1 << 4); // Run
-  CT_ECAP.ECCLR = 0xFF;
 }
 
 void CAP_ClearInterrupt(void) {
-  CT_ECAP.ECCLR = 0x20;
+  CT_ECAP.ECCLR = (1 << 0) | // INTR
+                  (1 << 1) | // CEVT1
+                  (1 << 2) | // CEVT2
+                  (1 << 5);  // OFLOW
 }

@@ -29,14 +29,14 @@
 
 void pwmHandler(void) {
   uint32_t clk = PWMSS1.EPWM_TBCNT;
-  PRULOG_1u32(INFO, "interrupt EPWM1 output A %u %u", clk);
+  PRULOG_1u32(INFO, "interrupt EPWM1 output A %u", clk);
   PWM_ClearInterrupt();
 }
 
 void ecapHandler(void) {
-  uint32_t down = CT_ECAP.CAP1;
-  uint32_t up = CT_ECAP.CAP2;
-  PRULOG_2u32(INFO, "interrupt ECAP", down, up);
+  uint32_t up = CT_ECAP.CAP1;
+  uint32_t down = CT_ECAP.CAP2;
+  PRULOG_2u32(INFO, "interrupt ECAP up %u down %u", up, down);
   CAP_ClearInterrupt();
 }
 
