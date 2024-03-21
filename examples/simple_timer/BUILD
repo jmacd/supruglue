@@ -1,8 +1,8 @@
 # -*- Mode: Python -*-
 cc_binary(
-    name = "led_outin",
+    name = "simple_timer",
     srcs = [
-        "led_outin.c",
+        "simple_timer.c",
         ":irqgen",
     ],
     additional_linker_inputs = [

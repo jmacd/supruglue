@@ -117,6 +117,16 @@ void   setEntry(Journal *jl, Entry *entry);
     setEntry(&__system.journal, entry);                                                                                \
   } while (0)
 
+#define PRULOG_1u64(level, fmt, arg1)                                                                                  \
+  do {                                                                                                                 \
+    Entry *entry = getEntry(&__system.journal);                                                                        \
+    entry->tid = TID(__system_current);                                                                                \
+    entry->flags = JW_##level | JW_FMT_Au64;                                                                           \
+    entry->msg = (fmt);                                                                                                \
+    entry->int1.U64 = (arg1);                                                                                          \
+    setEntry(&__system.journal, entry);                                                                                \
+  } while (0)
+
 #define PRULOG_2u64(level, fmt, arg1, arg2)                                                                            \
   do {                                                                                                                 \
     Entry *entry = getEntry(&__system.journal);                                                                        \

@@ -10,8 +10,8 @@ PID=""
 #OUT_GPIOs="gpio17 gpio115"
 #OUT_GPIOs=${ALL_GPIOs}
 
-OUT_GPIOs="gpio49" # P9.23
-IN_GPIOs="gpio117 gpio60" # P9.25 P9.12
+#OUT_GPIOs="gpio49" # P9.23
+#IN_GPIOs="gpio117 gpio60" # P9.25 P9.12
 
 LEDs="beaglebone:green:usr0 beaglebone:green:usr1 beaglebone:green:usr2 beaglebone:green:usr3"
 
@@ -21,24 +21,24 @@ cleanup()
   exit 1
 }
 
-configPins() {
-    echo "Configuring user LEDs"
-    for led in ${LEDs}; do
-	echo none > /sys/class/leds/${led}/trigger
-    done
-    echo "Configuring GPIO pins"
-    for gpio in ${OUT_GPIOs}; do
-	echo out > /sys/class/gpio/${gpio}/direction
-    done
-    for gpio in ${IN_GPIOs}; do
-	echo in > /sys/class/gpio/${gpio}/direction
-    done
-}
+# configPins() {
+#     echo "Configuring user LEDs"
+#     for led in ${LEDs}; do
+# 	echo none > /sys/class/leds/${led}/trigger
+#     done
+#     echo "Configuring GPIO pins"
+#     for gpio in ${OUT_GPIOs}; do
+# 	echo out > /sys/class/gpio/${gpio}/direction
+#     done
+#     for gpio in ${IN_GPIOs}; do
+# 	echo in > /sys/class/gpio/${gpio}/direction
+#     done
+# }
 
-configPins
+# configPins
 
 # Works!
-config-pin P9_14 pwm
+#config-pin P9_14 pwm
 
 # Not sure how to get ecap0 in
 #config-pin P9_92 pruin

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PRU=pru0
-EXAMPLE=pwm_outin
+EXAMPLE=${EXAMPLE:-pwm_outin}
 REMOTEPROC=/sys/class/remoteproc/remoteproc1
 
 REMOTE=./remote.sh
