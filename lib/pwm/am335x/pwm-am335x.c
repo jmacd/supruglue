@@ -61,7 +61,7 @@ void PWM_ClearInterrupt(void) {
 }
 
 // PWM_Init initializes but does not start the PWM.
-void PWM_Init(void) {
+void PWM_Init(int32_t lowHigh, int32_t period, int32_t interrupt) {
   // Enable the PWM clock.
 
   PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
@@ -103,14 +103,14 @@ void PWM_Init(void) {
   // CMPA: Not used
   // CMPAHR: Not used
 
-  PWM_BASE.EPWM_TBCNT = 0;     // TBCNT: Time-base clock (16 bits)
-  PWM_BASE.EPWM_TBPRD = 10000; // TBPRD: Time-base period (16 bits)
+  PWM_BASE.EPWM_TBCNT = 0;      // TBCNT: Time-base clock (16 bits)
+  PWM_BASE.EPWM_TBPRD = period; // TBPRD: Time-base period (16 bits)
 
   // CMPCTL: All defaults
   // CMPAHR: Not used
 
-  PWM_BASE.EPWM_CMPA = 5000; // CMPB: Compare value for clearing EPWMxA
-  PWM_BASE.EPWM_CMPB = 7500; // CMPB: Compare value for sample interrupt
+  PWM_BASE.EPWM_CMPA = lowHigh;   // CMPB: Compare value for clearing EPWMxA
+  PWM_BASE.EPWM_CMPB = interrupt; // CMPB: Compare value for sample interrupt
 
   //////////////////////////////////////////////////////////////////////
   // Action qualifier

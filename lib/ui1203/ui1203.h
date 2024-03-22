@@ -11,13 +11,18 @@ extern "C" {
 #endif
 
 typedef struct {
-  gpio_pin clock;
   gpio_pin data;
 } UI1203_Reader;
 
-// void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin clock, gpio_pin data);
+typedef struct {
+  gpio_pin data;
+} UI1203_Writer;
 
-// void UI1203_Run_Reader(UI1203_Reader *rdr);
+// Note! Uses ePWM1 to generate clock.  Uses GPIO to read.
+void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin data);
+
+// Note! Uses PRU-eCAP0 to receive clock.  Uses GPIO to write.
+void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data);
 
 #ifdef __cplusplus
 }

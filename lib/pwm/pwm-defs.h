@@ -10,7 +10,7 @@ extern "C" {
 
 #include "lib/soc/soc.h"
 
-void PWM_Init(void);
+void PWM_Init(int32_t lowHigh, int32_t period, int32_t interrupt);
 void PWM_ClearInterrupt(void);
 void PWM_Enable(void);
 

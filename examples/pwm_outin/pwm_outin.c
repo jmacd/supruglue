@@ -11,7 +11,6 @@
 #include "lib/cap/cap.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
-#include "lib/gpio/gpio.h"
 #include "lib/initproc/initproc.h"
 #include "lib/intc/intc.h"
 #include "lib/intc/service.h"
@@ -61,11 +60,10 @@ int main(void) {
   Args args;
 
   Init(NewSystemConfig());
-  PWM_Init();
+  PWM_Init(5000, 10000, 7500);
   InterruptServiceInit();
   ClockInit();
   RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
-  GPIO_Init();
   SyslogInit();
   ProcessInit();
   CAP_Init();

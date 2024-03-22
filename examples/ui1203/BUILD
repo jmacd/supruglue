@@ -21,6 +21,7 @@ cc_binary(
         "//lib/resource",
         "//lib/rpmsg",
         "//lib/time:process",
+        "//lib/ui1203",
         "//tools/toolchain/am335x",
     ],
 )

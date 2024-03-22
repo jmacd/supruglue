@@ -21,23 +21,23 @@
 #define PERIOD (2000000000U / 5)
 
 void runBlue(ThreadID tid, Args args) {
-  gpio_pin pinA = GPIO_PIN(P9_23);
-  gpio_pin pinB = GPIO_PIN(P9_25);
+  // gpio_pin pinA = GPIO_PIN(P9_23);
+  // gpio_pin pinB = GPIO_PIN(P9_25);
 
-  PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
+  // PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
 
-  Timestamp clock;
-  ReadClock(&clock);
-  while (1) {
-    uint32_t value = GPIO_GetPin(pin);
+  // Timestamp clock;
+  // ReadClock(&clock);
+  // while (1) {
+  //   uint32_t value = GPIO_GetPin(pin);
 
-    uint32_t val1 = 1;
-    uint32_t val2 = 2;
+  //   uint32_t val1 = 1;
+  //   uint32_t val2 = 2;
 
-    PRULOG_2u32(INFO_NOYIELD, "esr1 %u etflg %u", val1, val2);
+  //   PRULOG_2u32(INFO_NOYIELD, "esr1 %u etflg %u", val1, val2);
 
-    SleepUntil(&clock, PERIOD / 2);
-  }
+  //   SleepUntil(&clock, PERIOD / 2);
+  // }
 }
 
 SUPRUGLUE_DEFINE_THREAD(blue, 256);

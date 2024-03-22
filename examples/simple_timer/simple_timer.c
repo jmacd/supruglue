@@ -26,7 +26,8 @@
 #define OFF_FOR (((CYCLE - DUTY) * PERIOD) / CYCLE)
 
 void toggle_timer(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(P8_11);
+  gpio_pin pinO = GPIO_PIN(P8_11);
+  gpio_pin pinC = GPIO_PIN(P8_12);
 
   Timestamp clock;
   ReadClock(&clock);
@@ -40,7 +41,8 @@ void toggle_timer(ThreadID tid, Args args) {
   while (1) {
     PRULOG_1u64(INFO, "simple timer on %us", ON_FOR);
 
-    GPIO_SetPin(pin, 1);
+    GPIO_SetPin(pinO, 1);
+    GPIO_SetPin(pinC, 0);
 
     clock.CYCLES += oncycles;
 
@@ -48,7 +50,8 @@ void toggle_timer(ThreadID tid, Args args) {
 
     PRULOG_1u64(INFO, "simple timer off %us", OFF_FOR);
 
-    GPIO_SetPin(pin, 0);
+    GPIO_SetPin(pinO, 0);
+    GPIO_SetPin(pinC, 1);
 
     clock.CYCLES += offcycles;
 

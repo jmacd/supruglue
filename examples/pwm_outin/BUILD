@@ -15,7 +15,6 @@ cc_binary(
     deps = [
         "//lib/coroutine",
         "//lib/cap",
-        "//lib/gpio",
         "//lib/initproc",
         "//lib/intc:service",
         "//lib/log/daemon",
