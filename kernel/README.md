@@ -30,3 +30,12 @@ AUTO_BUILD=1
 
 This prevents running `make menuconfig` and clobbering your config.
 ??
+
+### Also note
+
+Required for the examples.
+
+```
+enable_uboot_overlays=1
+enable_uboot_cape_universal=1
+```

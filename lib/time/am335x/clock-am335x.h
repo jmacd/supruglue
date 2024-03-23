@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-#define TIME_SECOND 200000000
+#define TIME_SECOND ((uint32_t)200000000)
+#define TIME_SECOND64 ((uint64_t)200000000)
 
 extern Timestamp __clock;
 

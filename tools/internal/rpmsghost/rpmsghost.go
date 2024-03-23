@@ -16,6 +16,8 @@ import (
 
 const logEntrySize = 36
 
+const statsInterval = time.Second * 24 * 60 * 60
+
 type RPMsgDevice struct {
 	file *os.File
 }
@@ -59,7 +61,7 @@ func (host *Host) Run() error {
 
 	go func() {
 		// @@@ config
-		t := time.NewTicker(time.Second * 60)
+		t := time.NewTicker(statsInterval)
 		defer t.Stop()
 		for {
 			select {

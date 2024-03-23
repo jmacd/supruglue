@@ -19,7 +19,7 @@ void syslogProcess(ThreadID thid, Args args) {
 
     while (ClientSend(&__transport, &entry, sizeof(entry)) != 0) {
       // TODO: Flash user LEDs?
-      Sleep(TIME_SECOND / 2);
+      Sleep32(TIME_SECOND / 2);
     }
 
     Yield();

@@ -39,23 +39,19 @@ void toggle_timer(ThreadID tid, Args args) {
   offcycles *= OFF_FOR;
 
   while (1) {
-    PRULOG_1u64(INFO, "simple timer on %us", ON_FOR);
+    PRULOG_1u64(INFO, "simple timer on 8.11 off 8.12 %us", ON_FOR);
 
     GPIO_SetPin(pinO, 1);
     GPIO_SetPin(pinC, 0);
 
-    clock.CYCLES += oncycles;
+    SleepUntil64(&clock, oncycles);
 
-    SleepUntil(&clock, 0);
-
-    PRULOG_1u64(INFO, "simple timer off %us", OFF_FOR);
+    PRULOG_1u64(INFO, "simple timer off 8.11 on 8.12 %us", OFF_FOR);
 
     GPIO_SetPin(pinO, 0);
     GPIO_SetPin(pinC, 1);
 
-    clock.CYCLES += offcycles;
-
-    SleepUntil(&clock, 0);
+    SleepUntil64(&clock, offcycles);
   }
 }
 
