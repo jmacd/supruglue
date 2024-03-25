@@ -16,7 +16,6 @@
 #include "lib/intc/service.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/log/journal/journal.h"
-#include "lib/pinmap/pinmap.h"
 #include "lib/pwm/pwm.h"
 #include "lib/resource/table.h"
 #include "lib/rpmsg/rpmsg.h"
