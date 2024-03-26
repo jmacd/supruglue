@@ -1,10 +1,10 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "lib/dma/dma-defs.h"
-
 #ifndef LIB_DMA_AM335X_DMA_H
 #define LIB_DMA_AM335X_DMA_H
+
+#include "lib/dma/dma-defs.h"
 
 #ifdef __cplusplus
 extern "C" {

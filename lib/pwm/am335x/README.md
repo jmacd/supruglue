@@ -1,3 +1,6 @@
+// OH MY GOODNESS
+// TI Compiler uses "interrupt" as a keyword.  Can't use this as a C
+// variable name and you will get really bad compiler messages if you do!
 
 //
 // 1. The paragraph from 15.2.2.9.3 indicates a connection with the

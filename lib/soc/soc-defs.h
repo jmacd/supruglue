@@ -19,6 +19,11 @@ extern "C" {
     type2 space[size];                                                                                                 \
   }
 
+// TODO: The DATA_SECTION is incorrect. It causes the compiler
+// to place this data in the text section, probably because it
+// is page zero and there is not a linker command entry for the
+// section names produced here.
+
 #define SUPRUGLUE_DEFINE_SIZED(name, type1, thing1, type2, size)                                                       \
   SUPRUGLUE_DECLARE_SIZED(name, type1, thing1, type2, size);                                                           \
   _PRAGMA(DATA_SECTION(name, ".thread." #name))                                                                        \

@@ -49,7 +49,7 @@ void runBlue(ThreadID tid, Args args) {
 
     PRULOG_2u32(INFO_NOYIELD, "read clocks cap %u tbcnt %u", cap, pwm);
 
-    SleepUntil(&clock, PERIOD / 2);
+    SleepUntil32(&clock, PERIOD / 2);
   }
 }
 

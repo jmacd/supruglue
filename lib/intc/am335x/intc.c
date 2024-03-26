@@ -26,6 +26,7 @@ void ControllerInit(void) {
   uint8_t evt;
   for (evt = 0; evt < NUM_SYSEVTS; evt++) {
     __controller.handler[evt] = NULL;
+    __controller.args[evt].ptr = NULL;
   }
 
   // Disable interrupts until enabled in ControllerEnable().
@@ -38,8 +39,9 @@ void ControllerInit(void) {
   CT_INTC.SECR1 = 0xffffffff;
 }
 
-void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler, Args args) {
   __controller.handler[evt] = handler;
+  __controller.args[evt] = args;
 }
 
 void ServiceInterrupts(void) {
@@ -51,7 +53,7 @@ void ServiceInterrupts(void) {
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {
-      (__controller.handler[evt])();
+      (__controller.handler[evt])(__controller.args[evt]);
     }
 
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;

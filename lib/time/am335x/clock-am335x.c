@@ -27,7 +27,7 @@ void UpdateClock(void) {
   __clock.CYCLES_bit.LOW = ts;
 }
 
-void ClockHandler(void) {
+void ClockHandler(Args args) {
   CT_IEP.TMR_CMP_STS_bit.CMP_HIT = 0x1;
 
   SemaUp(&__clock_lock);
@@ -49,7 +49,9 @@ void TimeInit(void) {
   CT_IEP.TMR_CMP_CFG_bit.CMP_EN = 0x1;          // CMP[0] enabled
   CT_IEP.TMR_CMP_CFG_bit.CMP0_RST_CNT_EN = 0x1; // CMP[0] will reset
 
-  InterruptHandlerInit(SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND, ClockHandler);
+  Args args;
+
+  InterruptHandlerInit(SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND, ClockHandler, args);
 }
 
 void TimeStart(void) {

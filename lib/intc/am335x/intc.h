@@ -16,6 +16,7 @@ struct _InterruptController {
   // interrupts occupy space, and the lookup is O(1).  For now waste
   // some space.
   InterruptHandler *handler[NUM_SYSEVTS];
+  Args              args[NUM_SYSEVTS];
 };
 
 #ifdef __cplusplus

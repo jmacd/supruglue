@@ -17,12 +17,13 @@ high_resolution_clock::time_point started;
 high_resolution_clock::time_point switched;
 thread                           *source;
 
-void Tick(void) {
+void Tick(Args args) {
   SemaUp(&__clock_lock);
 }
 
 void TimeInit(void) {
-  InterruptHandlerInit(1, Tick);
+  Args args = {.ptr = NULL};
+  InterruptHandlerInit(1, Tick, args);
   source = new thread([] {
     for (;;) {
       usleep(10000);

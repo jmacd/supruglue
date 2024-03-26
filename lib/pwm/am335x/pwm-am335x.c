@@ -1,8 +1,12 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "pwm-am335x.h"
+#include <stdint.h>
+#include <string.h>
+
 #include "external/ti-pru-support/include/am335x/sys_pwmss.h"
+
+#include "pwm-am335x.h"
 
 #define PWM_BASE PWMSS1
 
@@ -51,7 +55,7 @@
 void PWM_ClearInterrupt(void) {
   // Important! Clear the DMA interrupt, THEN clear the DMA trigger
   // event.
-  EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1 << 31;
+  EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1U << 31;
 
   // Clear the DMA event
   EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
@@ -61,7 +65,8 @@ void PWM_ClearInterrupt(void) {
 }
 
 // PWM_Init initializes but does not start the PWM.
-void PWM_Init(int32_t lowHigh, int32_t period, int32_t interrupt) {
+void PWM_Init(int32_t LH, int32_t P, int32_t I) {
+
   // Enable the PWM clock.
 
   PWM_BASE.CLKCONFIG_bit.EPWMCLK_EN = 1;
@@ -103,14 +108,14 @@ void PWM_Init(int32_t lowHigh, int32_t period, int32_t interrupt) {
   // CMPA: Not used
   // CMPAHR: Not used
 
-  PWM_BASE.EPWM_TBCNT = 0;      // TBCNT: Time-base clock (16 bits)
-  PWM_BASE.EPWM_TBPRD = period; // TBPRD: Time-base period (16 bits)
+  PWM_BASE.EPWM_TBCNT = 0; // TBCNT: Time-base clock (16 bits)
+  PWM_BASE.EPWM_TBPRD = P; // TBPRD: Time-base period (16 bits)
 
   // CMPCTL: All defaults
   // CMPAHR: Not used
 
-  PWM_BASE.EPWM_CMPA = lowHigh;   // CMPB: Compare value for clearing EPWMxA
-  PWM_BASE.EPWM_CMPB = interrupt; // CMPB: Compare value for sample interrupt
+  PWM_BASE.EPWM_CMPA = LH; // CMPB: Compare value for clearing EPWMxA
+  PWM_BASE.EPWM_CMPB = I;  // CMPB: Compare value for sample interrupt
 
   //////////////////////////////////////////////////////////////////////
   // Action qualifier
@@ -159,8 +164,8 @@ void PWM_Init(int32_t lowHigh, int32_t period, int32_t interrupt) {
   EDMA_BASE[SHADOW1(EDMAREG_ICR)] = EDMA_dmaChannelMask;
 
   // Clear and enable the register (was added to shadow region above)
-  EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1 << 31;  // which is event 63
-  EDMA_BASE[SHADOW1(EDMAREG_IESRH)] = 1 << 31; // which is event 63
+  EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1U << 31;  // which is event 63
+  EDMA_BASE[SHADOW1(EDMAREG_IESRH)] = 1U << 31; // which is event 63
 
   // Clear secondary & missed register
   EDMA_BASE[SHADOW1(EDMAREG_SECR)] = EDMA_dmaChannelMask;
@@ -171,7 +176,7 @@ void PWM_Init(int32_t lowHigh, int32_t period, int32_t interrupt) {
   paramOffset += ((EDMA_paramNumber * EDMA_PARAM_SIZE) / WORDSZ);
 
   volatile edmaParam *edma_param_entry = (volatile edmaParam *)(EDMA_BASE + paramOffset);
-  memset(edma_param_entry, 0, sizeof(*edma_param_entry));
+  memset((void *)edma_param_entry, 0, sizeof(*edma_param_entry));
 
   edma_param_entry->lnkrld.link = 0xFFFF;
   edma_param_entry->lnkrld.bcntrld = 0x0000;
@@ -198,4 +203,8 @@ void PWM_Enable(void) {
 
   PWM_BASE.EPWM_ETSEL = (1 << 3) | // Interrupts enabled
                         (6 << 0);  // Interrupt on CMB-B == TBCNT
+}
+
+void PWM_Disable(void) {
+  PWM_BASE.EPWM_TBCTL &= ~(3 << 14); // FREE_SOFT: Free run
 }

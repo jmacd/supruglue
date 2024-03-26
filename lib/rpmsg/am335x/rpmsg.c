@@ -70,9 +70,11 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
   }
 
+  Args args;
+
   // The system events and port are core-specific.
 #if SUPRUGLUE_PRU_NUM == 0
-  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick);
+  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick, args);
   // @@@
   transport->channel_port = RPMSG_CHANNEL_PORT_0;
   sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/ui1203/ui1203.h"
+#include "lib/cap/cap.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/gpio/gpio.h"
 #include "lib/intc/intc.h"
@@ -12,23 +13,19 @@
 #include "lib/time/clock.h"
 #include <stdio.h>
 
-LockWord reader_lock;
-
-gpio_pin data_input_pin = GPIO_PIN_STRUCT(P9_23);
-gpio_pin data_output_pin = GPIO_PIN_STRUCT(P9_23);
-
-void readerHandler(void) {
-  SemaUp(&reader_lock);
+void readerHandler(Args args) {
+  UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
+  SemaUp(&rdr->lock);
   PWM_ClearInterrupt();
 }
 
 void readerRunner(ThreadID tid, Args args) {
-  Timestamp clock;
+  UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
+  Timestamp      clock;
   ReadClock(&clock);
   while (1) {
     // Reset state
     uint16_t position = 0;
-    uint16_t discard = 0;
     uint16_t byte = 0;
     uint16_t parity = 0;
     uint16_t count = 0;
@@ -47,9 +44,9 @@ void readerRunner(ThreadID tid, Args args) {
 
       for (;; count++) {
 
-        SemaDown(&reader_lock);
+        SemaDown(&rdr->lock);
 
-        int bit = GPIO_GetPin(data_input_pin);
+        int bit = GPIO_GetPin(rdr->data_in);
 
         parity = (parity ^ bit ^ byte) & 0x1;
         byte = (byte >> 1) | (bit << 9);
@@ -65,17 +62,16 @@ void readerRunner(ThreadID tid, Args args) {
           // output a byte
           PRULOG_1u32(INFO, "ui1203 byte 0x%x", (byte >> 1) & 0x7f);
 
-          discard += position * (count - 10);
+          if (position != 0 && count > 10) {
+            PRULOG_1u32(INFO, "ui1203 unused bits: %u", count);
+            break;
+          }
           position++;
           count = 0;
           byte = 0;
           parity = 0;
         }
       }
-    }
-
-    if (discard > 0) {
-      // @@@
     }
 
     PWM_Disable();
@@ -85,30 +81,42 @@ void readerRunner(ThreadID tid, Args args) {
 }
 
 SUPRUGLUE_DEFINE_THREAD(ui1203reader, 256);
+SUPRUGLUE_DEFINE_THREAD(ui1203writer, 256);
 
-void UI1203_Init_Reader(UI1203_Reader *rd, gpio_pin data) {
-  rd->data = data;
+void UI1203_Init_Reader(UI1203_Reader *rd, gpio_pin data_pin) {
+  rd->data_in = data_pin;
 
   PWM_Init(1500, 3000, 2000);
 
-  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, readerHandler);
-
   Args args; // @@@
+  args.ptr = (const char *)rd;
 
-  Create(&ui1203reader.thread, readerRunner, args, "ui1203read", sizeof(ui1203reader.space));
+  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, readerHandler, args);
+
+  Create(&ui1203reader.thread, readerRunner, args, "ui1203reader", sizeof(ui1203reader.space));
 }
 
-void writerHandler(void) {
+void writerHandler(Args args) {
   // Called after rising edge of clock, produces one bit via GPIO.
   // @@@ Keep state about current position
+  UI1203_Writer *wr = (UI1203_Writer *)args.ptr;
 
-  GPIO_SetPin(data_output_pin, X);
+  GPIO_SetPin(wr->data_out, 0); // @@@
 }
 
-void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data) {
-  wr->data = data;
+void writerRunner(ThreadID tid, Args args) {
+  Sleep32(TIME_SECOND);
+}
+
+void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data_pin) {
+  wr->data_out = data_pin;
 
   CAP_Init();
 
-  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, writerHandler);
+  Args args; // @@@
+  args.ptr = (const char *)wr;
+
+  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, writerHandler, args);
+
+  Create(&ui1203writer.thread, writerRunner, args, "ui1203writer", sizeof(ui1203writer.space));
 }

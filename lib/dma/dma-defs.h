@@ -4,11 +4,11 @@
 #ifndef LIB_DMA_DMA_DEFS_H
 #define LIB_DMA_DMA_DEFS_H
 
+#include "lib/soc/soc.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "lib/soc/soc.h"
 
 void DMA_Init(void);
 

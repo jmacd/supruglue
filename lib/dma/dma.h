@@ -4,10 +4,6 @@
 #ifndef LIB_DMA_DMA_H
 #define LIB_DMA_DMA_H
 
-#include "lib/pinmap/pinmap.h"
-#include "lib/soc/soc.h"
-#include <stdint.h>
-
 #include "lib/dma/dma-defs.h"
 
 #if defined(SUPRUGLUE_AM335X)
