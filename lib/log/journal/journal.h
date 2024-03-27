@@ -23,7 +23,7 @@ typedef struct _Entry   Entry;
 typedef struct _Block   Block;
 typedef struct _Integer Integer;
 
-#define NUM_PER_BLOCK 8
+#define NUM_PER_BLOCK 4
 #define NUM_BLOCKS 4
 
 SUPRUGLUE_DECLARE_LIST(BlockList, Block);

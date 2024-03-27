@@ -18,6 +18,7 @@ typedef struct {
 } UI1203_Reader;
 
 typedef struct {
+  LockWord lock;
   gpio_pin data_out;
   // Clock is configured through eCAP input
 } UI1203_Writer;

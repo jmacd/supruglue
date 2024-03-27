@@ -34,7 +34,7 @@ void initProcessThread(ThreadID thid, Args args) {
   }
 }
 
-SUPRUGLUE_DEFINE_THREAD(init, 512);
+SUPRUGLUE_DEFINE_THREAD(init, 256);
 
 int ProcessInit(void) {
   Args args;

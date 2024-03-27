@@ -25,8 +25,6 @@ UI1203_Reader reader;
 UI1203_Writer writer;
 
 int main(void) {
-  Args args;
-
   Init(NewSystemConfig());
   InterruptServiceInit();
   ClockInit();

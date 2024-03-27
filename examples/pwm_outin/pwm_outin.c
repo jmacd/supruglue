@@ -25,13 +25,13 @@
 
 #define PERIOD (2000000000U / 5)
 
-void pwmHandler(void) {
+void pwmHandler(Args args) {
   uint32_t clk = PWMSS1.EPWM_TBCNT;
   PRULOG_1u32(INFO, "interrupt EPWM1 output A %u", clk);
   PWM_ClearInterrupt();
 }
 
-void ecapHandler(void) {
+void ecapHandler(Args args) {
   uint32_t up = CT_ECAP.CAP1;
   uint32_t down = CT_ECAP.CAP2;
   PRULOG_2u32(INFO, "interrupt ECAP up %u down %u", up, down);
@@ -67,12 +67,12 @@ int main(void) {
   ProcessInit();
   CAP_Init();
 
-  args.ptr = "0";
+  args.ptr = "0"; // @@@
 
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
-  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler);
-  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, ecapHandler);
+  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler, args);
+  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, ecapHandler, args);
 
   // @@@ TODO remove
   PWM_ClearInterrupt();

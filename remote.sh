@@ -38,11 +38,13 @@ configPins() {
 configPins
 
 # Works!
-config-pin P9_14 pwm
+#config-pin P9_14 pwm
 
 # Not sure how to get ecap0 in
 #config-pin P9_92 pruin
 #config-pin P9_42 pru_ecap
+
+#config-pin P9_92 pruin
 
 
 # echo "Stopping ..."
