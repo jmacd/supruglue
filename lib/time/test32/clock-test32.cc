@@ -18,7 +18,7 @@ high_resolution_clock::time_point switched;
 thread                           *source;
 
 void Tick(Args args) {
-  SemaUp(&__clock_lock);
+  LockWake(&__clock_lock);
 }
 
 void TimeInit(void) {

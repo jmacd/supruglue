@@ -14,9 +14,9 @@
 #include <stdio.h>
 
 void readerHandler(Args args) {
-  PRULOG_0(INFO, "ui1203 OI!!");
+  PRULOG_0(INFO_NOYIELD, "ui1203 OI!!");
   UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
-  SemaUp(&rdr->lock);
+  SemaphoreUp(&rdr->sem);
   PWM_ClearInterrupt();
 }
 
@@ -32,7 +32,7 @@ void readerRunner(ThreadID tid, Args args) {
     uint16_t parity = 0;
     uint16_t count = 0;
 
-    PWM_Enable();
+    // PWM_Enable();
 
     for (; position < 32;) {
       // V;RBxxxxxxx;IByyyyy;Kmmmmm\r
@@ -47,7 +47,8 @@ void readerRunner(ThreadID tid, Args args) {
       for (;; count++) {
 
         PRULOG_0(INFO, "ui1203 reader DOWN");
-        SemaDown(&rdr->lock);
+        SemaphoreDown(&rdr->sem);
+        PRULOG_0(INFO, "ui1203 reader UP");
 
         int bit = GPIO_GetPin(rdr->data_in);
 
@@ -79,7 +80,7 @@ void readerRunner(ThreadID tid, Args args) {
       }
     }
 
-    PWM_Disable();
+    // PWM_Disable();
 
     SleepUntil32(&clock, 10 * TIME_SECOND);
   }
@@ -89,14 +90,11 @@ SUPRUGLUE_DEFINE_THREAD(ui1203reader, 256);
 SUPRUGLUE_DEFINE_THREAD(ui1203writer, 256);
 
 void UI1203_Init_Reader(UI1203_Reader *rd, gpio_pin data_pin) {
+  SemaphoreInit(&rd->sem);
   rd->data_in = data_pin;
-
-  PWM_Init(10000, 5000, 7500);
 
   Args args; // @@@
   args.ptr = (const char *)rd;
-
-  PWM_ClearInterrupt();
 
   InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, readerHandler, args);
 
@@ -104,9 +102,10 @@ void UI1203_Init_Reader(UI1203_Reader *rd, gpio_pin data_pin) {
 }
 
 void writerHandler(Args args) {
+  PRULOG_0(INFO, "ui1203 writer HANDLE");
   // Called after rising edge of clock, produces one bit via GPIO.
   UI1203_Writer *wr = (UI1203_Writer *)args.ptr;
-  SemaUp(&wr->lock);
+  SemaphoreUp(&wr->sem);
   CAP_ClearInterrupt();
 }
 
@@ -116,7 +115,8 @@ void writerRunner(ThreadID tid, Args args) {
   int x = 0;
   while (1) {
     PRULOG_0(INFO, "ui1203 writer DOWN");
-    SemaDown(&wr->lock);
+    SemaphoreDown(&wr->sem);
+    PRULOG_0(INFO, "ui1203 writer UP");
 
     GPIO_SetPin(wr->data_out, x);
 
@@ -125,9 +125,9 @@ void writerRunner(ThreadID tid, Args args) {
 }
 
 void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data_pin) {
-  wr->data_out = data_pin;
+  SemaphoreInit(&wr->sem);
 
-  CAP_Init();
+  wr->data_out = data_pin;
 
   Args args; // @@@
   args.ptr = (const char *)wr;

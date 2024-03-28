@@ -12,15 +12,19 @@ extern "C" {
 #endif
 
 typedef struct {
-  LockWord lock;
-  gpio_pin data_in;
+  Semaphore sem;
+  gpio_pin  data_in;
+
   // Clock is configured through ePWM output
+
 } UI1203_Reader;
 
 typedef struct {
-  LockWord lock;
-  gpio_pin data_out;
+  Semaphore sem;
+  gpio_pin  data_out;
+
   // Clock is configured through eCAP input
+
 } UI1203_Writer;
 
 // Note! Uses ePWM1 to generate clock.  Uses GPIO to read.

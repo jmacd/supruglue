@@ -14,7 +14,7 @@ SUPRUGLUE_DEFINE_THREAD(clockproc, 256);
 
 void clockProcess(ThreadID thid, Args args) {
   for (;;) {
-    SemaDown(&__clock_lock);
+    LockAwait(&__clock_lock);
 
     Timestamp clk;
     ReadClock(&clk);

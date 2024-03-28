@@ -16,13 +16,25 @@ struct _LockWord;
 typedef struct _LockWord LockWord;
 
 struct _LockWord {
-  // This code supports primitive sleep/wake, rename methods?
   ThreadList waiters;
 };
 
 void LockInit(LockWord *lockword);
-void SemaDown(LockWord *lockword);
-void SemaUp(LockWord *lockword);
+void LockAwait(LockWord *lockword);
+void LockWake(LockWord *lockword);
+
+struct _Semaphore;
+
+typedef struct _Semaphore Semaphore;
+
+struct _Semaphore {
+  LockWord lock;
+  int32_t  value;
+};
+
+void SemaphoreInit(Semaphore *semaphore);
+void SemaphoreUp(Semaphore *semaphore);
+void SemaphoreDown(Semaphore *semaphore);
 
 #ifdef __cplusplus
 }
