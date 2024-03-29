@@ -42,7 +42,7 @@ SUPRUGLUE_DEFINE_THREAD(blue, 256);
 int main(void) {
   Init(NewSystemConfig());
 
-  PWM_Init(10000, 5000, 7500);
+  PWM_Init(5000, 10000, 2500);
   CAP_Init();
 
   InterruptServiceInit();
@@ -52,8 +52,8 @@ int main(void) {
   SyslogInit();
   ProcessInit();
 
-  UI1203_Init_Reader(&reader, GPIO_PIN(P9_23));
-  UI1203_Init_Writer(&writer, GPIO_PIN(P9_25));
+  UI1203_Init_Reader(&reader, GPIO_PIN(P9_25));
+  UI1203_Init_Writer(&writer, GPIO_PIN(P9_23));
 
   Args args;
   args.ptr = "0"; // @@@

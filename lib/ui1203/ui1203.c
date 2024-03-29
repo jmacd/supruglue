@@ -14,7 +14,6 @@
 #include <stdio.h>
 
 void readerHandler(Args args) {
-  PRULOG_0(INFO_NOYIELD, "ui1203 OI!!");
   UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
   SemaphoreUp(&rdr->sem);
   PWM_ClearInterrupt();
@@ -45,10 +44,7 @@ void readerRunner(ThreadID tid, Args args) {
       // '\r` is 0xd (i.e., decimal 13)
 
       for (;; count++) {
-
-        PRULOG_0(INFO, "ui1203 reader DOWN");
         SemaphoreDown(&rdr->sem);
-        PRULOG_0(INFO, "ui1203 reader UP");
 
         int bit = GPIO_GetPin(rdr->data_in);
 
@@ -102,7 +98,6 @@ void UI1203_Init_Reader(UI1203_Reader *rd, gpio_pin data_pin) {
 }
 
 void writerHandler(Args args) {
-  PRULOG_0(INFO, "ui1203 writer HANDLE");
   // Called after rising edge of clock, produces one bit via GPIO.
   UI1203_Writer *wr = (UI1203_Writer *)args.ptr;
   SemaphoreUp(&wr->sem);
@@ -112,15 +107,30 @@ void writerHandler(Args args) {
 void writerRunner(ThreadID tid, Args args) {
   UI1203_Writer *wr = (UI1203_Writer *)args.ptr;
 
-  int x = 0;
   while (1) {
-    PRULOG_0(INFO, "ui1203 writer DOWN");
-    SemaphoreDown(&wr->sem);
-    PRULOG_0(INFO, "ui1203 writer UP");
 
-    GPIO_SetPin(wr->data_out, x);
+    const unsigned char *p = "R1234567890";
 
-    x = !x;
+    for (; *p != 0; p++) {
+
+      int32_t d0 = (*p) << 1;
+      int32_t x1 = (d0 >> 4) ^ d0;
+      int32_t x2 = (x1 >> 2) ^ x1;
+      int32_t x3 = (x2 >> 1) ^ x2;
+
+      d0 |= (x3 & 0x1) << 8;
+      d0 |= 1 << 9;
+
+      int b;
+      for (b = 0; b < 10; b++) {
+
+        SemaphoreDown(&wr->sem);
+
+        GPIO_SetPin(wr->data_out, d0 & 1);
+
+        d0 >>= 1;
+      }
+    }
   }
 }
 

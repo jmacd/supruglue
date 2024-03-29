@@ -120,8 +120,8 @@ void PWM_Init(int32_t LH, int32_t P, int32_t I) {
   //////////////////////////////////////////////////////////////////////
   // Action qualifier
 
-  PWM_BASE.EPWM_AQCTLA = (2 << 0) | // ZRO: force EPWMxA low when TBCNT == 0
-                         (1 << 4);  // CAU: force EPWMxA high when TBCNT == CMPA
+  PWM_BASE.EPWM_AQCTLA = (2 << 0) | // ZRO: force EPWMxA high when TBCNT == 0
+                         (1 << 4);  // CAU: force EPWMxA low when TBCNT == CMPA
   // AQCTLB: Not used
 
   // PWM_BASE.EPWM_AQSFRC = (3 << 6);  // Immediate mode

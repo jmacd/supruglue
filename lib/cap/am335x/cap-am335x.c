@@ -26,6 +26,8 @@ void CAP_Init(void) {
                    (0 << 0);  // Continuous
 
   CT_ECAP.ECEINT = (1 << 2); // Interrupt on Cap2
+
+  CT_ECAP.ECCLR = CT_ECAP.ECFLG & 0xfe; // Clear flags
 }
 
 void CAP_Enable(void) {
