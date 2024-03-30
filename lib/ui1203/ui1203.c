@@ -16,7 +16,15 @@
 void readerHandler(Args args) {
   UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
   SemaphoreUp(&rdr->sem);
+  // Note: For some reason, we have double interrupts happening for the PWM
+  // used here.  However,
+  // - if the log below is enabled, only one interrupt
+  // - if the call to delay is enabled, infinite loop
+  // - if two calls to clear the interrupt happen, no change
+  // PRULOG_0(INFO_NOYIELD, "pwm interrupt");
   PWM_ClearInterrupt();
+  // PWM_ClearInterrupt();
+  //  SystemOnChipDelay(3);
 }
 
 void readerRunner(ThreadID tid, Args args) {
@@ -62,10 +70,10 @@ void readerRunner(ThreadID tid, Args args) {
         // When parity matches and the start and stop bits are correct.
         if (parity == 1 && count >= 10 && (byte & 0x201) == 0x200) {
           // output a byte
-          PRULOG_1u32(INFO, "ui1203 byte 0x%x", (byte >> 1) & 0x7f);
+          // PRULOG_1u32(INFO, "ui1203 byte 0x%x", (byte >> 1) & 0x7f);
 
           if (position != 0 && count > 10) {
-            PRULOG_1u32(INFO, "ui1203 unused bits: %u", count);
+            // PRULOG_1u32(INFO, "ui1203 unused bits: %u", count);
             break;
           }
           position++;
@@ -109,7 +117,7 @@ void writerRunner(ThreadID tid, Args args) {
 
   while (1) {
 
-    const unsigned char *p = "R1234567890";
+    const unsigned char *p = "R";
 
     for (; *p != 0; p++) {
 
@@ -121,12 +129,15 @@ void writerRunner(ThreadID tid, Args args) {
       d0 |= (x3 & 0x1) << 8;
       d0 |= 1 << 9;
 
+      PRULOG_1u32(INFO, "write word is 0x%x", d0);
+
       int b;
       for (b = 0; b < 10; b++) {
-
         SemaphoreDown(&wr->sem);
 
-        GPIO_SetPin(wr->data_out, d0 & 1);
+        int32_t bit = d0 & 1;
+        PRULOG_2u32(INFO, "write bit %d is %d", b, bit);
+        GPIO_SetPin(wr->data_out, bit);
 
         d0 >>= 1;
       }

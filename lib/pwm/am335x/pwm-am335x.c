@@ -57,10 +57,12 @@ void PWM_ClearInterrupt(void) {
   // event.
   EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1U << 31;
 
-  // Clear the DMA event
+  // SystemOnChipDelay(3);
+  //   Clear the DMA event
   EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
 
-  // Clear the flag.  Very important this has to happen after the above.
+  // SystemOnChipDelay(3);
+  //   Clear the flag.  Very important this has to happen after the above.
   PWM_BASE.EPWM_ETCLR = 1;
 }
 
