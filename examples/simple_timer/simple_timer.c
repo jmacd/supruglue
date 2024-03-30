@@ -20,7 +20,7 @@
 // TODO: Configure these from the environment.
 #define DUTY 1
 #define CYCLE 24
-#define PERIOD 3600
+#define PERIOD (8 * 3600)
 
 #define ON_FOR ((DUTY * PERIOD) / CYCLE)
 #define OFF_FOR (((CYCLE - DUTY) * PERIOD) / CYCLE)
