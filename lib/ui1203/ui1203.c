@@ -22,6 +22,7 @@ void readerHandler(Args args) {
   // - if the call to delay is enabled, infinite loop
   // - if two calls to clear the interrupt happen, no change
   // PRULOG_0(INFO_NOYIELD, "pwm interrupt");
+
   PWM_ClearInterrupt();
   // PWM_ClearInterrupt();
   //  SystemOnChipDelay(3);
@@ -36,7 +37,6 @@ void readerRunner(ThreadID tid, Args args) {
     // Reset state
     uint16_t position = 0;
     uint16_t byte = 0;
-    uint16_t parity = 0;
     uint16_t count = 0;
 
     // PWM_Enable();
@@ -56,10 +56,13 @@ void readerRunner(ThreadID tid, Args args) {
 
         int bit = GPIO_GetPin(rdr->data_in);
 
-        PRULOG_1u32(INFO, "ui1203 read bit 0x%x", bit);
-
-        parity = (parity ^ bit ^ byte) & 0x1;
+        // PRULOG_1u32(INFO, "ui1203 read bit 0x%x", bit);
         byte = (byte >> 1) | (bit << 9);
+
+        int32_t  x1 = (byte >> 4) ^ byte;
+        int32_t  x2 = (x1 >> 2) ^ x1;
+        int32_t  x3 = (x2 >> 1) ^ x2;
+        uint16_t parity = (~x3 & 1);
 
         // Bits:
         // 0: start
@@ -67,10 +70,12 @@ void readerRunner(ThreadID tid, Args args) {
         // 8: parity
         // 9: stop
 
+        // PRULOG_2u32(INFO, "ui1203 read byte 0x%x %u", byte, parity);
+
         // When parity matches and the start and stop bits are correct.
-        if (parity == 1 && count >= 10 && (byte & 0x201) == 0x200) {
+        if (parity == 0 && count >= 10 && (byte & 0x201) == 0x200) {
           // output a byte
-          // PRULOG_1u32(INFO, "ui1203 byte 0x%x", (byte >> 1) & 0x7f);
+          PRULOG_1u32(INFO, "ui1203 byte 0x%x", (byte >> 1) & 0x7f);
 
           if (position != 0 && count > 10) {
             // PRULOG_1u32(INFO, "ui1203 unused bits: %u", count);
@@ -126,7 +131,7 @@ void writerRunner(ThreadID tid, Args args) {
       int32_t x2 = (x1 >> 2) ^ x1;
       int32_t x3 = (x2 >> 1) ^ x2;
 
-      d0 |= (x3 & 0x1) << 8;
+      d0 |= (~x3 & 0x1) << 8;
       d0 |= 1 << 9;
 
       PRULOG_1u32(INFO, "write word is 0x%x", d0);
@@ -136,7 +141,7 @@ void writerRunner(ThreadID tid, Args args) {
         SemaphoreDown(&wr->sem);
 
         int32_t bit = d0 & 1;
-        PRULOG_2u32(INFO, "write bit %d is %d", b, bit);
+        // PRULOG_2u32(INFO, "write bit %d is %d", b, bit);
         GPIO_SetPin(wr->data_out, bit);
 
         d0 >>= 1;

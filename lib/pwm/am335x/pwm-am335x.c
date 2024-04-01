@@ -57,13 +57,15 @@ void PWM_ClearInterrupt(void) {
   // event.
   EDMA_BASE[SHADOW1(EDMAREG_ICRH)] = 1U << 31;
 
-  // SystemOnChipDelay(3);
-  //   Clear the DMA event
+  // Clear the DMA event. Note this shoul
   EDMA_BASE[SHADOW1(EDMAREG_ECR)] = EDMA_dmaChannelMask;
 
-  // SystemOnChipDelay(3);
-  //   Clear the flag.  Very important this has to happen after the above.
+  // if (EDMA_BASE[SHADOW1(EDMAREG_ICRH)] & (1U << 31) != 0) {
   PWM_BASE.EPWM_ETCLR = 1;
+
+  // TRM says to do this when there are still IPR or IPRH
+  // bits set.  Seems OK to be unconditional.
+  EDMA_BASE[SHADOW1(EDMAREG_IEVAL)] = 1;
 }
 
 // PWM_Init initializes but does not start the PWM.
@@ -205,6 +207,8 @@ void PWM_Enable(void) {
 
   PWM_BASE.EPWM_ETSEL = (1 << 3) | // Interrupts enabled
                         (6 << 0);  // Interrupt on CMB-B == TBCNT
+
+  PWM_ClearInterrupt();
 }
 
 void PWM_Disable(void) {
