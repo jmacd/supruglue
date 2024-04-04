@@ -27,7 +27,6 @@
 
 void toggle_timer(ThreadID tid, Args args) {
   gpio_pin pinO = GPIO_PIN(P8_11);
-  gpio_pin pinC = GPIO_PIN(P8_12);
 
   Timestamp clock;
   ReadClock(&clock);
