@@ -20,11 +20,11 @@ cc_library(
         ],
 )
 
-# cc_test(
-#     name = "test",
-#     srcs = ["ui1203_test.cc"],
-#     deps = [
-#         ":ui1203",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "test",
+    srcs = ["ui1203_test.cc"],
+    deps = [
+        ":ui1203",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

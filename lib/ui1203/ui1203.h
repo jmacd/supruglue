@@ -33,6 +33,11 @@ void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin data);
 // Note! Uses PRU-eCAP0 to receive clock.  Uses GPIO to write.
 void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data);
 
+// Internal.
+
+int32_t asciiToBits(int32_t c);
+int32_t bitsToAscii(int32_t b);
+
 #ifdef __cplusplus
 }
 #endif

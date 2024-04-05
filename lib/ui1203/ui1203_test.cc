@@ -1,15 +1,14 @@
 // Copyright Joshua MacDonald
 // SPDX-License-Identifier: MIT
 
-#include "supruglue/pinmap-arch.h"
-#include "supruglue/test32/gpio.h"
-#include "supruglue/test32/soc.h"
 #include "ui1203.h"
 #include "gtest/gtest.h"
 
-// TEST(Ui1203Test, Output) {
-//   test_system *soc = new test_system;
+TEST(Ui1203Test, Bits) {
+  for (unsigned char c = 0; c < 128; c++) {
+    int32_t bits = asciiToBits(c);
+    uint8_t ascii = bitsToAscii(bits);
 
-//   UI1203_Reader rdr;
-//   UI1203_Init_Reader(&rdr, GPIO_PIN(soc, P8_3), GPIO_PIN(soc, P9_25));
-// }
+    EXPECT_EQ(c, ascii);
+  }
+}

@@ -1,5 +1,5 @@
 diff --git a/arch/arm/boot/dts/am335x-bone-common-univ.dtsi b/arch/arm/boot/dts/am335x-bone-common-univ.dtsi
-index 72b9d85e1d6f..cfb2ac21554c 100644
+index 72b9d85e1d6f..813fa695b69a 100644
 --- a/arch/arm/boot/dts/am335x-bone-common-univ.dtsi
 +++ b/arch/arm/boot/dts/am335x-bone-common-univ.dtsi
 @@ -73,7 +73,7 @@ BONE_PIN(P8_10, gpio_pd, P8_10(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7))
@@ -20,6 +20,15 @@ index 72b9d85e1d6f..cfb2ac21554c 100644
  	BONE_PIN(P8_12, gpio, P8_12(PIN_OUTPUT | INPUT_EN | MUX_MODE7))
  	BONE_PIN(P8_12, gpio_pu, P8_12(PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7))
  	BONE_PIN(P8_12, gpio_pd, P8_12(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7))
+@@ -393,7 +393,7 @@ BONE_PIN(P9_13, gpio_pd, P9_13(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7))
+ 	BONE_PIN(P9_13, uart, P9_13(PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE6))
+ 
+ 	/* P9_14 (ZCZ ball U14) gpmc_a2 (gpio1_18) */
+-	BONE_PIN(P9_14, default, P9_14(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7))
++	BONE_PIN(P9_14, default, P9_14(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE6))
+ 	BONE_PIN(P9_14, gpio, P9_14(PIN_OUTPUT | INPUT_EN | MUX_MODE7))
+ 	BONE_PIN(P9_14, gpio_pu, P9_14(PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7))
+ 	BONE_PIN(P9_14, gpio_pd, P9_14(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7))
 @@ -478,7 +478,7 @@ BONE_PIN(P9_22, pwm, P9_22(PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE3))
  	BONE_PIN(P9_22, pru_uart, P9_22(PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE4))
  
