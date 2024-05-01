@@ -26,6 +26,7 @@ void ControllerInit(void) {
   uint8_t evt;
   for (evt = 0; evt < NUM_SYSEVTS; evt++) {
     __controller.handler[evt] = NULL;
+    __controller.args[evt].ptr = NULL;
   }
 
   // Disable interrupts until enabled in ControllerEnable().
@@ -36,32 +37,23 @@ void ControllerInit(void) {
   // this PRU will use.
   CT_INTC.SECR0 = 0xffffffff;
   CT_INTC.SECR1 = 0xffffffff;
-
-  // Unset the raw events
-  CT_INTC.SICR_bit.STS_CLR_IDX = ARM_TO_PRU_EVT;
-  CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_PR1_IEP_TIM_CAP_CMP_PEND;
-  CT_INTC.SICR_bit.STS_CLR_IDX = SYSEVT_EPWM1_INTR_PEND;
 }
 
-void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler, Args args) {
   __controller.handler[evt] = handler;
+  __controller.args[evt] = args;
 }
 
 void ServiceInterrupts(void) {
   while ((__R31 & ARM_TO_PRU_IRQ) != 0) {
     uint8_t evt = HIPRIO_EVT;
 
-    // TODO: Can't use debug.h helpers here because they run longer
+    // Note: Can't use debug.h helpers here because they run longer
     // than one IEP cycle and lead to an endless interrupt cycle
-    // because presently, the IEP interrupt has highest priority.
-    // (Here, 46 is the EPWM1EVT event, which is not working.)
-    // if (evt == 46) {
-    //   flash(1);
-    // }
 
     // Unblock all and prioritize to run immediately.
     if (__controller.handler[evt] != NULL) {
-      (__controller.handler[evt])();
+      (__controller.handler[evt])(__controller.args[evt]);
     }
 
     CT_INTC.SICR_bit.STS_CLR_IDX = evt;

@@ -3,14 +3,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "am335x",
-    hdrs = [
-        "pwm-am335x.h",
-    ],
     srcs = [
         "pwm-am335x.c",
     ],
+    hdrs = [
+        "pwm-am335x.h",
+    ],
     deps = [
         "//lib/pwm:defs",
+        "//lib/dma/am335x",
         "//tools/toolchain/am335x",
     ],
 )

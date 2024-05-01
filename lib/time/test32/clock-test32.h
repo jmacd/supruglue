@@ -10,7 +10,8 @@ extern "C" {
 
 #include "lib/time/clock-defs.h"
 
-#define TIME_SECOND 10000000
+#define TIME_SECOND ((uint32_t)10000000)
+#define TIME_SECOND64 ((uint64_t)10000000)
 
 #ifdef __cplusplus
 }

@@ -16,6 +16,8 @@ import (
 
 const logEntrySize = 36
 
+const statsInterval = time.Second * 24 * 60 * 60
+
 type RPMsgDevice struct {
 	file *os.File
 }
@@ -58,7 +60,8 @@ func (host *Host) Run() error {
 	fmt.Println("rpmsg: channel open")
 
 	go func() {
-		t := time.NewTicker(time.Second * 5)
+		// @@@ config
+		t := time.NewTicker(statsInterval)
 		defer t.Stop()
 		for {
 			select {

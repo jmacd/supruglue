@@ -28,7 +28,7 @@ int JournalRead(Journal *jl, Entry *record, JournalReadFlags flags) {
     if ((flags & JR_BLOCKING) == 0) {
       return -1;
     }
-    SemaDown(&jl->lock);
+    LockAwait(&jl->lock);
   }
 
   Block *block = BlockListFront(&jl->data);
@@ -93,7 +93,7 @@ Entry *getEntry(Journal *jl) {
 void setEntry(Journal *jl, Entry *entry) {
   ReadClock(&entry->time);
 
-  SemaUp(&jl->lock);
+  LockWake(&jl->lock);
 
   if ((entry->flags & JW_YIELD) != 0) {
     Yield();

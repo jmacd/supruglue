@@ -31,7 +31,7 @@ ClientTransport __transport;
 
 void RpmsgKick(void) {
   // Note: this can wake > 1
-  SemaUp(&__transport.kick_lock);
+  LockWake(&__transport.kick_lock);
 }
 
 // These two system events are wired to the PRU automatically by the
@@ -70,9 +70,11 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   while (!(*status & VIRTIO_CONFIG_S_DRIVER_OK)) {
   }
 
+  Args args;
+
   // The system events and port are core-specific.
 #if SUPRUGLUE_PRU_NUM == 0
-  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick);
+  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ, &RpmsgKick, args);
   // @@@
   transport->channel_port = RPMSG_CHANNEL_PORT_0;
   sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
@@ -104,14 +106,14 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
   if (transport->peer_src_addr == 0) {
     // In case we have never received.
-    SemaDown(&transport->peer_lock);
+    LockAwait(&transport->peer_lock);
   }
 
   int err = pru_rpmsg_send(&transport->channel, transport->peer_dst_addr, transport->peer_src_addr, (void *)data, len);
   if (err != 0) {
     // IS THIS HAPPENING? OR THE ABOVE? We are copying from an address on the stack
     // and what ... can it move?   @@@  Hmm, nope.
-    SemaDown(&transport->kick_lock);
+    LockAwait(&transport->kick_lock);
   }
   return err;
 }
@@ -121,11 +123,11 @@ int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
 
   int err = pru_rpmsg_receive(&transport->channel, &transport->peer_src_addr, &transport->peer_dst_addr, data, len);
   if (err != 0) {
-    SemaDown(&transport->kick_lock);
+    LockAwait(&transport->kick_lock);
     return err;
   }
   if (was_unset != 0 && transport->peer_src_addr != 0) {
-    SemaUp(&transport->peer_lock);
+    LockWake(&transport->peer_lock);
   }
   return 0;
 }

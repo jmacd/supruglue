@@ -2,19 +2,20 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "external/ti-pru-support/include/am335x/pru_intc.h" // @@@
+// @@@ TODO: here for diagnostics, remove!
+#include "external/ti-pru-support/include/am335x/pru_ecap.h"
+#include "external/ti-pru-support/include/am335x/pru_intc.h"
 #include "external/ti-pru-support/include/am335x/sys_pwmss.h"
 
 #include "lib/args/args.h"
+#include "lib/cap/cap.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/debug/debug.h"
-#include "lib/gpio/gpio.h"
 #include "lib/initproc/initproc.h"
 #include "lib/intc/intc.h"
 #include "lib/intc/service.h"
 #include "lib/log/daemon/daemon.h"
 #include "lib/log/journal/journal.h"
-#include "lib/pinmap/pinmap.h"
 #include "lib/pwm/pwm.h"
 #include "lib/resource/table.h"
 #include "lib/rpmsg/rpmsg.h"
@@ -24,41 +25,31 @@
 
 #define PERIOD (2000000000U / 5)
 
-void pwmHandler(void) {
-  gpio_pin pin = GPIO_PIN(P9_12);
-  uint32_t value = GPIO_GetPin(pin);
-  PRULOG_1u32(INFO, "interrupt EPWM1 output A", value);
+void pwmHandler(Args args) {
+  uint32_t clk = PWMSS1.EPWM_TBCNT;
+  PRULOG_1u32(INFO, "interrupt EPWM1 output A %u", clk);
   PWM_ClearInterrupt();
 }
 
-void runBlue(ThreadID tid, Args args) {
-  gpio_pin pin = GPIO_PIN(P9_12);
+void ecapHandler(Args args) {
+  uint32_t up = CT_ECAP.CAP1;
+  uint32_t down = CT_ECAP.CAP2;
+  PRULOG_2u32(INFO, "interrupt ECAP up %u down %u", up, down);
+  CAP_ClearInterrupt();
+}
 
+void runBlue(ThreadID tid, Args args) {
   PRULOG_1u32(INFO, "starting reader %uns", PERIOD / 2);
-  PWM_ClearInterrupt();
 
   Timestamp clock;
   ReadClock(&clock);
   while (1) {
-    uint32_t value = GPIO_GetPin(pin);
+    uint32_t cap = CT_ECAP.TSCTR;
+    uint32_t pwm = PWMSS1.EPWM_TBCNT;
 
-    // uint32_t val1 = PWMSS1.EPWM_TBCNT;
-    // uint32_t val2 = PWMSS1.EPWM_ETPS;
-    // uint32_t val2 = PWMSS1.EPWM_ETFLG;
-    // uint32_t val2 = PWMSS1.EPWM_ETSEL;
-    // uint32_t val2 = PWMSS1.EPWM_CMPB;
-    // uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_SERH)];
-    uint32_t val1 = EDMA_BASE[SHADOW1(EDMAREG_IER)];
-    uint32_t val2 = EDMA_BASE[SHADOW1(EDMAREG_IERH)];
+    PRULOG_2u32(INFO_NOYIELD, "read clocks cap %u tbcnt %u", cap, pwm);
 
-    val1 = CT_INTC.ESR0;
-    val2 = CT_INTC.ESR1;
-
-    PRULOG_2u32(INFO_NOYIELD, "val1 %u val2 %u", val1, val2);
-
-    PWM_ClearInterrupt();
-
-    SleepUntil(&clock, PERIOD / 2);
+    SleepUntil32(&clock, PERIOD / 2);
   }
 }
 
@@ -68,23 +59,26 @@ int main(void) {
   Args args;
 
   Init(NewSystemConfig());
-  PWM_Init();
+  PWM_Init(5000, 10000, 7500);
   InterruptServiceInit();
   ClockInit();
   RpmsgInit(&__transport, &resourceTable.rpmsg_vdev, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1);
-  GPIO_Init();
   SyslogInit();
   ProcessInit();
+  CAP_Init();
 
-  args.ptr = "0";
+  args.ptr = "0"; // @@@
 
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
-  InterruptHandlerInit(SYSEVT_EPWM1_INTR_PEND, pwmHandler);
+  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler, args);
+  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, ecapHandler, args);
 
+  // @@@ TODO remove
+  PWM_ClearInterrupt();
+
+  CAP_Enable();
   PWM_Enable();
-
-  // @@@ TODO need to add this call in other tests, examples...
   ControllerEnable();
 
   return Run();

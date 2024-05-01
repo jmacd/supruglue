@@ -21,14 +21,15 @@ struct _TestInterruptController {
     for (int i = 0; i < NUM_SYSEVTS; i++) {
       if (_pending[i]) {
         _pending[i] = false;
-        _handler[i]();
+        _handler[i](_args[i]);
       }
     }
   }
 
-  void Init(uint8_t evt, InterruptHandler *handler) {
+  void Init(uint8_t evt, InterruptHandler *handler, Args args) {
     absl::MutexLock lock(&_lock);
     _handler[evt] = handler;
+    _args[evt] = args;
   }
 
   void Raise(uint8_t evt) {
@@ -39,6 +40,7 @@ struct _TestInterruptController {
   absl::Mutex                _lock;
   vector<bool>               _pending;
   vector<InterruptHandler *> _handler;
+  vector<Args>               _args;
 };
 
 void ControllerInit(void) {
@@ -49,8 +51,8 @@ void ServiceInterrupts(void) {
   __controller.test->Service();
 }
 
-void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler) {
-  __controller.test->Init(evt, handler);
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler, Args args) {
+  __controller.test->Init(evt, handler, args);
 }
 
 void RaiseInterrupt(uint8_t evt) {

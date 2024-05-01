@@ -1,0 +1,64 @@
+Offset,Name,Description
+0h,REVID,Revision ID Register
+4h,CR,Control Register
+10h,GER,Global Host Interrupt Enable Register
+1Ch,GNLR,Global Nesting Level Register
+20h,SISR,System Event Status Indexed Set Register
+24h,SICR,System Event Status Indexed Clear Register
+28h,EISR,System Event Enable Indexed Set Register
+2Ch,EICR,System Event Enable Indexed Clear Register
+34h,HIEISR,Host Interrupt Enable Indexed Set Register
+38h,HIDISR,Host Interrupt Enable Indexed Clear Register
+80h,GPIR,Global Prioritized Index Register
+200h,SRSR0,System Event Status Raw/Set Register0
+204h,SRSR1,System Event Status Raw/Set Register1
+280h,SECR0,System Event Status Enabled/Clear Register0
+284h,SECR1,System Event Status Enabled/Clear Register1
+300h,ESR0,System Event Enable Set Register0
+304h,ESR1,System Event Enable Set Register1
+380h,ECR0,System Event Enable Clear Register0
+384h,ECR1,System Event Enable Clear Register1
+400h,CMR0,Channel Map Register0
+404h,CMR1,Channel Map Register1
+408h,CMR2,Channel Map Register2
+40Ch,CMR3,Channel Map Register3
+410h,CMR4,Channel Map Register4
+414h,CMR5,Channel Map Register5
+418h,CMR6,Channel Map Register6
+41Ch,CMR7,Channel Map Register7
+420h,CMR8,Channel Map Register8
+424h,CMR9,Channel Map Register9
+428h,CMR10,Channel Map Register10
+42Ch,CMR11,Channel Map Register11
+430h,CMR12,Channel Map Register12
+434h,CMR13,Channel Map Register13
+438h,CMR14,Channel Map Register14
+43Ch,CMR15,Channel Map Register15
+800h,HMR0,Host Interrupt Map Register0
+804h,HMR1,Host Interrupt Map Register1
+808h,HMR2,Host Interrupt Map Register2
+900h,HIPIR0,Host Interrupt Prioritized Index Register0
+904h,HIPIR1,Host Interrupt Prioritized Index Register1
+908h,HIPIR2,Host Interrupt Prioritized Index Register2
+90Ch,HIPIR3,Host Interrupt Prioritized Index Register3
+910h,HIPIR4,Host Interrupt Prioritized Index Register4
+914h,HIPIR5,Host Interrupt Prioritized Index Register5
+918h,HIPIR6,Host Interrupt Prioritized Index Register6
+91Ch,HIPIR7,Host Interrupt Prioritized Index Register7
+920h,HIPIR8,Host Interrupt Prioritized Index Register8
+924h,HIPIR9,Host Interrupt Prioritized Index Register9
+D00h,SIPR0,System Event Polarity Register0
+D04h,SIPR1,System Event Polarity Register1
+D80h,SITR0,System Event Type Register0
+D84h,SITR1,System Event Type Register1
+1100h,HINLR0,Host Interrupt Nesting Level Register0
+1104h,HINLR1,Host Interrupt Nesting Level Register1
+1108h,HINLR2,Host Interrupt Nesting Level Register2
+110Ch,HINLR3,Host Interrupt Nesting Level Register3
+1110h,HINLR4,Host Interrupt Nesting Level Register4
+1114h,HINLR5,Host Interrupt Nesting Level Register5
+1118h,HINLR6,Host Interrupt Nesting Level Register6
+111Ch,HINLR7,Host Interrupt Nesting Level Register7
+1120h,HINLR8,Host Interrupt Nesting Level Register8
+1124h,HINLR9,Host Interrupt Nesting Level Register9
+1500h,HIER,Host Interrupt Enable Register

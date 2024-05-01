@@ -1,0 +1,5 @@
+Offset,Name,Description
+0h,IDVER,IP Revision Register
+4h,SYSCONFIG,System Configuration Register
+8h,CLKCONFIG,Clock Configuration Register
+Ch,CLKSTATUS,Clock Status Register

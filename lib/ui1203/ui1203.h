@@ -5,19 +5,38 @@
 #define LIB_UI1203_SUPRUGLUE_UI1203_H
 
 #include "lib/gpio/gpio.h"
+#include "lib/sync/sync.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-  gpio_pin clock;
-  gpio_pin data;
+  Semaphore sem;
+  gpio_pin  data_in;
+
+  // Clock is configured through ePWM output
+
 } UI1203_Reader;
 
-// void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin clock, gpio_pin data);
+typedef struct {
+  Semaphore sem;
+  gpio_pin  data_out;
 
-// void UI1203_Run_Reader(UI1203_Reader *rdr);
+  // Clock is configured through eCAP input
+
+} UI1203_Writer;
+
+// Note! Uses ePWM1 to generate clock.  Uses GPIO to read.
+void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin data);
+
+// Note! Uses PRU-eCAP0 to receive clock.  Uses GPIO to write.
+void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data);
+
+// Internal.
+
+int32_t asciiToBits(int32_t c);
+int32_t bitsToAscii(int32_t b);
 
 #ifdef __cplusplus
 }

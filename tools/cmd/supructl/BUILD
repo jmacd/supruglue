@@ -7,7 +7,11 @@ go_library(
     importpath = "github.com/jmacd/supruglue/tools/cmd/supructl",
     visibility = ["//visibility:private"],
     deps = [
+        "//arch/am335x",
+        "//tools/internal/arch",
+        "//tools/internal/csv",
         "//tools/internal/firmware",
+        "//tools/internal/memorymap",
         "//tools/internal/remoteproc",
         "//tools/internal/rpmsghost",
         "@com_github_spf13_cobra//:cobra",

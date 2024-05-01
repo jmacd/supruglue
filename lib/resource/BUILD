@@ -9,11 +9,11 @@ cc_library(
     hdrs = [
         "table.h",
     ],
-    deps = [
-        "@ti-pru-support//include",
-    ],
     target_compatible_with = select({
         "//tools/toolchain:am335x": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    deps = [
+        "@ti-pru-support//include",
+    ],
 )

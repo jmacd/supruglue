@@ -6,19 +6,21 @@
 
 #include <stdint.h>
 
+#include "lib/args/args.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct _InterruptController InterruptController;
 
-typedef void(InterruptHandler)(void);
+typedef void(InterruptHandler)(Args);
 
 extern InterruptController __controller;
 
 void ControllerInit(void);
 void ControllerEnable(void);
-void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler);
+void InterruptHandlerInit(uint8_t evt, InterruptHandler *handler, Args args);
 void ServiceInterrupts(void);
 
 #ifdef __cplusplus

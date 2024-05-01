@@ -18,9 +18,9 @@ cc_binary(
         "//lib/initproc",
         "//lib/intc:service",
         "//lib/log/daemon",
+        "//lib/resource",
         "//lib/rpmsg",
         "//lib/time:process",
-        "//lib/resource",
         "//tools/toolchain/am335x",
     ],
 )

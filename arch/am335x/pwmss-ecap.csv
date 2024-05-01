@@ -1,0 +1,14 @@
+Offset,Name,Description
+0h,TSCTR,Time-Stamp Counter Register
+4h,CTRPHS,Counter Phase Offset Value Register
+8h,CAP1,Capture 1 Register
+Ch,CAP2,Capture 2 Register
+10h,CAP3,Capture 3 Register
+14h,CAP4,Capture 4 Register
+28h,ECCTL1,Capture Control Register 1
+2Ah,ECCTL2,Capture Control Register 2
+2Ch,ECEINT,Capture Interrupt Enable Register
+2Eh,ECFLG,Capture Interrupt Flag Register
+30h,ECCLR,Capture Interrupt Clear Register
+32h,ECFRC,Capture Interrupt Force Register
+5Ch,REVID,Revision ID Register

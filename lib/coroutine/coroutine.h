@@ -21,7 +21,7 @@ typedef struct _System       System;
 typedef struct _SystemConfig SystemConfig;
 
 struct _SystemConfig {
-  int32_t export_interval;
+  int64_t export_interval;
 };
 
 struct _System {
