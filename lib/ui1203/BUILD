@@ -13,7 +13,6 @@ cc_library(
         "//lib/gpio",
         "//lib/coroutine",
         "//lib/log/journal",
-        "//lib/rpmsg",
         "//lib/time",
         ],
 )
@@ -28,6 +27,8 @@ cc_test(
         "//lib/gpio/test32",
         "//lib/intc",
         "//lib/intc:service",
+        "//lib/log/daemon",
+        "//lib/log/journal",
         "//lib/pinmap",
         "//lib/rpmsg/test32",
         "//lib/time:process",

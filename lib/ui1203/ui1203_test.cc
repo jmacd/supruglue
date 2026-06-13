@@ -7,11 +7,14 @@
 #include "lib/gpio/gpio.h"
 #include "lib/gpio/test32/gpio.h"
 #include "lib/intc/service.h"
+#include "lib/log/daemon/daemon.h"
+#include "lib/log/journal/journal.h"
 #include "lib/pinmap/pinmap.h"
 #include "lib/rpmsg/rpmsg.h"
 #include "lib/time/process.h"
 #include "gtest/gtest.h"
 
+#include <cstring>
 #include <string>
 #include <thread>
 #include <vector>
@@ -38,35 +41,42 @@ static std::vector<int> frameBits(const std::string &s) {
   return bits;
 }
 
-// Feed every bit through the decoder, returning decoded bytes and the number of
-// framing errors reported.
-static std::string decodeAll(const std::vector<int> &bits, int *errors = nullptr) {
+// Feed every bit through the decoder, returning decoded bytes and counting the
+// parity and framing errors reported.
+static std::string decodeAll(const std::vector<int> &bits, int *parity = nullptr, int *framing = nullptr) {
   UI1203_Decoder dec;
   UI1203_DecoderInit(&dec);
 
   std::string out;
-  int         errs = 0;
+  int         perr = 0;
+  int         ferr = 0;
   for (int bit : bits) {
     int32_t byte = 0;
     int     r = UI1203_FeedBit(&dec, bit, &byte);
     if (r == UI1203_BYTE) {
       out.push_back((char)byte);
+    } else if (r == UI1203_PARITY_ERROR) {
+      perr++;
     } else if (r == UI1203_FRAME_ERROR) {
-      errs++;
+      ferr++;
     }
   }
-  if (errors != nullptr) {
-    *errors = errs;
+  if (parity != nullptr) {
+    *parity = perr;
+  }
+  if (framing != nullptr) {
+    *framing = ferr;
   }
   return out;
 }
 
-// A frame-aligned stream decodes exactly.
+// A frame-aligned stream decodes exactly with no errors.
 TEST(Ui1203Decoder, Aligned) {
-  int         errors = -1;
-  std::string got = decodeAll(frameBits("R12\r"), &errors);
+  int         parity = -1, framing = -1;
+  std::string got = decodeAll(frameBits("R12\r"), &parity, &framing);
   EXPECT_EQ("R12\r", got);
-  EXPECT_EQ(0, errors);
+  EXPECT_EQ(0, parity);
+  EXPECT_EQ(0, framing);
 }
 
 // Leading idle (mark) bits do not false-sync; the decoder still recovers the
@@ -83,25 +93,34 @@ TEST(Ui1203Decoder, MisalignedResync) {
   EXPECT_NE(std::string::npos, got.find("R12\r"));
 }
 
-// A corrupted frame is reported as an error, and the decoder re-syncs on the
-// following frames.
-TEST(Ui1203Decoder, FrameErrorAndRecover) {
-  std::vector<int> bits = frameBits("RX\r");
-  // Flip the parity bit (index 8) of the second frame ('X').
-  bits[10 + 8] ^= 1;
+// A flipped parity bit on an aligned frame is reported as a parity error (not a
+// framing error), and the decoder stays aligned to decode the next frame.
+TEST(Ui1203Decoder, ParityError) {
+  std::vector<int> bits = frameBits("R1\r");
+  bits[10 + 8] ^= 1; // parity bit of the second frame ('1')
 
-  int         errors = 0;
-  std::string got = decodeAll(bits, &errors);
-  EXPECT_GE(errors, 1);
+  int         parity = 0, framing = 0;
+  std::string got = decodeAll(bits, &parity, &framing);
+  EXPECT_EQ(1, parity);
+  EXPECT_EQ(0, framing);
   EXPECT_NE(std::string::npos, got.find('R'));
   EXPECT_NE(std::string::npos, got.find('\r'));
 }
 
-// End-to-end: a simulated meter drives the data line in response to the reader's
-// clock toggles, and the real reader thread decodes the reading and delivers it
-// to the host over RPMsg.
+// A flipped stop bit on an aligned frame is reported as a framing error.
+TEST(Ui1203Decoder, FramingError) {
+  std::vector<int> bits = frameBits("R1\r");
+  bits[10 + 9] ^= 1; // stop bit of the second frame ('1')
 
-static const char *const kMeterReading = "R1234\r";
+  int parity = 0, framing = 0;
+  decodeAll(bits, &parity, &framing);
+  EXPECT_EQ(0, parity);
+  EXPECT_EQ(1, framing);
+}
+
+// End-to-end: a simulated meter drives the data line in response to the reader's
+// clock toggles; the real reader thread decodes the reading and its events reach
+// the host over RPMsg as journal log entries delivered by the syslog daemon.
 
 struct FakeMeter {
   gpio_pin         clock;
@@ -127,17 +146,12 @@ struct FakeMeter {
 
 UI1203_Reader e2e_reader;
 
-TEST(Ui1203EndToEnd, ReadsReading) {
+// runReader drives the given meter bit stream through the real reader and
+// collects the log entries the host receives, until an entry whose format
+// string contains needle arrives (returning that entry) or a cap is hit.
+static bool runReader(FakeMeter *meter, const char *needle, Entry *found) {
   GPIO_TestReset();
-
-  gpio_pin clock = GPIO_PIN(P9_25);
-  gpio_pin data = GPIO_PIN(P9_23);
-
-  FakeMeter meter;
-  meter.clock = clock;
-  meter.data = data;
-  meter.bits = frameBits(kMeterReading);
-  GPIO_TestSetWriteHook(FakeMeter::hook, &meter);
+  GPIO_TestSetWriteHook(FakeMeter::hook, meter);
 
   auto tt = NewTestTransport();
 
@@ -145,20 +159,58 @@ TEST(Ui1203EndToEnd, ReadsReading) {
   EXPECT_EQ(0, InterruptServiceInit());
   ClockInit();
   GPIO_Init();
+  SyslogInit();
 
-  UI1203_Init_Reader(&e2e_reader, clock, data);
+  UI1203_Init_Reader(&e2e_reader, meter->clock, meter->data);
 
-  std::string received;
-  std::thread client([tt, &received] {
-    char     buf[64];
-    uint16_t blen = sizeof(buf);
-    EXPECT_EQ(0, HostRecv(tt, buf, &blen));
-    received.assign(buf, blen);
+  bool  ok = false;
+  Entry hit;
+  std::thread client([tt, needle, &ok, &hit] {
+    for (int i = 0; i < 200; i++) {
+      Entry    entry;
+      uint16_t blen = sizeof(entry);
+      if (HostRecv(tt, &entry, &blen) != 0) {
+        break;
+      }
+      if (entry.msg != nullptr && std::strstr(entry.msg, needle) != nullptr) {
+        hit = entry;
+        ok = true;
+        break;
+      }
+    }
     Shutdown();
   });
 
   EXPECT_EQ(0, ::Run());
   client.join();
 
-  EXPECT_EQ(kMeterReading, received);
+  if (ok) {
+    *found = hit;
+  }
+  return ok;
+}
+
+TEST(Ui1203EndToEnd, ReadingOverRpmsg) {
+  FakeMeter meter;
+  meter.clock = GPIO_PIN(P9_25);
+  meter.data = GPIO_PIN(P9_23);
+  meter.bits = frameBits("R1234\r");
+
+  Entry found;
+  ASSERT_TRUE(runReader(&meter, "ui1203 reading", &found));
+  EXPECT_EQ(1234u, found.int1.U64);
+  EXPECT_EQ(0u, found.int2.U64); // no errors
+}
+
+TEST(Ui1203EndToEnd, ParityErrorOverRpmsg) {
+  std::vector<int> bits = frameBits("R12\r");
+  bits[10 + 8] ^= 1; // corrupt the parity of the '1' frame
+
+  FakeMeter meter;
+  meter.clock = GPIO_PIN(P9_25);
+  meter.data = GPIO_PIN(P9_23);
+  meter.bits = bits;
+
+  Entry found;
+  ASSERT_TRUE(runReader(&meter, "parity error", &found));
 }

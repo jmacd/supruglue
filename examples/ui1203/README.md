@@ -23,8 +23,13 @@ directly first; if the meter is unreliable, drive RED from a 5 V supply through
 a GPIO-gated transistor/FET switch (data still pulled up to 3.3 V).
 
 Status: the reader is implemented with plain GPIO bit-banging (no ePWM/eCAP/DMA,
-so no device-tree changes for those peripherals are required). The framing
-decoder, the RPMsg delivery of the decoded reading, and a full end-to-end host
-simulation (a fake meter drives the data line in response to the reader's clock
-toggles) are covered by unit tests in `lib/ui1203`. On-hardware bring-up and
-pin/voltage validation are the remaining steps.
+so no device-tree changes for those peripherals are required). All reader output
+— the decoded reading and per-frame parity/framing errors — is emitted through
+the journal logging and delivered to the host over RPMsg as log events by the
+syslog daemon (the host accepts only fixed-size log entries, so the reading is
+logged as its numeric value rather than sent as a raw string). The framing
+decoder, error classification, and a full end-to-end host simulation (a fake
+meter drives the data line in response to the reader's clock toggles, and the
+host observes the reading and error events over RPMsg) are covered by unit tests
+in `lib/ui1203`. On-hardware bring-up and pin/voltage validation are the
+remaining steps.

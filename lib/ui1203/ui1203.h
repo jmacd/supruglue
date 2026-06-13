@@ -53,9 +53,10 @@ typedef struct {
 
 // Result of feeding one bit to the decoder.
 enum {
-  UI1203_NEED_MORE = 0,    // no byte yet
-  UI1203_BYTE = 1,         // a byte was decoded (written to *out)
-  UI1203_FRAME_ERROR = -1, // an aligned frame failed validation; sync was lost
+  UI1203_NEED_MORE = 0,     // no byte yet
+  UI1203_BYTE = 1,          // a byte was decoded (written to *out)
+  UI1203_FRAME_ERROR = -1,  // an aligned frame had a bad start/stop bit
+  UI1203_PARITY_ERROR = -2, // an aligned frame had a parity mismatch
 };
 
 void UI1203_DecoderInit(UI1203_Decoder *dec);

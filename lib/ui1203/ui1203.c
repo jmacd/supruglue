@@ -5,7 +5,6 @@
 #include "lib/coroutine/coroutine.h"
 #include "lib/gpio/gpio.h"
 #include "lib/log/journal/journal.h"
-#include "lib/rpmsg/rpmsg.h"
 #include "lib/time/clock.h"
 
 // Per-bit half-period. The protocol is slow and timing-tolerant; ~1ms per
@@ -65,10 +64,14 @@ int UI1203_FeedBit(UI1203_Decoder *dec, int bit, int32_t *out) {
     return UI1203_BYTE;
   }
 
-  // A single frame failed validation. The meter transmits contiguous,
+  // A single aligned frame failed validation. The meter transmits contiguous,
   // frame-aligned bytes, so this is most likely a transient bit error: surface
-  // it but stay aligned so the next frame still decodes.
-  return UI1203_FRAME_ERROR;
+  // it (distinguishing a bad start/stop bit from a parity mismatch) but stay
+  // aligned so the next frame still decodes.
+  if ((dec->window & 0x201) != 0x200) {
+    return UI1203_FRAME_ERROR;
+  }
+  return UI1203_PARITY_ERROR;
 }
 
 // powerUp applies continuous power so the meter resets and begins transmitting.
@@ -94,11 +97,14 @@ static int readBit(UI1203_Reader *rdr) {
   return GPIO_GetPin(rdr->data_in) == 0 ? 1 : 0;
 }
 
-// readMessage reads one whole reading into rdr->message, returning the number
-// of bytes (including the terminating carriage return), or 0 on timeout.
-static uint32_t readMessage(UI1203_Reader *rdr) {
+// readMessage reads one whole reading into rdr->message, logging each
+// parity/framing error as it occurs. On return *errors holds the number of
+// errors seen; the return value is the message length (including the
+// terminating carriage return), or 0 if no complete message was read.
+static uint32_t readMessage(UI1203_Reader *rdr, uint32_t *errors) {
   UI1203_Decoder dec;
   uint32_t       i;
+  uint32_t       errs = 0;
 
   UI1203_DecoderInit(&dec);
   rdr->length = 0;
@@ -108,8 +114,14 @@ static uint32_t readMessage(UI1203_Reader *rdr) {
     int32_t byte;
 
     int r = UI1203_FeedBit(&dec, bit, &byte);
+    if (r == UI1203_PARITY_ERROR) {
+      errs++;
+      PRULOG_1u32(WARNING, "ui1203 parity error at byte %u", rdr->length);
+      continue;
+    }
     if (r == UI1203_FRAME_ERROR) {
-      PRULOG_0(WARNING, "ui1203 framing error");
+      errs++;
+      PRULOG_1u32(WARNING, "ui1203 framing error at byte %u", rdr->length);
       continue;
     }
     if (r != UI1203_BYTE) {
@@ -118,10 +130,40 @@ static uint32_t readMessage(UI1203_Reader *rdr) {
 
     rdr->message[rdr->length++] = (char)byte;
     if (byte == '\r') {
+      *errors = errs;
       return rdr->length;
     }
   }
+
+  *errors = errs;
   return 0;
+}
+
+// logReading parses a completed message ("R" followed by decimal digits) and
+// logs its numeric value together with the error count. An unrecognized payload
+// is logged as a distinct warning rather than silently coerced.
+static void logReading(UI1203_Reader *rdr, uint32_t len, uint32_t errors) {
+  uint64_t value = 0;
+  uint32_t digits = 0;
+  uint32_t i;
+
+  if (len > 0 && rdr->message[0] == 'R') {
+    for (i = 1; i < len; i++) {
+      char c = rdr->message[i];
+      if (c < '0' || c > '9') {
+        break;
+      }
+      value = value * 10 + (uint64_t)(c - '0');
+      digits++;
+    }
+  }
+
+  if (digits == 0) {
+    PRULOG_1u32(WARNING, "ui1203 unrecognized reading, %u bytes", len);
+    return;
+  }
+
+  PRULOG_2u64(INFO, "ui1203 reading %u (errors %u)", value, (uint64_t)errors);
 }
 
 // The larger stack is needed for host (test32) testing, where native stack
@@ -141,16 +183,12 @@ void readerRunner(ThreadID tid, Args args) {
   while (1) {
     powerUp(rdr);
 
-    uint32_t len = readMessage(rdr);
+    uint32_t errors = 0;
+    uint32_t len = readMessage(rdr, &errors);
     if (len == 0) {
-      PRULOG_0(WARNING, "ui1203 read timed out");
+      PRULOG_1u32(WARNING, "ui1203 read timed out, %u errors", errors);
     } else {
-      PRULOG_1u32(INFO, "ui1203 read %u bytes", len);
-
-      // Forward the reading to the host, retrying until it is accepted.
-      while (ClientSend(&__transport, rdr->message, (uint16_t)len) != 0) {
-        Sleep32(TIME_SECOND / 2);
-      }
+      logReading(rdr, len, errors);
     }
 
     powerDown(rdr);
