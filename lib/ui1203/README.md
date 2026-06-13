@@ -49,3 +49,9 @@ weak pull-ups cannot reliably source the meter's supply current.
 ### Schematic
 
 ![UI-1203 / Sensus meter to BeagleBone Black interface](sensus_bbb_interface.svg)
+
+## Future work
+
+See [`hardware.md`](hardware.md) for work-in-progress, hypothetical research
+outlining a possible open-source hardware cape (prototype &rarr; verify &rarr;
+small production run) for water systems.
