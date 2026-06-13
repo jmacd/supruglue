@@ -31,6 +31,52 @@ Must succeed before any PCB work begins.
 - Produce a working **device-tree overlay** for those pins. Everything
   downstream (EEPROM contents, silkscreen) depends on this being final.
 
+#### Phase 0 shopping list
+
+Already on hand: ZENNER Stealth Ultrasonic meter (ZSU/ZSUR) and the ZENNER
+Stealth bare-3-wire interface cable.
+
+**Core circuit (required)**
+
+| Item | Spec / suggested part | Qty |
+|------|-----------------------|-----|
+| BeagleBone Black | Rev C (4 GB eMMC) — *if not already owned* | 1 |
+| Level-up buffer | Adafruit 74AHCT125 breakout (#1787) | 1 |
+| Data pull-up resistor | 10 kΩ, ¼ W (assortment pack is handy) | 1+ |
+| Decoupling cap | 0.1 µF ceramic (74AHCT125 VCC) | 1–2 |
+| Half-size breadboard | 400-tie | 1 |
+| Jumper wires | M–M and M–F assortment | 1 pack |
+| 3-pos screw terminal | breadboard-pitch, to land the bare meter cable | 1 |
+
+**BBB host & imaging (required)**
+
+| Item | Spec | Qty |
+|------|------|-----|
+| microSD card | 8–16 GB (flash the new Debian/PRU image) | 1 |
+| microSD reader | if your machine lacks a slot | 1 |
+| USB cable | mini-USB-B (BBB's port — not micro) for power + console | 1 |
+| 5 V barrel supply | 5 V ≥ 2 A, 5.5×2.1 mm center-positive | 1 |
+| Ethernet cable | for networking/SSH | 1 |
+
+**Debug & test (strongly recommended)**
+
+| Item | Why | Qty |
+|------|-----|-----|
+| USB logic analyzer | 8-ch, sigrok/PulseView-compatible — verify power-toggle bit-bang timing & 10-bit framing | 1 |
+| 3.3 V USB-TTL serial cable (FTDI) | BBB J1 serial debug console for headless bring-up | 1 |
+| Multimeter | confirm 5 V buffer output, continuity, pull-up | 1 |
+
+**Optional line protection (nice for a field-facing prototype)**
+
+| Item | Spec | Qty |
+|------|------|-----|
+| Series resistors | 100–330 Ω on the meter clock/data lines | 2 |
+| TVS / clamp diode | low-capacitance, 3.3–5 V standoff, on exposed lines | 1–2 |
+
+Minimum to get a first reading: BBB + 74AHCT125 breakout + 10 kΩ +
+breadboard/jumpers + microSD + mini-USB + power. The logic analyzer is not
+strictly required but saves hours when validating timing.
+
 ### Phase 1 — Schematic capture & review
 
 - Capture in KiCad (open tooling, matches open-hardware intent).
