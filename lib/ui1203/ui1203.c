@@ -5,6 +5,7 @@
 #include "lib/coroutine/coroutine.h"
 #include "lib/gpio/gpio.h"
 #include "lib/log/journal/journal.h"
+#include "lib/rpmsg/rpmsg.h"
 #include "lib/time/clock.h"
 
 // Per-bit half-period. The protocol is slow and timing-tolerant; ~1ms per
@@ -17,9 +18,58 @@
 // Interval between successive whole-message reads.
 #define UI1203_READ_INTERVAL (10 * TIME_SECOND)
 
-// Upper bound on bits read while searching for frame alignment: a few message
-// lengths' worth, so a silent or unsynchronizable line does not loop forever.
-#define UI1203_SYNC_MAX_BITS (UI1203_MSG_MAX * 10 * 2)
+// Upper bound on bits read for one message, generous enough to absorb the
+// initial frame search plus a full reading, so a silent or unsynchronizable
+// line does not loop forever.
+#define UI1203_MAX_BITS (UI1203_MSG_MAX * 10 * 3)
+
+void UI1203_DecoderInit(UI1203_Decoder *dec) {
+  dec->window = 0;
+  dec->synced = 0;
+  dec->count = 0;
+  dec->fill = 0;
+}
+
+int UI1203_FeedBit(UI1203_Decoder *dec, int bit, int32_t *out) {
+  dec->window = (uint16_t)((dec->window >> 1) | ((bit & 1) << 9));
+
+  if (!dec->synced) {
+    // Wait until the window holds ten real bits before attempting to lock, so a
+    // partially filled window cannot produce a false frame match.
+    if (dec->fill < 10) {
+      dec->fill++;
+      if (dec->fill < 10) {
+        return UI1203_NEED_MORE;
+      }
+    }
+
+    int32_t v = bitsToAscii(dec->window);
+    if (v < 0) {
+      return UI1203_NEED_MORE;
+    }
+    dec->synced = 1;
+    dec->count = 0;
+    *out = v;
+    return UI1203_BYTE;
+  }
+
+  // Aligned: a frame completes every 10 bits.
+  if (++dec->count < 10) {
+    return UI1203_NEED_MORE;
+  }
+  dec->count = 0;
+
+  int32_t v = bitsToAscii(dec->window);
+  if (v >= 0) {
+    *out = v;
+    return UI1203_BYTE;
+  }
+
+  // A single frame failed validation. The meter transmits contiguous,
+  // frame-aligned bytes, so this is most likely a transient bit error: surface
+  // it but stay aligned so the next frame still decodes.
+  return UI1203_FRAME_ERROR;
+}
 
 // powerUp applies continuous power so the meter resets and begins transmitting.
 static void powerUp(UI1203_Reader *rdr) {
@@ -44,39 +94,44 @@ static int readBit(UI1203_Reader *rdr) {
   return GPIO_GetPin(rdr->data_in) == 0 ? 1 : 0;
 }
 
-// syncByte slides a 10-bit window one bit at a time until a valid frame is
-// found, establishing byte alignment. Returns the decoded ASCII value, or -1 if
-// no valid frame appears within UI1203_SYNC_MAX_BITS.
-static int32_t syncByte(UI1203_Reader *rdr) {
-  uint16_t window = 0;
-  uint32_t i;
+// readMessage reads one whole reading into rdr->message, returning the number
+// of bytes (including the terminating carriage return), or 0 on timeout.
+static uint32_t readMessage(UI1203_Reader *rdr) {
+  UI1203_Decoder dec;
+  uint32_t       i;
 
-  for (i = 0; i < UI1203_SYNC_MAX_BITS; i++) {
-    int bit = readBit(rdr);
-    window = (uint16_t)((window >> 1) | (bit << 9));
+  UI1203_DecoderInit(&dec);
+  rdr->length = 0;
 
-    int32_t data = bitsToAscii(window);
-    if (data >= 0) {
-      return data;
+  for (i = 0; i < UI1203_MAX_BITS && rdr->length < UI1203_MSG_MAX; i++) {
+    int     bit = readBit(rdr);
+    int32_t byte;
+
+    int r = UI1203_FeedBit(&dec, bit, &byte);
+    if (r == UI1203_FRAME_ERROR) {
+      PRULOG_0(WARNING, "ui1203 framing error");
+      continue;
+    }
+    if (r != UI1203_BYTE) {
+      continue;
+    }
+
+    rdr->message[rdr->length++] = (char)byte;
+    if (byte == '\r') {
+      return rdr->length;
     }
   }
-  return -1;
+  return 0;
 }
 
-// readByte reads exactly one frame-aligned byte (10 bits) and decodes it.
-// Returns the ASCII value, or -1 on a framing/parity error.
-static int32_t readByte(UI1203_Reader *rdr) {
-  uint16_t window = 0;
-  int      b;
-
-  for (b = 0; b < 10; b++) {
-    int bit = readBit(rdr);
-    window = (uint16_t)((window >> 1) | (bit << 9));
-  }
-  return bitsToAscii(window);
-}
-
+// The larger stack is needed for host (test32) testing, where native stack
+// frames are bigger than the compact clpru ones; on the PRU a 256 byte stack
+// is sufficient and DMEM is tight.
+#if defined(SUPRUGLUE_TEST32)
+SUPRUGLUE_DEFINE_THREAD(ui1203reader, 512);
+#else
 SUPRUGLUE_DEFINE_THREAD(ui1203reader, 256);
+#endif
 
 void readerRunner(ThreadID tid, Args args) {
   UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
@@ -86,26 +141,17 @@ void readerRunner(ThreadID tid, Args args) {
   while (1) {
     powerUp(rdr);
 
-    rdr->length = 0;
-
-    // Synchronize to the first frame, then read aligned bytes until the
-    // terminating carriage return or the message buffer fills.
-    int32_t data = syncByte(rdr);
-    while (data >= 0 && rdr->length < UI1203_MSG_MAX) {
-      rdr->message[rdr->length++] = (char)data;
-      if (data == '\r') {
-        break;
-      }
-      data = readByte(rdr);
-    }
-
-    if (data < 0) {
-      PRULOG_1u32(WARNING, "ui1203 framing error after %u bytes", rdr->length);
+    uint32_t len = readMessage(rdr);
+    if (len == 0) {
+      PRULOG_0(WARNING, "ui1203 read timed out");
     } else {
-      PRULOG_1u32(INFO, "ui1203 read %u bytes", rdr->length);
-    }
+      PRULOG_1u32(INFO, "ui1203 read %u bytes", len);
 
-    // TODO(M2): forward rdr->message to the host over RPMsg.
+      // Forward the reading to the host, retrying until it is accepted.
+      while (ClientSend(&__transport, rdr->message, (uint16_t)len) != 0) {
+        Sleep32(TIME_SECOND / 2);
+      }
+    }
 
     powerDown(rdr);
     SleepUntil32(&clock, UI1203_READ_INTERVAL);

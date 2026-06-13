@@ -40,6 +40,31 @@ typedef struct {
 // starts the reader thread.
 void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin clock, gpio_pin data);
 
+// UI1203_Decoder turns a stream of received bits into framed ASCII bytes. It
+// first slides a 10-bit window to find frame alignment, then reads one byte per
+// 10 aligned bits. A framing/parity failure after alignment drops sync so the
+// decoder re-aligns on the following bits.
+typedef struct {
+  uint16_t window;
+  uint8_t  synced;
+  uint8_t  count;
+  uint8_t  fill;
+} UI1203_Decoder;
+
+// Result of feeding one bit to the decoder.
+enum {
+  UI1203_NEED_MORE = 0,    // no byte yet
+  UI1203_BYTE = 1,         // a byte was decoded (written to *out)
+  UI1203_FRAME_ERROR = -1, // an aligned frame failed validation; sync was lost
+};
+
+void UI1203_DecoderInit(UI1203_Decoder *dec);
+
+// UI1203_FeedBit consumes one received bit (already de-inverted: 1 = mark).
+// Returns one of the UI1203_* result codes; on UI1203_BYTE, *out holds the
+// ASCII value.
+int UI1203_FeedBit(UI1203_Decoder *dec, int bit, int32_t *out);
+
 // Internal: framing/parity codec shared with the unit tests.
 //
 // asciiToBits encodes a 7-bit ASCII character into a 10-bit UI-1203 frame.
