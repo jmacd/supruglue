@@ -18,27 +18,23 @@ extern "C" {
 #include "lib/time/test32/clock-test32.h"
 #endif
 
-void Sleep32(uint32_t cycles);
-void TimeAddCycles32(Timestamp *clock, uint32_t cycles);
 void SleepUntil32(Timestamp *when, uint32_t cycles);
 
-inline void Sleep32(uint32_t cycles) {
+static inline void Sleep32(uint32_t cycles) {
   SleepUntil32(&__system_current->when, cycles);
 }
 
-inline void TimeAddCycles32(Timestamp *clock, uint32_t cycles) {
+static inline void TimeAddCycles32(Timestamp *clock, uint32_t cycles) {
   clock->CYCLES += cycles;
 }
 
-void Sleep64(uint64_t cycles);
-void TimeAddCycles64(Timestamp *clock, uint64_t cycles);
 void SleepUntil64(Timestamp *when, uint64_t cycles);
 
-inline void Sleep64(uint64_t cycles) {
+static inline void Sleep64(uint64_t cycles) {
   SleepUntil64(&__system_current->when, cycles);
 }
 
-inline void TimeAddCycles64(Timestamp *clock, uint64_t cycles) {
+static inline void TimeAddCycles64(Timestamp *clock, uint64_t cycles) {
   clock->CYCLES += cycles;
 }
 
