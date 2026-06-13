@@ -35,8 +35,6 @@ genrule(
         "//arch:sysevts",
         "//lib/rpmsg/am335x:irq",
         "//lib/time/am335x:iep_tim_cap_cmp_pend",
-        "//lib/pwm/am335x:epwm1_intr_pend",
-        "//lib/cap/am335x:pru_ecap_intr_pend",
     ],
     outs = [
         "irq.c",

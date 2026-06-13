@@ -11,12 +11,9 @@ cc_library(
     ],
     deps = [
         "//lib/gpio",
-        "//lib/pwm",
-        "//lib/cap",
-        "//lib/sync",
-        "//lib/time",
         "//lib/coroutine",
         "//lib/log/journal",
+        "//lib/time",
         ],
 )
 
