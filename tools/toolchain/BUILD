@@ -4,14 +4,6 @@
 
 package(default_visibility = ["//visibility:public"])
 
-cc_toolchain_suite(
-    name = "clpru_suite",
-    toolchains = {
-        "pru": ":pru_toolchain",
-        "darwin": ":pru_toolchain",
-    },
-)
-
 filegroup(
     name = "wrappers_all",
     srcs = glob([

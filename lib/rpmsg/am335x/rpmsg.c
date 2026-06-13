@@ -4,7 +4,7 @@
 #include "rpmsg.h"
 #include <stdint.h>
 
-#include "external/ti-pru-support/include/am335x/pru_intc.h"
+#include "include/am335x/pru_intc.h"
 #include "lib/debug/debug.h"
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg-defs.h"

@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 // @@@ TODO: here for diagnostics, remove!
-#include "external/ti-pru-support/include/am335x/pru_ecap.h"
-#include "external/ti-pru-support/include/am335x/pru_intc.h"
-#include "external/ti-pru-support/include/am335x/sys_pwmss.h"
+#include "include/am335x/pru_ecap.h"
+#include "include/am335x/pru_intc.h"
+#include "include/am335x/sys_pwmss.h"
 
 #include "lib/args/args.h"
 #include "lib/cap/cap.h"

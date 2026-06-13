@@ -51,7 +51,8 @@ As space becomes tight, more space-optimization will likely be needed.
 This project pins a specific Bazel version in `.bazelversion`, so it is
 easiest to invoke Bazel through [Bazelisk](https://github.com/bazelbuild/bazelisk)
 (`brew install bazelisk`), which downloads and runs the pinned version
-automatically as `bazel`.
+automatically as `bazel`. External dependencies are managed with Bzlmod in
+`MODULE.bazel`.
 
 To build PRU firmware with TI's compiler for PRU-0:
 

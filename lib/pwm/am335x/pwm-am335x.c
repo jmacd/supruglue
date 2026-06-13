@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "external/ti-pru-support/include/am335x/sys_pwmss.h"
+#include "include/am335x/sys_pwmss.h"
 
 #include "pwm-am335x.h"
 

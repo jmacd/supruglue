@@ -1,0 +1,62 @@
+module(
+    name = "supruglue",
+    version = "0.0.0",
+)
+
+# Core Bazel modules. repo_name keeps the historical apparent repository
+# names that BUILD files and gazelle-generated rules already reference.
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(
+    name = "googletest",
+    version = "1.15.2",
+    repo_name = "com_google_googletest",
+)
+bazel_dep(
+    name = "abseil-cpp",
+    version = "20240722.0",
+    repo_name = "com_google_absl",
+)
+bazel_dep(
+    name = "rules_go",
+    version = "0.50.1",
+    repo_name = "io_bazel_rules_go",
+)
+bazel_dep(
+    name = "gazelle",
+    version = "0.39.1",
+    repo_name = "bazel_gazelle",
+)
+
+# Go SDK (pinned to match go.mod) and module dependencies from go.mod.
+go_sdk = use_extension("@io_bazel_rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.download(version = "1.20.7")
+
+go_deps = use_extension("@bazel_gazelle//:extensions.bzl", "go_deps")
+go_deps.from_file(go_mod = "//:go.mod")
+use_repo(
+    go_deps,
+    "com_github_mitchellh_mapstructure",
+    "com_github_spf13_cobra",
+    "in_gopkg_yaml_v3",
+)
+
+# Custom repositories that are not published to the Bazel Central Registry.
+
+# The TI PRU code generation tools, vendored as a tarball.
+local_archive = use_repo_rule("//tools/toolchain/download:local.bzl", "local_archive")
+
+local_archive(
+    name = "ti-cgt-pru",
+    build_file = "//tools/toolchain:ti-cgt-pru.BUILD",
+    src = "//tools/toolchain/download:ti_cgt_pru_2.3.3_osx_installer_x86_64.tar.gz",
+)
+
+# A fork of the TI PRU software support package with a few build workarounds.
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "ti-pru-support",
+    commit = "99c5b892e2e315b8b3bf211c957c26e98c59a870",
+    remote = "git@github.com:jmacd/pru-software-support-package.git",
+)

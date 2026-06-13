@@ -4,7 +4,7 @@
 // TODO: This is a placeholder.  Presently there is nothing
 // configurable here--all the examples use the same resource table.
 
-#include "external/ti-pru-support/include/rsc_types.h"
+#include "include/rsc_types.h"
 
 #define NUM_RESOURCES 1
 

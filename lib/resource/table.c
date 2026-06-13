@@ -6,8 +6,8 @@
 
 #include <stddef.h>
 
-#include "external/ti-pru-support/include/pru_virtio_ids.h"
-#include "external/ti-pru-support/include/rsc_types.h"
+#include "include/pru_virtio_ids.h"
+#include "include/rsc_types.h"
 
 #include "table.h"
 

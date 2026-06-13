@@ -4,8 +4,8 @@
 #ifndef LIB_RPMSG_AM335X_RPMSG_AM335X_H
 #define LIB_RPMSG_AM335X_RPMSG_AM335X_H
 
-#include "external/ti-pru-support/include/pru_rpmsg.h"
-#include "external/ti-pru-support/include/rsc_types.h"
+#include "include/pru_rpmsg.h"
+#include "include/rsc_types.h"
 #include "lib/rpmsg/rpmsg-defs.h"
 #include "lib/sync/sync.h"
 

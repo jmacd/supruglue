@@ -1,6 +1,8 @@
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 load(
     "@rules_cc//cc:cc_toolchain_config_lib.bzl",
+    "env_entry",
+    "env_set",
     "feature",
     "feature_set",
     "flag_group",
@@ -11,6 +13,12 @@ load(
 )
 
 def _impl(ctx):
+    # The TI compiler lives in the @ti-cgt-pru external repository. Under
+    # Bzlmod its exec-root path is a canonical name (e.g.
+    # external/+local_archive+ti-cgt-pru) rather than external/ti-cgt-pru,
+    # so derive it from a known file instead of hard-coding it. clpru is at
+    # <repo>/bin/clpru, so the repo root is the parent of its bin directory.
+    ti_root = ctx.file.ti_clpru.dirname.rpartition("/")[0]
     # See https://stackoverflow.com/questions/73504780/bazel-reference-binaries-from-packages-in-custom-toolchain-definition
     tool_paths = [
         tool_path(
@@ -117,7 +125,7 @@ def _impl(ctx):
                 ],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Iexternal/ti-cgt-pru/include"],
+                        flags = ["-I" + ti_root + "/include"],
                     ),
                 ],
             ),
@@ -139,7 +147,7 @@ def _impl(ctx):
                 ],
                 flag_groups = [
                     flag_group(
-                        flags = ["-iexternal/ti-cgt-pru/lib", "--reread_libs"],
+                        flags = ["-i" + ti_root + "/lib", "--reread_libs"],
                     ),
                 ],
             ),
@@ -170,13 +178,38 @@ def _impl(ctx):
         name = "random_seed",
         enabled = False,
     )
-    
-    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature, linker_flags_feature, strip_debug_symbols_feature]
+
+    # Pass the resolved @ti-cgt-pru repository root to the compiler/linker/ar
+    # wrapper scripts so they can locate the real TI binaries regardless of
+    # the (Bzlmod canonical) external path.
+    ti_tools_env_feature = feature(
+        name = "ti_tools_env",
+        enabled = True,
+        env_sets = [
+            env_set(
+                actions = [
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.assemble,
+                    ACTION_NAMES.cpp_link_executable,
+                    ACTION_NAMES.cpp_link_dynamic_library,
+                    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                    ACTION_NAMES.cpp_link_static_library,
+                ],
+                env_entries = [
+                    env_entry(key = "TI_CGT_PRU_ROOT", value = ti_root),
+                ],
+            ),
+        ],
+    )
+
+    features = [dependency_file_feature, include_paths_feature, random_seed_feature, sysroot_feature, linker_flags_feature, strip_debug_symbols_feature, ti_tools_env_feature]
     
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
         cxx_builtin_include_directories = [
-            "external/ti-cgt-pru/include",
+            ti_root + "/include",
         ],
         toolchain_identifier = "pru-toolchain",
         host_system_name = "local",
@@ -193,6 +226,10 @@ def _impl(ctx):
 cc_toolchain_config = rule(
     implementation = _impl,
     attrs = {
+        "ti_clpru": attr.label(
+            allow_single_file = True,
+            default = Label("@ti-cgt-pru//:bin/clpru"),
+        ),
     },
     provides = [CcToolchainConfigInfo],
 )
