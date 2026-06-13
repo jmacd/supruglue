@@ -11,12 +11,9 @@ cc_library(
     ],
     deps = [
         "//lib/gpio",
-        "//lib/pwm",
-        "//lib/cap",
-        "//lib/sync",
-        "//lib/time",
         "//lib/coroutine",
         "//lib/log/journal",
+        "//lib/time",
         ],
 )
 
@@ -25,6 +22,16 @@ cc_test(
     srcs = ["ui1203_test.cc"],
     deps = [
         ":ui1203",
+        "//lib/coroutine",
+        "//lib/gpio",
+        "//lib/gpio/test32",
+        "//lib/intc",
+        "//lib/intc:service",
+        "//lib/log/daemon",
+        "//lib/log/journal",
+        "//lib/pinmap",
+        "//lib/rpmsg/test32",
+        "//lib/time:process",
         "@com_google_googletest//:gtest_main",
     ],
 )

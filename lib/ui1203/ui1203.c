@@ -2,25 +2,178 @@
 // SPDX-License-Identifier: MIT
 
 #include "lib/ui1203/ui1203.h"
-#include "lib/cap/cap.h"
 #include "lib/coroutine/coroutine.h"
 #include "lib/gpio/gpio.h"
-#include "lib/intc/intc.h"
 #include "lib/log/journal/journal.h"
-#include "lib/pwm/pwm.h"
-#include "lib/soc/sysevts.h"
-#include "lib/sync/sync.h"
 #include "lib/time/clock.h"
-#include <stdio.h>
 
-void readerHandler(Args args) {
-  UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
-  SemaphoreUp(&rdr->sem);
+// Per-bit half-period. The protocol is slow and timing-tolerant; ~1ms per
+// clock phase (power off, then on) is well within spec.
+#define UI1203_BIT_DELAY (TIME_SECOND / 1000)
 
-  // PRULOG_0(INFO_NOYIELD, "pwm interrupt");
+// Continuous power required before the meter begins transmitting.
+#define UI1203_WARMUP (3 * TIME_SECOND)
 
-  PWM_ClearInterrupt();
+// Interval between successive whole-message reads.
+#define UI1203_READ_INTERVAL (10 * TIME_SECOND)
+
+// Upper bound on bits read for one message, generous enough to absorb the
+// initial frame search plus a full reading, so a silent or unsynchronizable
+// line does not loop forever.
+#define UI1203_MAX_BITS (UI1203_MSG_MAX * 10 * 3)
+
+void UI1203_DecoderInit(UI1203_Decoder *dec) {
+  dec->window = 0;
+  dec->synced = 0;
+  dec->count = 0;
+  dec->fill = 0;
 }
+
+int UI1203_FeedBit(UI1203_Decoder *dec, int bit, int32_t *out) {
+  dec->window = (uint16_t)((dec->window >> 1) | ((bit & 1) << 9));
+
+  if (!dec->synced) {
+    // Wait until the window holds ten real bits before attempting to lock, so a
+    // partially filled window cannot produce a false frame match.
+    if (dec->fill < 10) {
+      dec->fill++;
+      if (dec->fill < 10) {
+        return UI1203_NEED_MORE;
+      }
+    }
+
+    int32_t v = bitsToAscii(dec->window);
+    if (v < 0) {
+      return UI1203_NEED_MORE;
+    }
+    dec->synced = 1;
+    dec->count = 0;
+    *out = v;
+    return UI1203_BYTE;
+  }
+
+  // Aligned: a frame completes every 10 bits.
+  if (++dec->count < 10) {
+    return UI1203_NEED_MORE;
+  }
+  dec->count = 0;
+
+  int32_t v = bitsToAscii(dec->window);
+  if (v >= 0) {
+    *out = v;
+    return UI1203_BYTE;
+  }
+
+  // A single aligned frame failed validation. The meter transmits contiguous,
+  // frame-aligned bytes, so this is most likely a transient bit error: surface
+  // it (distinguishing a bad start/stop bit from a parity mismatch) but stay
+  // aligned so the next frame still decodes.
+  if ((dec->window & 0x201) != 0x200) {
+    return UI1203_FRAME_ERROR;
+  }
+  return UI1203_PARITY_ERROR;
+}
+
+// powerUp applies continuous power so the meter resets and begins transmitting.
+static void powerUp(UI1203_Reader *rdr) {
+  GPIO_SetPin(rdr->clock_out, 1);
+  Sleep32(UI1203_WARMUP);
+}
+
+// powerDown removes power from the meter.
+static void powerDown(UI1203_Reader *rdr) {
+  GPIO_SetPin(rdr->clock_out, 0);
+}
+
+// readBit clocks out one bit by cycling power (off, then on) and samples the
+// data line. The data line is open-collector and active LOW, so a LOW level is
+// a 1 bit.
+static int readBit(UI1203_Reader *rdr) {
+  GPIO_SetPin(rdr->clock_out, 0);
+  Sleep32(UI1203_BIT_DELAY);
+  GPIO_SetPin(rdr->clock_out, 1);
+  Sleep32(UI1203_BIT_DELAY);
+
+  return GPIO_GetPin(rdr->data_in) == 0 ? 1 : 0;
+}
+
+// readMessage reads one whole reading into rdr->message, logging each
+// parity/framing error as it occurs. On return *errors holds the number of
+// errors seen; the return value is the message length (including the
+// terminating carriage return), or 0 if no complete message was read.
+static uint32_t readMessage(UI1203_Reader *rdr, uint32_t *errors) {
+  UI1203_Decoder dec;
+  uint32_t       i;
+  uint32_t       errs = 0;
+
+  UI1203_DecoderInit(&dec);
+  rdr->length = 0;
+
+  for (i = 0; i < UI1203_MAX_BITS && rdr->length < UI1203_MSG_MAX; i++) {
+    int     bit = readBit(rdr);
+    int32_t byte;
+
+    int r = UI1203_FeedBit(&dec, bit, &byte);
+    if (r == UI1203_PARITY_ERROR) {
+      errs++;
+      PRULOG_1u32(WARNING, "ui1203 parity error at byte %u", rdr->length);
+      continue;
+    }
+    if (r == UI1203_FRAME_ERROR) {
+      errs++;
+      PRULOG_1u32(WARNING, "ui1203 framing error at byte %u", rdr->length);
+      continue;
+    }
+    if (r != UI1203_BYTE) {
+      continue;
+    }
+
+    rdr->message[rdr->length++] = (char)byte;
+    if (byte == '\r') {
+      *errors = errs;
+      return rdr->length;
+    }
+  }
+
+  *errors = errs;
+  return 0;
+}
+
+// logReading parses a completed message ("R" followed by decimal digits) and
+// logs its numeric value together with the error count. An unrecognized payload
+// is logged as a distinct warning rather than silently coerced.
+static void logReading(UI1203_Reader *rdr, uint32_t len, uint32_t errors) {
+  uint64_t value = 0;
+  uint32_t digits = 0;
+  uint32_t i;
+
+  if (len > 0 && rdr->message[0] == 'R') {
+    for (i = 1; i < len; i++) {
+      char c = rdr->message[i];
+      if (c < '0' || c > '9') {
+        break;
+      }
+      value = value * 10 + (uint64_t)(c - '0');
+      digits++;
+    }
+  }
+
+  if (digits == 0) {
+    PRULOG_1u32(WARNING, "ui1203 unrecognized reading, %u bytes", len);
+    return;
+  }
+
+  PRULOG_2u64(INFO, "ui1203 reading %u (errors %u)", value, (uint64_t)errors);
+}
+
+// The larger stack is needed for host (test32) testing, where native stack
+// frames are bigger than the compact clpru ones; on the PRU a 256 byte stack
+// is sufficient and DMEM is tight.
+#if defined(SUPRUGLUE_TEST32)
+SUPRUGLUE_DEFINE_THREAD(ui1203reader, 512);
+#else
+SUPRUGLUE_DEFINE_THREAD(ui1203reader, 256);
+#endif
 
 void readerRunner(ThreadID tid, Args args) {
   UI1203_Reader *rdr = (UI1203_Reader *)args.ptr;
@@ -28,117 +181,30 @@ void readerRunner(ThreadID tid, Args args) {
   ReadClock(&clock);
 
   while (1) {
-    // Reset state
-    uint16_t position = 0;
-    uint16_t byte = 0;
-    uint16_t count = 0;
+    powerUp(rdr);
 
-    // PWM_Enable();
-
-    for (; position < 32;) {
-      // V;RBxxxxxxx;IByyyyy;Kmmmmm\r
-      // or
-      // Rxxxxyyyyyyyy\r
-
-      // Note that ASCII:
-      // '0' is 0x30 (i.e., decimal 48)
-      // 'R' is 0x52 (i.e., decimal 82)
-      // '\r` is 0xd (i.e., decimal 13)
-
-      for (;; count++) {
-        SemaphoreDown(&rdr->sem);
-
-        int bit = GPIO_GetPin(rdr->data_in);
-
-        // PRULOG_1u32(INFO, "ui1203 read bit 0x%x", bit);
-        byte = (byte >> 1) | (bit << 9);
-
-        int32_t data = bitsToAscii(byte);
-
-        // PRULOG_2u32(INFO, "ui1203 read byte 0x%x %u", byte, parity);
-
-        // When parity matches and the start and stop bits are correct.
-        if (data >= 0) {
-          // output a byte
-          PRULOG_1u32(INFO, "ui1203 byte 0x%x", data);
-
-          if (position != 0 && count > 10) {
-            // PRULOG_1u32(INFO, "ui1203 unused bits: %u", count);
-            break;
-          }
-          position++;
-          count = 0;
-          byte = 0;
-        }
-      }
+    uint32_t errors = 0;
+    uint32_t len = readMessage(rdr, &errors);
+    if (len == 0) {
+      PRULOG_1u32(WARNING, "ui1203 read timed out, %u errors", errors);
+    } else {
+      logReading(rdr, len, errors);
     }
 
-    // PWM_Disable();
-
-    SleepUntil32(&clock, 10 * TIME_SECOND);
+    powerDown(rdr);
+    SleepUntil32(&clock, UI1203_READ_INTERVAL);
   }
 }
 
-SUPRUGLUE_DEFINE_THREAD(ui1203reader, 256);
-SUPRUGLUE_DEFINE_THREAD(ui1203writer, 256);
+void UI1203_Init_Reader(UI1203_Reader *rdr, gpio_pin clock, gpio_pin data) {
+  rdr->clock_out = clock;
+  rdr->data_in = data;
+  rdr->length = 0;
 
-void UI1203_Init_Reader(UI1203_Reader *rd, gpio_pin data_pin) {
-  SemaphoreInit(&rd->sem);
-  rd->data_in = data_pin;
-
-  Args args; // @@@
-  args.ptr = (const char *)rd;
-
-  InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, readerHandler, args);
+  Args args;
+  args.ptr = (const char *)rdr;
 
   Create(&ui1203reader.thread, readerRunner, args, "ui1203reader", sizeof(ui1203reader.space));
-}
-
-void writerHandler(Args args) {
-  // Called after rising edge of clock, produces one bit via GPIO.
-  UI1203_Writer *wr = (UI1203_Writer *)args.ptr;
-  SemaphoreUp(&wr->sem);
-  CAP_ClearInterrupt();
-}
-
-void writerRunner(ThreadID tid, Args args) {
-  UI1203_Writer *wr = (UI1203_Writer *)args.ptr;
-
-  while (1) {
-
-    const char *p = "R";
-
-    for (; *p != 0; p++) {
-
-      int32_t d10 = asciiToBits(*p);
-
-      PRULOG_1u32(INFO, "write word is 0x%x", d10);
-
-      int b;
-      for (b = 0; b < 10; b++) {
-        SemaphoreDown(&wr->sem);
-
-        int32_t bit = d10 & 1;
-        PRULOG_2u32(INFO, "write bit %d is %d", b, bit);
-        GPIO_SetPin(wr->data_out, bit);
-
-        d10 >>= 1;
-      }
-    }
-  }
-}
-
-void UI1203_Init_Writer(UI1203_Writer *wr, gpio_pin data_pin) {
-  SemaphoreInit(&wr->sem);
-
-  wr->data_out = data_pin;
-
-  Args args; // @@@
-  args.ptr = (const char *)wr;
-
-  InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, writerHandler, args);
-
-  Create(&ui1203writer.thread, writerRunner, args, "ui1203writer", sizeof(ui1203writer.space));
 }
 
 // Bits:

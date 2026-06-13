@@ -18,6 +18,16 @@ extern "C" {
 #define GPIO_BANK2 ((gpio_bank *)3)
 #define GPIO_BANK3 ((gpio_bank *)4)
 
+// Test-only hook invoked after every GPIO_SetRegister write, so a simulated
+// peripheral (e.g. a UI-1203 meter) can react to output changes. The hook is
+// not re-entered for writes it performs itself.
+typedef void (*GPIO_WriteHook)(void *ctx, gpio_bank *bank, int reg, uint32_t value);
+
+void GPIO_TestSetWriteHook(GPIO_WriteHook hook, void *ctx);
+
+// Test-only: reset all banks and clear any installed hook.
+void GPIO_TestReset(void);
+
 #ifdef __cplusplus
 }
 #endif
