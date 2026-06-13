@@ -7,6 +7,7 @@
 #include "lib/log/daemon/daemon.h"
 #include "lib/log/journal/journal.h"
 #include "lib/rpmsg/rpmsg.h"
+#include "lib/time/clock.h"
 #include "lib/time/process.h"
 #include "gtest/gtest.h"
 
@@ -24,7 +25,12 @@ using std::vector;
 TEST(InitProc, Simple) {
   auto tt = NewTestTransport();
 
-  EXPECT_EQ(0, Init(NewSystemConfig()));
+  SystemConfig cfg = NewSystemConfig();
+  // Use a short metrics export interval so the test exercises several rounds
+  // quickly. The one-hour production default would make the test run for
+  // minutes and accumulate far more than one second of cycles per round.
+  cfg.export_interval = TIME_SECOND;
+  EXPECT_EQ(0, Init(cfg));
 
   InterruptServiceInit();
   ClockInit();

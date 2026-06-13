@@ -20,6 +20,41 @@ protected:
   Channel(const Channel &other) = delete;
 
 public:
+  // Non-blocking send used from the cooperative PRU scheduler, which must
+  // never block the scheduler thread on the host. Returns 0 if the value was
+  // delivered to a waiting receiver, or -1 if no receiver is ready yet or an
+  // error was injected (mirrors the am335x pru_rpmsg_send retry contract).
+  int try_send(T &&val) {
+    absl::MutexLock lock(&__system_lock);
+    if (__system_shutdown) {
+      return -1;
+    }
+    if (!(_has_receiver && !_has_value)) {
+      return -1;
+    }
+    _has_value = true;
+    if (_has_error) {
+      _val.reset();
+      return -1;
+    }
+    _val = val;
+    return 0;
+  }
+
+  // Non-blocking receive used from the cooperative PRU scheduler. Returns a
+  // value when one is available (which may be empty if an error was injected),
+  // or nullopt if nothing is ready yet so the caller can yield and retry.
+  std::optional<T> try_receive() {
+    absl::MutexLock lock(&__system_lock);
+    _has_receiver = true;
+    if (!_has_value) {
+      return std::nullopt;
+    }
+    _has_receiver = false;
+    _has_value = false;
+    return std::move(_val);
+  }
+
   // causes opposite send() to get a value
   std::optional<T> receive() {
     absl::MutexLock lock(&__system_lock);

@@ -34,7 +34,14 @@ void initProcessThread(ThreadID thid, Args args) {
   }
 }
 
+// The larger stack is needed for host (test32) testing, where native stack
+// frames are bigger than the compact clpru ones; on the PRU a 256 byte stack
+// is sufficient and DMEM is tight.
+#if defined(SUPRUGLUE_TEST32)
+SUPRUGLUE_DEFINE_THREAD(init, 512);
+#else
 SUPRUGLUE_DEFINE_THREAD(init, 256);
+#endif
 
 int ProcessInit(void) {
   Args args;

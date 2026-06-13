@@ -13,7 +13,7 @@ using std::vector;
 InterruptController __controller;
 
 struct _TestInterruptController {
-  _TestInterruptController() : _pending(NUM_SYSEVTS), _handler(NUM_SYSEVTS) {
+  _TestInterruptController() : _pending(NUM_SYSEVTS), _handler(NUM_SYSEVTS), _args(NUM_SYSEVTS) {
   }
 
   void Service() {
