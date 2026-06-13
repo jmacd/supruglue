@@ -176,7 +176,7 @@ def _impl(ctx):
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
         cxx_builtin_include_directories = [
-            "%package(@ti-cgt-pru//include)%",
+            "external/ti-cgt-pru/include",
         ],
         toolchain_identifier = "pru-toolchain",
         host_system_name = "local",
