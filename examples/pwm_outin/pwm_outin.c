@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-// @@@ TODO: here for diagnostics, remove!
+// These headers provide direct register access (PWMSS1, CT_ECAP) for the
+// diagnostic logging in the handlers and runBlue below.
 #include "include/am335x/pru_ecap.h"
-#include "include/am335x/pru_intc.h"
 #include "include/am335x/sys_pwmss.h"
 
 #include "lib/args/args.h"
@@ -67,14 +67,14 @@ int main(void) {
   ProcessInit();
   CAP_Init();
 
-  args.ptr = "0"; // @@@
+  args.ptr = "0";
 
   Create(&blue.thread, runBlue, args, "blue", sizeof(blue.space));
 
   InterruptHandlerInit(SYSEVT_TPCC_INT_PEND_PO1, pwmHandler, args);
   InterruptHandlerInit(SYSEVT_PR1_PRU_ECAP_INTR_REQ, ecapHandler, args);
 
-  // @@@ TODO remove
+  // Clear any spurious PWM event before enabling interrupts.
   PWM_ClearInterrupt();
 
   CAP_Enable();
