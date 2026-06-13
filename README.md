@@ -39,6 +39,8 @@ Sample application goals:
 
 - Pulse counter repeater: count and repeat pulses between a water meter and dosing pump, connect to online monitoring
 - UI1203 meter reader: read UI1203 protocol, connect to online monitoring.
+  See [lib/ui1203](lib/ui1203/README.md) for the protocol, tested hardware, and
+  the BeagleBone Black interface schematic.
 
 If you made it this far, you're probably thinking what I'm thinking.
 Code size is a concern!  The current example application has around

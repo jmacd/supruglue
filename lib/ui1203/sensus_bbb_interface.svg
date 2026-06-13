@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620" font-family="Helvetica, Arial, sans-serif">
+  <style>
+    .wire   { stroke:#222; stroke-width:2; fill:none; }
+    .wire5  { stroke:#c0392b; stroke-width:2.5; fill:none; }
+    .wire3  { stroke:#e67e22; stroke-width:2.5; fill:none; }
+    .wireg  { stroke:#27ae60; stroke-width:2.5; fill:none; }
+    .gnd    { stroke:#555; stroke-width:2; fill:none; }
+    .box    { fill:#f7f9fb; stroke:#333; stroke-width:2; }
+    .pin    { fill:#fff; stroke:#333; stroke-width:1.5; }
+    .lbl    { font-size:13px; fill:#222; }
+    .lblb   { font-size:14px; fill:#111; font-weight:bold; }
+    .small  { font-size:11px; fill:#555; }
+    .node   { fill:#222; }
+    .title  { font-size:20px; fill:#111; font-weight:bold; }
+    .sub    { font-size:12px; fill:#666; }
+  </style>
+
+  <text x="24" y="34" class="title">UI-1203 / Sensus protocol meter &#8594; BeagleBone Black interface</text>
+  <text x="24" y="54" class="sub">DATA: open-collector, 3.3V pull-up direct to GPIO &#8226; CLOCK/POWER: 74AHCT125 buffer drives 5V &#8226; BBB GPIO is NOT 5V tolerant</text>
+
+  <!-- ===================== BeagleBone Black ===================== -->
+  <rect x="40" y="100" width="220" height="430" rx="8" class="box"/>
+  <text x="150" y="128" text-anchor="middle" class="lblb">BeagleBone Black</text>
+  <text x="150" y="146" text-anchor="middle" class="small">P9 header (3.3V logic)</text>
+
+  <!-- BBB pins (right edge) -->
+  <!-- SYS_5V -->
+  <rect x="244" y="180" width="16" height="16" class="pin"/>
+  <text x="236" y="192" text-anchor="end" class="lbl">P9_7  SYS_5V (5V)</text>
+  <!-- 3V3 -->
+  <rect x="244" y="230" width="16" height="16" class="pin"/>
+  <text x="236" y="242" text-anchor="end" class="lbl">P9_3  VDD_3V3</text>
+  <!-- GPIO out clock -->
+  <rect x="244" y="300" width="16" height="16" class="pin"/>
+  <text x="236" y="312" text-anchor="end" class="lbl">GPIO out (CLK)</text>
+  <!-- GPIO in data -->
+  <rect x="244" y="380" width="16" height="16" class="pin"/>
+  <text x="236" y="392" text-anchor="end" class="lbl">GPIO in (DATA)</text>
+  <!-- GND -->
+  <rect x="244" y="470" width="16" height="16" class="pin"/>
+  <text x="236" y="482" text-anchor="end" class="lbl">P9_1  DGND</text>
+
+  <!-- ===================== 74AHCT125 ===================== -->
+  <rect x="430" y="240" width="180" height="140" rx="8" class="box"/>
+  <text x="520" y="266" text-anchor="middle" class="lblb">74AHCT125</text>
+  <text x="520" y="284" text-anchor="middle" class="small">one buffer (level-up)</text>
+  <text x="520" y="300" text-anchor="middle" class="small">3.3V in &#8594; 5V out</text>
+
+  <!-- AHCT VCC pin (top) -->
+  <rect x="512" y="232" width="16" height="16" class="pin"/>
+  <text x="520" y="226" text-anchor="middle" class="small">VCC=5V</text>
+  <!-- AHCT GND pin (bottom) -->
+  <rect x="512" y="372" width="16" height="16" class="pin"/>
+  <text x="520" y="404" text-anchor="middle" class="small">GND</text>
+  <!-- AHCT input (left) -->
+  <rect x="422" y="302" width="16" height="16" class="pin"/>
+  <text x="430" y="336" text-anchor="middle" class="small">A (in)</text>
+  <!-- AHCT /OE tied low -->
+  <text x="430" y="356" text-anchor="middle" class="small">/OE&#8594;GND</text>
+  <!-- AHCT output (right) -->
+  <rect x="602" y="302" width="16" height="16" class="pin"/>
+  <text x="592" y="336" text-anchor="middle" class="small">Y (out 5V)</text>
+
+  <!-- ===================== Pull-up resistor ===================== -->
+  <!-- resistor symbol for data pull-up -->
+  <line x1="320" y1="230" x2="320" y2="350" class="wire3"/>
+  <rect x="310" y="350" width="20" height="46" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="338" y="377" class="small">10k</text>
+  <!-- node where pull-up meets data line -->
+  <circle cx="320" cy="388" r="4" class="node"/>
+  <line x1="320" y1="396" x2="320" y2="388" class="wire"/>
+
+  <!-- ===================== Meter / cable ===================== -->
+  <rect x="740" y="180" width="200" height="300" rx="8" class="box"/>
+  <text x="840" y="208" text-anchor="middle" class="lblb">Sensus meter</text>
+  <text x="840" y="226" text-anchor="middle" class="small">encoded register / cable</text>
+  <text x="840" y="242" text-anchor="middle" class="small">(UI-1203 / Sensus)</text>
+
+  <!-- RED clock/power pin -->
+  <rect x="724" y="300" width="16" height="16" class="pin"/>
+  <circle cx="716" cy="308" r="5" fill="#c0392b"/>
+  <text x="840" y="312" text-anchor="middle" class="lbl">RED &#8211; CLK/PWR (5V)</text>
+  <!-- GREEN data pin (open collector) -->
+  <rect x="724" y="380" width="16" height="16" class="pin"/>
+  <circle cx="716" cy="388" r="5" fill="#27ae60"/>
+  <text x="840" y="384" text-anchor="middle" class="lbl">GREEN &#8211; DATA</text>
+  <text x="840" y="400" text-anchor="middle" class="small">(open collector)</text>
+  <!-- BLACK ground pin -->
+  <rect x="724" y="460" width="16" height="16" class="pin"/>
+  <circle cx="716" cy="468" r="5" fill="#111"/>
+  <text x="840" y="464" text-anchor="middle" class="lbl">BLACK &#8211; GND</text>
+
+  <!-- ===================== Wires ===================== -->
+  <!-- 5V: SYS_5V -> AHCT VCC -->
+  <path class="wire5" d="M260 188 H 520 V 232"/>
+  <text x="300" y="180" class="small" fill="#c0392b">5V (SYS_5V)</text>
+
+  <!-- 3V3: VDD_3V3 -> pull-up top -->
+  <path class="wire3" d="M260 238 H 320 V 230"/>
+  <text x="270" y="232" class="small" fill="#e67e22">3.3V</text>
+
+  <!-- CLK GPIO out -> AHCT input A -->
+  <path class="wire" d="M260 308 H 410 V 310 H 422"/>
+  <text x="300" y="302" class="small">3.3V CLK</text>
+
+  <!-- AHCT output Y -> RED clock/power -->
+  <path class="wire5" d="M618 310 H 680 V 308 H 724"/>
+  <text x="648" y="302" class="small" fill="#c0392b">5V CLK</text>
+
+  <!-- DATA: meter GREEN -> node -> BBB GPIO in ; node also tied to pull-up -->
+  <path class="wireg" d="M724 388 H 320"/>
+  <path class="wire" d="M320 388 H 260"/>
+  <text x="470" y="382" class="small" fill="#27ae60">DATA (max 3.3V at GPIO)</text>
+
+  <!-- Ground rail: BBB GND, AHCT GND, meter GND all common -->
+  <path class="gnd" d="M260 478 H 520 V 388"/>
+  <path class="gnd" d="M520 478 H 724 M724 468 H 700 V 478"/>
+  <circle cx="520" cy="478" r="4" class="node"/>
+  <text x="540" y="498" class="small">common GND</text>
+
+  <!-- ground symbol -->
+  <line x1="640" y1="478" x2="640" y2="510" class="gnd"/>
+  <line x1="624" y1="510" x2="656" y2="510" class="gnd"/>
+  <line x1="630" y1="518" x2="650" y2="518" class="gnd"/>
+  <line x1="636" y1="526" x2="644" y2="526" class="gnd"/>
+
+  <!-- ===================== Legend ===================== -->
+  <rect x="40" y="552" width="900" height="48" rx="6" fill="#fbfbfb" stroke="#ddd"/>
+  <line x1="58" y1="568" x2="92" y2="568" class="wire5"/><text x="100" y="572" class="small">5V signal/rail</text>
+  <line x1="210" y1="568" x2="244" y2="568" class="wire3"/><text x="252" y="572" class="small">3.3V rail</text>
+  <line x1="340" y1="568" x2="374" y2="568" class="wireg"/><text x="382" y="572" class="small">meter data (open-collector)</text>
+  <line x1="588" y1="568" x2="622" y2="568" class="wire"/><text x="630" y="572" class="small">3.3V logic signal</text>
+  <line x1="770" y1="568" x2="804" y2="568" class="gnd"/><text x="812" y="572" class="small">ground</text>
+  <text x="58" y="590" class="small">Note: 74AHCT125 /OE pin tied to GND (always enabled). BBB GPIO is not 5V tolerant &#8212; data line clamps at 3.3V via pull-up only.</text>
+</svg>
