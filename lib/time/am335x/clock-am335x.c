@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include "external/ti-pru-support/include/am335x/pru_ctrl.h"
-#include "external/ti-pru-support/include/am335x/pru_iep.h"
+#include "include/am335x/pru_ctrl.h"
+#include "include/am335x/pru_iep.h"
 
 #include "lib/intc/intc.h"
 #include "lib/soc/sysevts.h"

@@ -4,14 +4,6 @@
 
 package(default_visibility = ["//visibility:public"])
 
-cc_toolchain_suite(
-    name = "clpru_suite",
-    toolchains = {
-        "pru": ":pru_toolchain",
-        "darwin": ":pru_toolchain",
-    },
-)
-
 filegroup(
     name = "wrappers_all",
     srcs = glob([
@@ -38,6 +30,18 @@ load(":cc_toolchain_config.bzl", "cc_toolchain_config")
 
 cc_toolchain_config(
     name = "pru_toolchain_config",
+)
+
+# Platform-based toolchain resolution (Bazel 7+). Selected via
+# --extra_toolchains in the pru0/pru1 .bazelrc configs; only matches
+# target platforms that declare the :am335x constraint, so host and
+# exec-config (Go tools, codegen) C++ compiles fall through to the
+# autodetected host toolchain.
+toolchain(
+    name = "pru_cc_toolchain",
+    target_compatible_with = [":am335x"],
+    toolchain = ":pru_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 
 constraint_setting(name = "pru_soc")

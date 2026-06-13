@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "soc.h"
-#include "external/ti-pru-support/include/am335x/pru_cfg.h"
-#include "external/ti-pru-support/include/am335x/pru_ctrl.h"
+#include "include/am335x/pru_cfg.h"
+#include "include/am335x/pru_ctrl.h"
 
 void SystemOnChipSetup(void) {
   // Allow OCP master port access by the PRU.

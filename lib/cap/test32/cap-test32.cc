@@ -7,3 +7,9 @@
 
 void CAP_Init(void) {
 }
+
+void CAP_Enable(void) {
+}
+
+void CAP_ClearInterrupt(void) {
+}

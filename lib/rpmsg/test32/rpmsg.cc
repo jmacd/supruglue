@@ -3,6 +3,7 @@
 
 #include "rpmsg.h"
 #include "chan.h"
+#include "lib/coroutine/coroutine.h"
 #include <thread>
 
 struct _TestTransport {
@@ -22,11 +23,23 @@ TestTransport *NewTestTransport(void) {
 }
 
 int ClientSend(ClientTransport *transport, const void *data, uint16_t len) {
-  return transport->test->pru_to_host.send(std::string(static_cast<const char *>(data), len));
+  std::string msg(static_cast<const char *>(data), len);
+  // Inside the cooperative scheduler (__system_yield set) the send must not
+  // block the scheduler thread; return a would-block error so the caller can
+  // yield and retry, matching the am335x ClientSend contract.
+  if (__system_yield != NULL) {
+    return transport->test->pru_to_host.try_send(std::move(msg));
+  }
+  return transport->test->pru_to_host.send(std::move(msg));
 }
 
 int ClientRecv(ClientTransport *transport, void *data, uint16_t *len) {
-  std::optional<std::string> r = transport->test->host_to_pru.receive();
+  std::optional<std::string> r;
+  if (__system_yield != NULL) {
+    r = transport->test->host_to_pru.try_receive();
+  } else {
+    r = transport->test->host_to_pru.receive();
+  }
   if (!r) {
     return -1;
   }

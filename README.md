@@ -48,6 +48,12 @@ As space becomes tight, more space-optimization will likely be needed.
 
 ### Quickstart
 
+This project pins a specific Bazel version in `.bazelversion`, so it is
+easiest to invoke Bazel through [Bazelisk](https://github.com/bazelbuild/bazelisk)
+(`brew install bazelisk`), which downloads and runs the pinned version
+automatically as `bazel`. External dependencies are managed with Bzlmod in
+`MODULE.bazel`.
+
 To build PRU firmware with TI's compiler for PRU-0:
 
 ```
@@ -72,10 +78,10 @@ bazel build --config=arm ...
 The example will alternatingly flash two LEDs on pins `P9_23` and `P9_25`.
 
 ```
-bazel build --config=pru0 //examples/two_leds:example_pru0
+bazel build --config=pru0 //examples/two_leds:two_leds
 ```
 
-The firmware is located in `bazel-out/pru-fastbuild/bin/examples/two_leds/example_pru0`
+The firmware is located in `bazel-out/darwin_arm64-fastbuild/bin/examples/two_leds/two_leds`
 
 To build the Supruglue command-line interface,
 
@@ -88,7 +94,7 @@ The program is located in `bazel-bin/tools/cmd/supructl/supructl_/supructl`.
 Copy both to the Beaglebone Black machine, then:
 
 ```
-supructl start --firmware example_pru0
+supructl start --firmware two_leds
 ```
 
 The example starts two threads (one for each LED) in addition to the

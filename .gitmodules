@@ -1,3 +1,8 @@
-[submodule "kernel/ti-linux-kernel-dev"]
-	path = kernel/ti-linux-kernel-dev
-	url = git@github.com:RobertCNelson/ti-linux-kernel-dev.git
+[submodule "kernel/BeagleBoard-DeviceTrees"]
+	path = kernel/BeagleBoard-DeviceTrees
+	url = https://github.com/beagleboard/BeagleBoard-DeviceTrees.git
+	branch = v6.18.x
+[submodule "kernel/bb-kernel"]
+	path = kernel/bb-kernel
+	url = https://github.com/RobertCNelson/bb-kernel.git
+	branch = am33x-v6.18

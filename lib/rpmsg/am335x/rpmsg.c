@@ -4,7 +4,7 @@
 #include "rpmsg.h"
 #include <stdint.h>
 
-#include "external/ti-pru-support/include/am335x/pru_intc.h"
+#include "include/am335x/pru_intc.h"
 #include "lib/debug/debug.h"
 #include "lib/intc/intc.h"
 #include "lib/rpmsg/rpmsg-defs.h"
@@ -80,7 +80,7 @@ int RpmsgInit(ClientTransport *transport, struct fw_rsc_vdev *vdev, struct fw_rs
   sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR0_INTR_REQ;
   sysevt_arm_to_pru = SYSEVT_PR1_PRU_MST_INTR1_INTR_REQ;
 #elif SUPRUGLUE_PRU_NUM == 1
-  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ, &RpmsgKick);
+  InterruptHandlerInit(SYSEVT_PR1_PRU_MST_INTR3_INTR_REQ, &RpmsgKick, args);
   // @@@
   transport->channel_port = RPMSG_CHANNEL_PORT_1;
   sysevt_pru_to_arm = SYSEVT_PR1_PRU_MST_INTR2_INTR_REQ;

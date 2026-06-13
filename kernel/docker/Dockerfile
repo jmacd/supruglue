@@ -1,25 +1,29 @@
-FROM debian:bullseye-slim
+# Image for the Tier 2 *fallback* full kernel build (RobertCNelson/bb-kernel,
+# am33x-v6.18). The DTB-only workflow in ../devicetree is preferred for device
+# tree iteration; build a full kernel only when a CONFIG/driver change is
+# actually required.
+FROM debian:trixie-slim
 
-RUN apt-get -y update
-RUN apt-get -y install gcc-arm-linux-gnueabihf
-RUN apt-get -y install git
-RUN apt-get -y install cpio
-RUN apt-get -y install lz4
-RUN apt-get -y install bc
-RUN apt-get -y install build-essential
-RUN apt-get -y install fakeroot
-RUN apt-get -y install lsb-release
-RUN apt-get -y install lzma
-RUN apt-get -y install man-db
-RUN apt-get -y install gettext
-RUN apt-get -y install bison
-RUN apt-get -y install flex
-RUN apt-get -y install pkg-config
-RUN apt-get -y install libmpc-dev
-RUN apt-get -y install u-boot-tools
-RUN apt-get -y install libncurses-dev:amd64
-RUN apt-get -y install libssl-dev:amd64
-RUN apt-get -y install wget
-RUN apt-get -y install rsync
-RUN apt-get -y install kmod
-
+RUN apt-get -y update && \
+    apt-get -y install --no-install-recommends \
+        bc \
+        bison \
+        build-essential \
+        ca-certificates \
+        ccache \
+        cpio \
+        device-tree-compiler \
+        fakeroot \
+        flex \
+        gcc-arm-linux-gnueabihf \
+        git \
+        kmod \
+        libelf-dev \
+        libncurses-dev \
+        libssl-dev \
+        lz4 \
+        lzma \
+        rsync \
+        u-boot-tools \
+        wget && \
+    rm -rf /var/lib/apt/lists/*

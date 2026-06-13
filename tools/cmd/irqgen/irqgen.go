@@ -81,7 +81,7 @@ func main() {
 #define %s
 
 #include <stdint.h>
-#include "external/ti-pru-support/include/pru_types.h"
+#include "include/pru_types.h"
 #include "lib/soc/sysevts.h"
 
 #pragma DATA_SECTION(supruglue_incoming_irq_rsc, ".pru_irq_map")

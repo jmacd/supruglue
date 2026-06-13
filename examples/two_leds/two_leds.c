@@ -29,12 +29,12 @@ void toggle_blue(ThreadID tid, Args args) {
     PRULOG_0(INFO, "on");
 
     GPIO_SetPin(pin, 1);
-    SleepUntil(&clock, BLUE_PERIOD);
+    SleepUntil32(&clock, BLUE_PERIOD);
 
     PRULOG_0(INFO, "off");
 
     GPIO_SetPin(pin, 0);
-    SleepUntil(&clock, BLUE_PERIOD);
+    SleepUntil32(&clock, BLUE_PERIOD);
   }
 }
 
@@ -48,12 +48,12 @@ void toggle_yellow(ThreadID tid, Args args) {
     PRULOG_0(INFO, "on");
 
     GPIO_SetPin(pin, 1);
-    SleepUntil(&clock, YELLOW_PERIOD);
+    SleepUntil32(&clock, YELLOW_PERIOD);
 
     PRULOG_0(INFO, "off");
 
     GPIO_SetPin(pin, 0);
-    SleepUntil(&clock, YELLOW_PERIOD);
+    SleepUntil32(&clock, YELLOW_PERIOD);
   }
 }
 
