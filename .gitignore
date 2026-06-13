@@ -1,3 +1,4 @@
 bazel-*
 dead.code
 *~
+/kernel/.kernel-build/
