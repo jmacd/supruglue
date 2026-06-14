@@ -82,9 +82,12 @@ strictly required but saves hours when validating timing.
 - Capture in KiCad (open tooling, matches open-hardware intent).
 - ~5 functional parts: 74AHCT125, data pull-up, 3-pin meter connector
   (terminal block or JST), BBB 2×23 headers, I²C EEPROM for cape ID.
-- Add protection on the exposed meter lines: series resistors + TVS/clamp, plus
-  decoupling caps. The meter cable leaves the enclosure, so ESD/transient
-  protection matters for a field-deployed water-system device.
+- Add protection on the exposed meter lines: series resistors (~220 Ω, limit
+  fault/inrush current) plus a **TVS** — a Transient Voltage Suppressor diode
+  that clamps ESD/surge spikes to ground, protecting the not-5V-tolerant BBB
+  GPIO. Plus per-IC decoupling caps (same 0.1 µF type as the Phase 0 BoM). These
+  are already drawn on the prototype [schematic](sensus_bbb_interface.svg) and
+  marked as recommended for robust field deployment.
 
 ### Phase 2 — Cape conformance & layout
 

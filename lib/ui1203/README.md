@@ -50,6 +50,10 @@ weak pull-ups cannot reliably source the meter's supply current.
 
 ![UI-1203 / Sensus meter to BeagleBone Black interface](sensus_bbb_interface.svg)
 
+The schematic also includes the series-resistor and TVS-clamp protection
+(dashed, "field") that is recommended for a robust field deployment but may be
+omitted on the bench prototype.
+
 ## Future work
 
 See [`hardware.md`](hardware.md) for work-in-progress, hypothetical research

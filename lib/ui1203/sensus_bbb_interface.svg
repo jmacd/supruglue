@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" font-family="Helvetica, Arial, sans-serif">
   <style>
     .wire   { stroke:#222; stroke-width:2; fill:none; }
     .wire5  { stroke:#c0392b; stroke-width:2.5; fill:none; }
@@ -7,129 +7,153 @@
     .gnd    { stroke:#555; stroke-width:2; fill:none; }
     .box    { fill:#f7f9fb; stroke:#333; stroke-width:2; }
     .pin    { fill:#fff; stroke:#333; stroke-width:1.5; }
+    .comp   { fill:#fff; stroke:#333; stroke-width:1.8; }
+    .field  { fill:none; stroke:#2980b9; stroke-width:1.5; stroke-dasharray:5 4; }
     .lbl    { font-size:13px; fill:#222; }
     .lblb   { font-size:14px; fill:#111; font-weight:bold; }
     .small  { font-size:11px; fill:#555; }
+    .fieldt { font-size:10px; fill:#2980b9; }
     .node   { fill:#222; }
     .title  { font-size:20px; fill:#111; font-weight:bold; }
     .sub    { font-size:12px; fill:#666; }
   </style>
 
-  <text x="24" y="34" class="title">UI-1203 / Sensus protocol meter &#8594; BeagleBone Black interface</text>
+  <text x="24" y="34" class="title">UI-1203 / Sensus protocol meter &#8594; BeagleBone Black interface (prototype)</text>
   <text x="24" y="54" class="sub">DATA: open-collector, 3.3V pull-up direct to GPIO &#8226; CLOCK/POWER: 74AHCT125 buffer drives 5V &#8226; BBB GPIO is NOT 5V tolerant</text>
+  <text x="24" y="72" class="sub">Dashed blue = recommended for robust field deployment (series resistors + TVS clamps); may be omitted on the bench. Crossing wires without a dot are not connected.</text>
 
   <!-- ===================== BeagleBone Black ===================== -->
-  <rect x="40" y="100" width="220" height="430" rx="8" class="box"/>
-  <text x="150" y="128" text-anchor="middle" class="lblb">BeagleBone Black</text>
-  <text x="150" y="146" text-anchor="middle" class="small">P9 header (3.3V logic)</text>
+  <rect x="40" y="120" width="200" height="470" rx="8" class="box"/>
+  <text x="140" y="150" text-anchor="middle" class="lblb">BeagleBone Black</text>
+  <text x="140" y="170" text-anchor="middle" class="small">P9 header (3.3 V logic)</text>
 
-  <!-- BBB pins (right edge) -->
-  <!-- SYS_5V -->
-  <rect x="244" y="180" width="16" height="16" class="pin"/>
-  <text x="236" y="192" text-anchor="end" class="lbl">P9_7  SYS_5V (5V)</text>
-  <!-- 3V3 -->
-  <rect x="244" y="230" width="16" height="16" class="pin"/>
-  <text x="236" y="242" text-anchor="end" class="lbl">P9_3  VDD_3V3</text>
-  <!-- GPIO out clock -->
-  <rect x="244" y="300" width="16" height="16" class="pin"/>
-  <text x="236" y="312" text-anchor="end" class="lbl">GPIO out (CLK)</text>
-  <!-- GPIO in data -->
-  <rect x="244" y="380" width="16" height="16" class="pin"/>
-  <text x="236" y="392" text-anchor="end" class="lbl">GPIO in (DATA)</text>
-  <!-- GND -->
-  <rect x="244" y="470" width="16" height="16" class="pin"/>
-  <text x="236" y="482" text-anchor="end" class="lbl">P9_1  DGND</text>
+  <rect x="240" y="192" width="16" height="16" class="pin"/>
+  <text x="232" y="204" text-anchor="end" class="lbl">P9_7  SYS_5V (5 V)</text>
+  <rect x="240" y="252" width="16" height="16" class="pin"/>
+  <text x="232" y="264" text-anchor="end" class="lbl">P9_3  VDD_3V3</text>
+  <rect x="240" y="342" width="16" height="16" class="pin"/>
+  <text x="232" y="354" text-anchor="end" class="lbl">GPIO out (CLK)</text>
+  <rect x="240" y="462" width="16" height="16" class="pin"/>
+  <text x="232" y="474" text-anchor="end" class="lbl">GPIO in (DATA)</text>
+  <rect x="240" y="552" width="16" height="16" class="pin"/>
+  <text x="232" y="564" text-anchor="end" class="lbl">P9_1  DGND</text>
 
   <!-- ===================== 74AHCT125 ===================== -->
-  <rect x="430" y="240" width="180" height="140" rx="8" class="box"/>
-  <text x="520" y="266" text-anchor="middle" class="lblb">74AHCT125</text>
-  <text x="520" y="284" text-anchor="middle" class="small">one buffer (level-up)</text>
-  <text x="520" y="300" text-anchor="middle" class="small">3.3V in &#8594; 5V out</text>
+  <rect x="470" y="325" width="170" height="110" rx="8" class="box"/>
+  <text x="555" y="352" text-anchor="middle" class="lblb">74AHCT125</text>
+  <text x="555" y="370" text-anchor="middle" class="small">buffer 3.3 V &#8594; 5 V</text>
+  <text x="555" y="416" text-anchor="middle" class="small">/OE &#8594; GND</text>
+  <rect x="547" y="317" width="16" height="8" class="pin"/>
+  <text x="555" y="312" text-anchor="middle" class="small">VCC = 5 V</text>
+  <rect x="547" y="435" width="16" height="8" class="pin"/>
+  <text x="555" y="458" text-anchor="middle" class="small">GND</text>
+  <rect x="462" y="380" width="8" height="16" class="pin"/>
+  <text x="486" y="393" class="small">A</text>
+  <rect x="640" y="380" width="8" height="16" class="pin"/>
+  <text x="628" y="393" text-anchor="end" class="small">Y</text>
 
-  <!-- AHCT VCC pin (top) -->
-  <rect x="512" y="232" width="16" height="16" class="pin"/>
-  <text x="520" y="226" text-anchor="middle" class="small">VCC=5V</text>
-  <!-- AHCT GND pin (bottom) -->
-  <rect x="512" y="372" width="16" height="16" class="pin"/>
-  <text x="520" y="404" text-anchor="middle" class="small">GND</text>
-  <!-- AHCT input (left) -->
-  <rect x="422" y="302" width="16" height="16" class="pin"/>
-  <text x="430" y="336" text-anchor="middle" class="small">A (in)</text>
-  <!-- AHCT /OE tied low -->
-  <text x="430" y="356" text-anchor="middle" class="small">/OE&#8594;GND</text>
-  <!-- AHCT output (right) -->
-  <rect x="602" y="302" width="16" height="16" class="pin"/>
-  <text x="592" y="336" text-anchor="middle" class="small">Y (out 5V)</text>
+  <!-- ===================== Sensus meter / cable ===================== -->
+  <rect x="940" y="160" width="220" height="440" rx="8" class="box"/>
+  <text x="1050" y="190" text-anchor="middle" class="lblb">Sensus meter</text>
+  <text x="1050" y="210" text-anchor="middle" class="small">encoded register / cable</text>
+  <text x="1050" y="228" text-anchor="middle" class="small">(UI-1203 / Sensus)</text>
 
-  <!-- ===================== Pull-up resistor ===================== -->
-  <!-- resistor symbol for data pull-up -->
-  <line x1="320" y1="230" x2="320" y2="350" class="wire3"/>
-  <rect x="310" y="350" width="20" height="46" fill="#fff" stroke="#333" stroke-width="1.5"/>
-  <text x="338" y="377" class="small">10k</text>
-  <!-- node where pull-up meets data line -->
-  <circle cx="320" cy="388" r="4" class="node"/>
-  <line x1="320" y1="396" x2="320" y2="388" class="wire"/>
+  <rect x="924" y="349" width="16" height="16" class="pin"/>
+  <circle cx="916" cy="357" r="5" fill="#c0392b"/>
+  <text x="1050" y="361" text-anchor="middle" class="lbl">RED &#8211; CLK/PWR (5 V)</text>
+  <rect x="924" y="462" width="16" height="16" class="pin"/>
+  <circle cx="916" cy="470" r="5" fill="#27ae60"/>
+  <text x="1050" y="458" text-anchor="middle" class="lbl">GREEN &#8211; DATA</text>
+  <text x="1050" y="474" text-anchor="middle" class="small">(open collector)</text>
+  <rect x="924" y="512" width="16" height="16" class="pin"/>
+  <circle cx="916" cy="520" r="5" fill="#111"/>
+  <text x="1050" y="524" text-anchor="middle" class="lbl">BLACK &#8211; GND</text>
 
-  <!-- ===================== Meter / cable ===================== -->
-  <rect x="740" y="180" width="200" height="300" rx="8" class="box"/>
-  <text x="840" y="208" text-anchor="middle" class="lblb">Sensus meter</text>
-  <text x="840" y="226" text-anchor="middle" class="small">encoded register / cable</text>
-  <text x="840" y="242" text-anchor="middle" class="small">(UI-1203 / Sensus)</text>
+  <!-- ===================== 5V rail + decoupling ===================== -->
+  <path class="wire5" d="M256 200 H 555 V 317"/>
+  <text x="300" y="192" class="small" fill="#c0392b">5 V (SYS_5V)</text>
+  <circle cx="410" cy="200" r="4" class="node"/>
+  <!-- C1 decoupling cap -->
+  <path class="wire" d="M410 200 V 250"/>
+  <line x1="392" y1="250" x2="428" y2="250" class="comp"/>
+  <line x1="392" y1="260" x2="428" y2="260" class="comp"/>
+  <path class="gnd" d="M410 260 V 640"/>
+  <text x="436" y="259" class="small">C1 0.1 µF</text>
 
-  <!-- RED clock/power pin -->
-  <rect x="724" y="300" width="16" height="16" class="pin"/>
-  <circle cx="716" cy="308" r="5" fill="#c0392b"/>
-  <text x="840" y="312" text-anchor="middle" class="lbl">RED &#8211; CLK/PWR (5V)</text>
-  <!-- GREEN data pin (open collector) -->
-  <rect x="724" y="380" width="16" height="16" class="pin"/>
-  <circle cx="716" cy="388" r="5" fill="#27ae60"/>
-  <text x="840" y="384" text-anchor="middle" class="lbl">GREEN &#8211; DATA</text>
-  <text x="840" y="400" text-anchor="middle" class="small">(open collector)</text>
-  <!-- BLACK ground pin -->
-  <rect x="724" y="460" width="16" height="16" class="pin"/>
-  <circle cx="716" cy="468" r="5" fill="#111"/>
-  <text x="840" y="464" text-anchor="middle" class="lbl">BLACK &#8211; GND</text>
+  <!-- ===================== 3.3V rail + pull-up ===================== -->
+  <path class="wire3" d="M256 260 H 350"/>
+  <text x="270" y="252" class="small" fill="#e67e22">3.3 V</text>
+  <path class="wire3" d="M350 260 V 350"/>
+  <rect x="342" y="350" width="16" height="60" class="comp"/>
+  <text x="366" y="384" class="small">R_pu 10k</text>
+  <path class="wire" d="M350 410 V 470"/>
+  <circle cx="350" cy="470" r="4" class="node"/>
 
-  <!-- ===================== Wires ===================== -->
-  <!-- 5V: SYS_5V -> AHCT VCC -->
-  <path class="wire5" d="M260 188 H 520 V 232"/>
-  <text x="300" y="180" class="small" fill="#c0392b">5V (SYS_5V)</text>
+  <!-- ===================== Clock signal path ===================== -->
+  <!-- GPIO CLK out -> chip A -->
+  <path class="wire" d="M256 350 H 300 V 388 H 462"/>
+  <text x="300" y="344" class="small">3.3 V CLK</text>
+  <!-- chip Y -> series Rs1 -> connector RED, with TVS1 -->
+  <path class="wire5" d="M648 388 H 680 V 357 H 690"/>
+  <rect x="690" y="349" width="50" height="16" class="comp"/>
+  <text x="715" y="343" text-anchor="middle" class="small">Rs 220 Ω</text>
+  <rect x="684" y="333" width="62" height="40" rx="4" class="field"/>
+  <text x="715" y="329" text-anchor="middle" class="fieldt">field</text>
+  <path class="wire5" d="M740 357 H 924"/>
+  <text x="772" y="350" class="small" fill="#c0392b">5 V CLK</text>
+  <!-- TVS1 from clock line to GND -->
+  <circle cx="800" cy="357" r="4" class="node"/>
+  <path class="wire" d="M800 357 V 392"/>
+  <rect x="783" y="392" width="34" height="24" rx="3" class="comp"/>
+  <text x="800" y="408" text-anchor="middle" class="small">TVS</text>
+  <path class="gnd" d="M800 416 V 640"/>
+  <rect x="777" y="386" width="46" height="40" rx="4" class="field"/>
+  <text x="800" y="382" text-anchor="middle" class="fieldt">field</text>
 
-  <!-- 3V3: VDD_3V3 -> pull-up top -->
-  <path class="wire3" d="M260 238 H 320 V 230"/>
-  <text x="270" y="232" class="small" fill="#e67e22">3.3V</text>
+  <!-- ===================== Data signal path ===================== -->
+  <!-- connector GREEN -> TVS2 -> Rs2 -> node(pull-up) -> GPIO in -->
+  <path class="wireg" d="M924 470 H 670"/>
+  <rect x="620" y="462" width="50" height="16" class="comp"/>
+  <text x="645" y="494" text-anchor="middle" class="small">Rs 220 Ω</text>
+  <rect x="614" y="456" width="62" height="40" rx="4" class="field"/>
+  <text x="645" y="452" text-anchor="middle" class="fieldt">field</text>
+  <path class="wire" d="M620 470 H 350"/>
+  <path class="wire" d="M350 470 H 256"/>
+  <text x="430" y="464" text-anchor="middle" class="small" fill="#27ae60">DATA (max 3.3 V at GPIO)</text>
+  <!-- TVS2 from data line to GND -->
+  <circle cx="860" cy="470" r="4" class="node"/>
+  <path class="wire" d="M860 470 V 496"/>
+  <rect x="843" y="496" width="34" height="24" rx="3" class="comp"/>
+  <text x="860" y="512" text-anchor="middle" class="small">TVS</text>
+  <path class="gnd" d="M860 520 V 640"/>
+  <rect x="837" y="490" width="46" height="40" rx="4" class="field"/>
+  <text x="860" y="486" text-anchor="middle" class="fieldt">field</text>
 
-  <!-- CLK GPIO out -> AHCT input A -->
-  <path class="wire" d="M260 308 H 410 V 310 H 422"/>
-  <text x="300" y="302" class="small">3.3V CLK</text>
-
-  <!-- AHCT output Y -> RED clock/power -->
-  <path class="wire5" d="M618 310 H 680 V 308 H 724"/>
-  <text x="648" y="302" class="small" fill="#c0392b">5V CLK</text>
-
-  <!-- DATA: meter GREEN -> node -> BBB GPIO in ; node also tied to pull-up -->
-  <path class="wireg" d="M724 388 H 320"/>
-  <path class="wire" d="M320 388 H 260"/>
-  <text x="470" y="382" class="small" fill="#27ae60">DATA (max 3.3V at GPIO)</text>
-
-  <!-- Ground rail: BBB GND, AHCT GND, meter GND all common -->
-  <path class="gnd" d="M260 478 H 520 V 388"/>
-  <path class="gnd" d="M520 478 H 724 M724 468 H 700 V 478"/>
-  <circle cx="520" cy="478" r="4" class="node"/>
-  <text x="540" y="498" class="small">common GND</text>
-
+  <!-- ===================== Ground bus ===================== -->
+  <path class="gnd" d="M256 640 H 924"/>
+  <path class="gnd" d="M256 560 V 640"/>
+  <path class="gnd" d="M555 443 V 640"/>
+  <path class="gnd" d="M924 520 V 640"/>
+  <circle cx="256" cy="640" r="4" class="node"/>
+  <circle cx="410" cy="640" r="4" class="node"/>
+  <circle cx="555" cy="640" r="4" class="node"/>
+  <circle cx="800" cy="640" r="4" class="node"/>
+  <circle cx="860" cy="640" r="4" class="node"/>
+  <circle cx="924" cy="640" r="4" class="node"/>
+  <text x="600" y="632" class="small">common GND</text>
   <!-- ground symbol -->
-  <line x1="640" y1="478" x2="640" y2="510" class="gnd"/>
-  <line x1="624" y1="510" x2="656" y2="510" class="gnd"/>
-  <line x1="630" y1="518" x2="650" y2="518" class="gnd"/>
-  <line x1="636" y1="526" x2="644" y2="526" class="gnd"/>
+  <line x1="600" y1="640" x2="600" y2="668" class="gnd"/>
+  <line x1="584" y1="668" x2="616" y2="668" class="gnd"/>
+  <line x1="590" y1="676" x2="610" y2="676" class="gnd"/>
+  <line x1="595" y1="684" x2="605" y2="684" class="gnd"/>
 
   <!-- ===================== Legend ===================== -->
-  <rect x="40" y="552" width="900" height="48" rx="6" fill="#fbfbfb" stroke="#ddd"/>
-  <line x1="58" y1="568" x2="92" y2="568" class="wire5"/><text x="100" y="572" class="small">5V signal/rail</text>
-  <line x1="210" y1="568" x2="244" y2="568" class="wire3"/><text x="252" y="572" class="small">3.3V rail</text>
-  <line x1="340" y1="568" x2="374" y2="568" class="wireg"/><text x="382" y="572" class="small">meter data (open-collector)</text>
-  <line x1="588" y1="568" x2="622" y2="568" class="wire"/><text x="630" y="572" class="small">3.3V logic signal</text>
-  <line x1="770" y1="568" x2="804" y2="568" class="gnd"/><text x="812" y="572" class="small">ground</text>
-  <text x="58" y="590" class="small">Note: 74AHCT125 /OE pin tied to GND (always enabled). BBB GPIO is not 5V tolerant &#8212; data line clamps at 3.3V via pull-up only.</text>
+  <rect x="40" y="690" width="1120" height="26" rx="6" fill="#fbfbfb" stroke="#ddd"/>
+  <line x1="58" y1="703" x2="92" y2="703" class="wire5"/><text x="100" y="707" class="small">5 V</text>
+  <line x1="150" y1="703" x2="184" y2="703" class="wire3"/><text x="192" y="707" class="small">3.3 V</text>
+  <line x1="252" y1="703" x2="286" y2="703" class="wireg"/><text x="294" y="707" class="small">meter data (open-collector)</text>
+  <line x1="470" y1="703" x2="504" y2="703" class="wire"/><text x="512" y="707" class="small">3.3 V logic</text>
+  <line x1="600" y1="703" x2="634" y2="703" class="gnd"/><text x="642" y="707" class="small">ground</text>
+  <rect x="710" y="696" width="24" height="14" rx="3" class="field"/><text x="742" y="707" class="small">recommended for field deployment</text>
+  <text x="980" y="707" class="small">74AHCT125 /OE tied to GND (always enabled)</text>
 </svg>
